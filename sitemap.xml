@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://blog.zebedy.com/post/de583f28.html</loc>
+    
+    <lastmod>2024-07-04</lastmod>
+    
+    <title>北京联通异地宽带办理指南 | Undefined</title>
+    <date>1716953487000</date>
+    <desc>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。 1000 Mbps 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30元 500 Mbps 无合约 166 元&#x2F;月 因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。 北京地区的异</desc>
+    <changefreq>weekly</changefreq>
+  </url>
+  
+  <url>
     <loc>https://blog.zebedy.com/post/5f8a6fc4.html</loc>
     
     <lastmod>2024-06-04</lastmod>
@@ -20,17 +31,6 @@
     <title>有点意思的 Python 系列一 数学函数和导数计算 | Undefined</title>
     <date>1717493806000</date>
     <desc>该系列旨在收集整理一些很有意思的 Python 代码，这些代码有些是通过简洁的代码实现了很牛逼的功能，有些则是通过花里胡哨的技巧代码眼花缭乱。 虽然很多代码并不适合日常的使用，但是研究一下相关的机制还是对提升能力有很大的帮助。</desc>
-    <changefreq>weekly</changefreq>
-  </url>
-  
-  <url>
-    <loc>https://blog.zebedy.com/post/de583f28.html</loc>
-    
-    <lastmod>2024-05-29</lastmod>
-    
-    <title>北京联通异地宽带办理指南 | Undefined</title>
-    <date>1716953487000</date>
-    <desc>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。 1000 MB 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30元 500 MB 无合约 166 元&#x2F;月 因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。 北京地区的异地宽带分</desc>
     <changefreq>weekly</changefreq>
   </url>
   
