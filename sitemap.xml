@@ -6,10 +6,8 @@
     
     <lastmod>2024-07-04</lastmod>
     
-    <title>北京联通异地宽带办理指南 | Undefined</title>
-    <date>1716953487000</date>
-    <desc>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。 1000 Mbps 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30元 500 Mbps 无合约 166 元&#x2F;月 因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。 北京地区的异</desc>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
@@ -17,10 +15,8 @@
     
     <lastmod>2024-06-04</lastmod>
     
-    <title>有点意思的 Python 系列二 内置类型增加额外方法 | Undefined</title>
-    <date>1717494351000</date>
-    <desc>我们知道，如果想给一个自定义类型增加对应的方法，可以直接修改这个类就可以了，但是如果我们这个时候想给内置的类型增加一些自定义方法呢？</desc>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
@@ -28,10 +24,8 @@
     
     <lastmod>2024-06-04</lastmod>
     
-    <title>有点意思的 Python 系列一 数学函数和导数计算 | Undefined</title>
-    <date>1717493806000</date>
-    <desc>该系列旨在收集整理一些很有意思的 Python 代码，这些代码有些是通过简洁的代码实现了很牛逼的功能，有些则是通过花里胡哨的技巧代码眼花缭乱。 虽然很多代码并不适合日常的使用，但是研究一下相关的机制还是对提升能力有很大的帮助。</desc>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
@@ -39,10 +33,8 @@
     
     <lastmod>2024-03-24</lastmod>
     
-    <title>macOS GPG 使用指南 | Undefined</title>
-    <date>1683614083000</date>
-    <desc>这篇指南面向的是对 GPG 有了一定了解的的朋友，如果你还不知道 GPG 是什么，那么可能需要先补充一下这部分的基础知识，再来食用比较合适。 如果你已经大概了解 GPG 的一些内容，知道它能用来干什么而且你真的需要用到。那么这篇指南或许对你有一点的帮助。 这篇指南主要针对于 macOS 系统下的 GPG 使用方法，如果你使用的是 Windows 或者 Linux，其中有些内容可能并不适用。 文中使</desc>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
@@ -50,10 +42,8 @@
     
     <lastmod>2022-12-10</lastmod>
     
-    <title>OpenWrt 配置记录 | Undefined</title>
-    <date>1646207015000</date>
-    <desc>这里会增量记录 OpenWrt 相关的一些技巧或者配置方法。</desc>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
@@ -61,10 +51,8 @@
     
     <lastmod>2022-11-24</lastmod>
     
-    <title>更改 macOS 强调色 | Undefined</title>
-    <date>1669300275000</date>
-    <desc>Apple 在 iMac 24” Mac 中首次使用了新的强调色，这些强调色是这些 Mac 独有的。但是现在只要是 macOS 11.3.1 以上的系统，即使不是 iMac 24” 机器，也可以使用这些特有的强调色。</desc>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
@@ -72,10 +60,8 @@
     
     <lastmod>2022-05-31</lastmod>
     
-    <title>搭建家庭私人 GitLab 服务器 | Undefined</title>
-    <date>1644066754000</date>
-    <desc>大概今年（2022）一月中旬的时候入手了一个 R86S 的小主机。因为错过了众筹的车，所以是直接下的单。最后入手了 16G 的黑色千兆版本。不上万兆一个原因是家里没有这个需求，还有一个就是万兆版的没有 NVME 硬盘位，这一点对我还是刚需。</desc>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
@@ -83,10 +69,8 @@
     
     <lastmod>2022-02-14</lastmod>
     
-    <title>GitLab 自动部署 GitHub Pages 博客 | Undefined</title>
-    <date>1644819963000</date>
-    <desc>在之前《搭建家庭私人 GitLab 服务器》说到我现在有这样的需求，而且根据上一篇，我们已经搭建好了这样的一个环境。那么有什么就赶紧用起来吧。</desc>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   
   <url>
@@ -94,10 +78,19 @@
     
     <lastmod>2022-02-05</lastmod>
     
-    <title>Hello World | Undefined</title>
-    <date>1644040310000</date>
-    <desc></desc>
-    <changefreq>weekly</changefreq>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
+  
+
+  <url>
+    <loc>https://blog.zebedy.com/</loc>
+    <lastmod>2024-08-05</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  
+
   
 </urlset>
