@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.ico">
@@ -161,7 +161,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">13</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -310,13 +310,13 @@
 <p>然后重启 OpenWrt，此时内网设备就可以通过浏览器访问 <code>192.168.1.1</code> 登录光猫后台了。</p>
 <h1 id="开启-Dnsmasq-日志"><a href="#开启-Dnsmasq-日志" class="headerlink" title="开启 Dnsmasq 日志"></a>开启 Dnsmasq 日志</h1><p>编辑 <code>dnsmasq</code> 配置 <code>/etc/dnsmasq.conf</code> 文件</p>
 <p>添加以下内容</p>
-<figure class="highlight 1c"><table><tr><td class="code"><pre><span class="line"><span class="built_in">log</span>-queries</span><br><span class="line"><span class="built_in">log</span>-facility=/tmp/dnsmasq.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line"><span class="built_in">log</span>-queries</span><br><span class="line"><span class="built_in">log</span>-facility=<span class="regexp">/tmp/</span>dnsmasq.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
 
 <p>重启 dnsmasq 服务</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">/etc/init.d/dnsmasq restart</span><br></pre></td></tr></table></figure>
 
 <p>添加日志解析器</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/sh</span></span><br><span class="line"></span><br><span class="line">tail -f -n 1 /tmp/dnsmasq.log</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line"></span><br><span class="line">tail -f -n 1 /tmp/dnsmasq.log</span><br></pre></td></tr></table></figure>
 
 <h1 id="系统日志中屏蔽-crontab-相关日志"><a href="#系统日志中屏蔽-crontab-相关日志" class="headerlink" title="系统日志中屏蔽 crontab 相关日志"></a>系统日志中屏蔽 crontab 相关日志</h1><p>编辑系统配置 <code>/etc/config/system</code></p>
 <p>在 <code>system</code> 段中修改相关配置为以下内容</p>
@@ -364,7 +364,7 @@
 
 <div class="copyright">
   &copy; 2022 – 
-  <span itemprop="copyrightYear">2024</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -427,7 +427,7 @@
 
 
   
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script async src="https://busuanzi.icodeq.com/busuanzi.pure.mini.js"></script>
 
 
 

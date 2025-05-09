@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.ico">
@@ -161,7 +161,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">13</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -319,7 +319,7 @@
 <h2 id="创建-GitLab-备份位置"><a href="#创建-GitLab-备份位置" class="headerlink" title="创建 GitLab 备份位置"></a>创建 GitLab 备份位置</h2><p>上面说到了，这个 R86S 自带一个 128G的 EMMC 存储，虽然性能比较差，但是东西不能浪费了。所以这里我拿来作为一个独立的 GitLab 数据备份存储，即使是主硬盘挂了，还有一份独立的备份存在，而且短时间内 128G 还是够用的。</p>
 <h3 id="创建新的硬盘分区"><a href="#创建新的硬盘分区" class="headerlink" title="创建新的硬盘分区"></a>创建新的硬盘分区</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo cfdisk /dev/mmcblk0        # mmcblk0 是 EMMC 设备</span><br><span class="line">sudo mkfs.ext4 /dev/mmcblk0     # 格式化为 ext4</span><br></pre></td></tr></table></figure>
 
-<h3 id="挂载到-x2F-mmc"><a href="#挂载到-x2F-mmc" class="headerlink" title="挂载到 &#x2F;mmc"></a>挂载到 &#x2F;mmc</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo vim /etc/fstab</span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加一行</span></span><br><span class="line">/dev/mmcblk0 /mmc ext4 defaults 0 0</span><br></pre></td></tr></table></figure>
+<h3 id="挂载到-x2F-mmc"><a href="#挂载到-x2F-mmc" class="headerlink" title="挂载到 &#x2F;mmc"></a>挂载到 &#x2F;mmc</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo vim /etc/fstab</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加一行</span></span><br><span class="line">/dev/mmcblk0 /mmc ext4 defaults 0 0</span><br></pre></td></tr></table></figure>
 <h2 id="安装-GitLab"><a href="#安装-GitLab" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h2><h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt install -y curl openssh-server ca-certificates tzdata perl</span><br></pre></td></tr></table></figure>
 <h3 id="添加-GitLab-源"><a href="#添加-GitLab-源" class="headerlink" title="添加 GitLab 源"></a>添加 GitLab 源</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash</span><br></pre></td></tr></table></figure>
 <h3 id="安装-GitLab-1"><a href="#安装-GitLab-1" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt install gitlab-ce</span><br></pre></td></tr></table></figure>
@@ -376,7 +376,7 @@
 
 <div class="copyright">
   &copy; 2022 – 
-  <span itemprop="copyrightYear">2024</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -439,7 +439,7 @@
 
 
   
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script async src="https://busuanzi.icodeq.com/busuanzi.pure.mini.js"></script>
 
 
 

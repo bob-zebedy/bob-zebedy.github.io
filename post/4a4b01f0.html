@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.ico">
@@ -166,7 +166,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">13</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -300,7 +300,7 @@
 <ol>
 <li>卸载旧版本 Docker（如果没安装过，可以省略） <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt remove docker docker-engine docker.io containerd runc</span><br></pre></td></tr></table></figure></li>
 <li>安装必要依赖 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt update &amp;&amp; sudo apt install apt-transport-https ca-certificates curl gnupg lsb-release</span><br></pre></td></tr></table></figure></li>
-<li>添加 apt 源 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg</span><br><span class="line"></span><br><span class="line">echo \</span><br><span class="line"> &quot;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \</span><br><span class="line"><span class="meta"> $</span><span class="bash">(lsb_release -cs) stable<span class="string">&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null</span></span></span><br></pre></td></tr></table></figure></li>
+<li>添加 apt 源 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg</span><br><span class="line"></span><br><span class="line">echo \</span><br><span class="line"> &quot;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \</span><br><span class="line"><span class="meta prompt_"> $</span><span class="language-bash">(lsb_release -cs) stable<span class="string">&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null</span></span></span><br></pre></td></tr></table></figure></li>
 <li>安装 Docker <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt update &amp;&amp; sudo apt install docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure></li>
 <li>启动 Docker <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo systemctl enable docker</span><br><span class="line">sudo systemctl start docker</span><br></pre></td></tr></table></figure></li>
 </ol>
@@ -318,7 +318,7 @@
 <img src="https://zebedy-image.oss-cn-beijing.aliyuncs.com/blog/GitLab-%E8%87%AA%E5%8A%A8%E9%83%A8%E7%BD%B2-GitHub-Pages-%E5%8D%9A%E5%AE%A2/GitLab-Admin-Runners-Register.png" class="" width="243" height="184">
 
 <p>再次通过 ssh 连接 GitLab 服务器注册一个共享 Runner</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo gitlab-runner register</span></span><br><span class="line">Enter the GitLab instance URL (for example, https://gitlab.com/):</span><br><span class="line">http://git.home/            # 本地 GitLab 域名或者IP</span><br><span class="line">Enter the registration token:</span><br><span class="line">xxxxxxxxxxxxxxxx            # 上面获取到的 token</span><br><span class="line">Enter a description for the runner:</span><br><span class="line">[ubuntu]: node              # runner 自定一个名字</span><br><span class="line">Enter tags for the runner (comma-separated):</span><br><span class="line">node                        # runner tag 的名字，通过 tag 指定运行 runner</span><br><span class="line">Registering runner... succeeded                     runner=xxxxxx</span><br><span class="line">Enter an executor: custom, ssh, docker-ssh+machine, kubernetes, docker, docker-ssh, parallels, shell, virtualbox, docker+machine:</span><br><span class="line">docker                      # 这里选择 docker</span><br><span class="line">Enter the default Docker image (for example, ruby:2.6):</span><br><span class="line">node:17                     # docker 镜像以及版本</span><br><span class="line">Runner registered successfully. Feel free to start it, but if it&#x27;s running already the config should be automatically reloaded!</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">sudo</span> gitlab-runner register</span></span><br><span class="line">Enter the GitLab instance URL (for example, https://gitlab.com/):</span><br><span class="line">http://git.home/            # 本地 GitLab 域名或者IP</span><br><span class="line">Enter the registration token:</span><br><span class="line">xxxxxxxxxxxxxxxx            # 上面获取到的 token</span><br><span class="line">Enter a description for the runner:</span><br><span class="line">[ubuntu]: node              # runner 自定一个名字</span><br><span class="line">Enter tags for the runner (comma-separated):</span><br><span class="line">node                        # runner tag 的名字，通过 tag 指定运行 runner</span><br><span class="line">Registering runner... succeeded                     runner=xxxxxx</span><br><span class="line">Enter an executor: custom, ssh, docker-ssh+machine, kubernetes, docker, docker-ssh, parallels, shell, virtualbox, docker+machine:</span><br><span class="line">docker                      # 这里选择 docker</span><br><span class="line">Enter the default Docker image (for example, ruby:2.6):</span><br><span class="line">node:17                     # docker 镜像以及版本</span><br><span class="line">Runner registered successfully. Feel free to start it, but if it&#x27;s running already the config should be automatically reloaded!</span><br></pre></td></tr></table></figure>
 
 <p>当创建好 Runner 之后，再次回到 <code>Runners</code> 页面刷新就可以显示刚刚创建的 Runner 了。</p>
 <h2 id="创建-SSH-密钥对"><a href="#创建-SSH-密钥对" class="headerlink" title="创建 SSH 密钥对"></a>创建 SSH 密钥对</h2><p>在本地或者服务器上执行</p>
@@ -382,7 +382,7 @@
 
 <div class="copyright">
   &copy; 2022 – 
-  <span itemprop="copyrightYear">2024</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -445,7 +445,7 @@
 
 
   
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script async src="https://busuanzi.icodeq.com/busuanzi.pure.mini.js"></script>
 
 
 
