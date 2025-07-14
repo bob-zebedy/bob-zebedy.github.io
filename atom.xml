@@ -6,7 +6,7 @@
   <link href="https://blog.zebedy.com/atom.xml" rel="self"/>
   
   <link href="https://blog.zebedy.com/"/>
-  <updated>2025-05-09T09:02:44.000Z</updated>
+  <updated>2025-07-14T01:54:18.000Z</updated>
   <id>https://blog.zebedy.com/</id>
   
   <author>
@@ -17,50 +17,16 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>北京骑行路线分享 (3/100)</title>
-    <link href="https://blog.zebedy.com/post/6414278d.html"/>
-    <id>https://blog.zebedy.com/post/6414278d.html</id>
-    <published>2025-05-09T09:02:44.000Z</published>
-    <updated>2025-05-09T09:02:44.000Z</updated>
+    <title>macOS Chrome 更新至 138 后提示 &#39;这些扩展程序不再受支持，因此已停用&#39; 解决办法</title>
+    <link href="https://blog.zebedy.com/post/e72f1311.html"/>
+    <id>https://blog.zebedy.com/post/e72f1311.html</id>
+    <published>2025-07-14T01:54:18.000Z</published>
+    <updated>2025-07-14T01:54:18.000Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="路线介绍"><a href="#路线介绍" class="headerlink" title="路线介绍"></a>路线介绍</h1><p>来自于 2025 年环昌平公路车赛个人大组赛</p><span id="more"></span><div class="strava-embed-placeholder" data-embed-type="route" data-embed-id="3352132220659813478" data-full-width="true" data-style="winter" data-terrain="3d" data-from-embed="false"></div><script src="https://strava-embeds.com/embed.js"></script>]]></content>
-    
-    
-    <summary type="html">&lt;h1 id=&quot;路线介绍&quot;&gt;&lt;a href=&quot;#路线介绍&quot; class=&quot;headerlink&quot; title=&quot;路线介绍&quot;&gt;&lt;/a&gt;路线介绍&lt;/h1&gt;&lt;p&gt;来自于 2025 年环昌平公路车赛个人大组赛&lt;/p&gt;</summary>
+    <content type="html"><![CDATA[<p>今天早上发现 macOS Chrome 版本更新到了 138.0.7204.101 打开浏览器的时候提示 “这些扩展程序不再受支持，因此已停用”，简单搜了一下发现有解决办法，但是都是针对于 Windows 下的解决方案。  </p><span id="more"></span><p>但是同时发现了 <a href="https://chromeenterprise.google/intl/zh_cn/policies/?policy=ExtensionManifestV2Availability">ExtensionManifestV2Availability(控制 Manifest V2 扩展程序的可用性)</a> 的官方文档，里面明确写了是支持 macOS 的。<br>简单研究了一下发现使用下面方法即可。  </p><p>打开终端，输入以下内容</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo tee &quot;/Library/Managed Preferences/com.google.Chrome.plist&quot; &gt;/dev/null &lt;&lt;EOF</span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot;</span><br><span class="line">  &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;\&gt;</span><br><span class="line">&lt;plist version=&quot;1.0&quot;&gt;</span><br><span class="line">  &lt;dict&gt;</span><br><span class="line">    &lt;key&gt;ExtensionManifestV2Availability&lt;/key&gt;</span><br><span class="line">    &lt;integer&gt;2&lt;/integer&gt;</span><br><span class="line">  &lt;/dict&gt;</span><br><span class="line">&lt;/plist&gt;</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure><p>完全关闭 Chrome 后再打开，在地址栏输入 <code>chrome://policy/</code> 点击左上角的重新加载政策，然后旧版的扩展就可以继续使用啦。</p>]]></content>
     
     
-    
-    
-  </entry>
-  
-  <entry>
-    <title>北京骑行路线分享 (2/100)</title>
-    <link href="https://blog.zebedy.com/post/af48f428.html"/>
-    <id>https://blog.zebedy.com/post/af48f428.html</id>
-    <published>2025-05-09T09:01:45.000Z</published>
-    <updated>2025-05-09T09:01:45.000Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="路线介绍"><a href="#路线介绍" class="headerlink" title="路线介绍"></a>路线介绍</h1><p>日常骑行路线</p><span id="more"></span><div class="strava-embed-placeholder" data-embed-type="route" data-embed-id="3347441893327307598" data-full-width="true" data-style="winter" data-terrain="3d" data-map-hash="8.17/40.217/116.365" data-from-embed="true"></div><script src="https://strava-embeds.com/embed.js"></script>]]></content>
-    
-    
-    <summary type="html">&lt;h1 id=&quot;路线介绍&quot;&gt;&lt;a href=&quot;#路线介绍&quot; class=&quot;headerlink&quot; title=&quot;路线介绍&quot;&gt;&lt;/a&gt;路线介绍&lt;/h1&gt;&lt;p&gt;日常骑行路线&lt;/p&gt;</summary>
-    
-    
-    
-    
-  </entry>
-  
-  <entry>
-    <title>北京骑行路线分享 (1/100)</title>
-    <link href="https://blog.zebedy.com/post/29dc8686.html"/>
-    <id>https://blog.zebedy.com/post/29dc8686.html</id>
-    <published>2025-05-09T08:55:34.000Z</published>
-    <updated>2025-05-09T08:55:34.000Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="路线介绍"><a href="#路线介绍" class="headerlink" title="路线介绍"></a>路线介绍</h1><p>来自于 2025 年耀骑第一站 昌平 半程路线</p><span id="more"></span><div class="strava-embed-placeholder" data-embed-type="route" data-embed-id="3340566855082934478" data-full-width="true" data-style="winter" data-terrain="3d" data-map-hash="8.22/40.223/116.326" data-from-embed="true"></div><script src="https://strava-embeds.com/embed.js"></script>]]></content>
-    
-    
-    <summary type="html">&lt;h1 id=&quot;路线介绍&quot;&gt;&lt;a href=&quot;#路线介绍&quot; class=&quot;headerlink&quot; title=&quot;路线介绍&quot;&gt;&lt;/a&gt;路线介绍&lt;/h1&gt;&lt;p&gt;来自于 2025 年耀骑第一站 昌平 半程路线&lt;/p&gt;</summary>
+    <summary type="html">&lt;p&gt;今天早上发现 macOS Chrome 版本更新到了 138.0.7204.101 打开浏览器的时候提示 “这些扩展程序不再受支持，因此已停用”，简单搜了一下发现有解决办法，但是都是针对于 Windows 下的解决方案。  &lt;/p&gt;</summary>
     
     
     

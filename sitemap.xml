@@ -2,27 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://blog.zebedy.com/post/6414278d.html</loc>
+    <loc>https://blog.zebedy.com/post/e72f1311.html</loc>
     
-    <lastmod>2025-05-09</lastmod>
-    
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.zebedy.com/post/af48f428.html</loc>
-    
-    <lastmod>2025-05-09</lastmod>
-    
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.zebedy.com/post/29dc8686.html</loc>
-    
-    <lastmod>2025-05-09</lastmod>
+    <lastmod>2025-07-14</lastmod>
     
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -112,7 +94,7 @@
 
   <url>
     <loc>https://blog.zebedy.com/</loc>
-    <lastmod>2025-05-09</lastmod>
+    <lastmod>2025-07-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
