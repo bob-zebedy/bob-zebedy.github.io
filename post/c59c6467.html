@@ -300,9 +300,11 @@
 
 <p>首先需要开启基于硬件的强调色 <code>NSColorSimulateHardwareAccent</code> 功能</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulateHardwareAccent -bool YES</span><br></pre></td></tr></table></figure>
+
 <p>然后通过 <code>NSColorSimulatedHardwareEnclosureNumber</code> 选择其中任意一种颜色。其中可选的颜色选项为 3 到 8 (包含 3 和 8)</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulatedHardwareEnclosureNumber -int 3</span><br></pre></td></tr></table></figure>
-<p>然后重新启动电脑或者退出登录重新登录即可生效。<br>然后在 <strong>系统设置</strong> -&gt; <strong>外观选项卡</strong> -&gt; <strong>强调色</strong> 和 <strong>高亮标记颜色</strong> 选项中会出现一个 <strong>这台Mac</strong> 的颜色选项，其中颜色即为上面设置的颜色。</p>
+
+<p>然后重新启动电脑或者退出登录重新登录即可生效。<br>然后在 <strong>系统设置</strong> -&gt; <strong>外观选项卡</strong> -&gt; <strong>强调色</strong> 和 <strong>高亮标记颜色</strong> 选项中会出现一个 <strong>这台 Mac</strong> 的颜色选项，其中颜色即为上面设置的颜色。</p>
 <p>以下是 <code>NSColorSimulatedHardwareEnclosureNumber</code> 不同值的实际效果</p>
 <img src="https://images.zabrian.com/c5f66aed-fff8-43e1-940d-8388311a0a01/origin" title="颜色 3" style="zoom:57%;" />
 

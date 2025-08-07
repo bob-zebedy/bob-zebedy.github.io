@@ -302,7 +302,7 @@
 <h1 id="内网设备直接访问光猫"><a href="#内网设备直接访问光猫" class="headerlink" title="内网设备直接访问光猫"></a>内网设备直接访问光猫</h1><p>在光猫桥接的情况下，一般 OpenWrt 和光猫的因为不在一个网段下，所以 OpenWrt 分配的 IP 并不能直接访问光猫。但是通过对 OpenWrt 防火墙进行相关的的配置可以实现访问光猫</p>
 <h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ul>
 <li>OpenWrt WAN 口: eth0</li>
-<li>光猫IP: 192.168.1.1</li>
+<li>光猫 IP: 192.168.1.1</li>
 </ul>
 <h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>登录 OpenWrt 后台。在 <code>网络</code> -&gt; <code>防火墙</code> -&gt; <code>自定义规则</code> 下添加以下内容</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">ifconfig eth0 192.168.1.10 netmask 255.255.255.0 broadcast 192.168.1.255</span><br><span class="line">iptables -I forwarding_rule -d 192.168.1.1 -j ACCEPT</span><br><span class="line">iptables -t nat -I postrouting_rule -d 192.168.1.1 -j MASQUERADE</span><br></pre></td></tr></table></figure>
@@ -330,6 +330,7 @@
 
 <p>然后重启 crontab 服务即可</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">/etc/init.d/cron restart</span><br></pre></td></tr></table></figure>
+
     </div>
 
     

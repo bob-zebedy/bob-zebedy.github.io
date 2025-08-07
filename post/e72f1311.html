@@ -296,20 +296,21 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>今天早上发现 macOS Chrome 版本更新到了 138.0.7204.101 打开浏览器的时候提示 “这些扩展程序不再受支持，因此已停用”，简单搜了一下发现有解决办法，但是都是针对于 Windows 下的解决方案。<br>而对于 macOS 有以下两种发放，任选其一即可。  </p>
+        <p>今天早上发现 macOS Chrome 版本更新到了 138.0.7204.101 打开浏览器的时候提示 “这些扩展程序不再受支持，因此已停用”，简单搜了一下发现有解决办法，但是都是针对于 Windows 下的解决方案。<br>而对于 macOS 有以下两种发放，任选其一即可。</p>
 <span id="more"></span>
 
 <h2 id="通过-chrome-flags-推荐"><a href="#通过-chrome-flags-推荐" class="headerlink" title="通过 chrome:&#x2F;&#x2F;flags (推荐)"></a>通过 chrome:&#x2F;&#x2F;flags (推荐)</h2><ol>
 <li>升级到最新版本的 Chrome</li>
 <li>地址栏输入 <code>chrome://flags</code></li>
-<li>以下设置改为 <code>Enabled</code><br> <code>temporary-unexpire-flags-m137</code>  </li>
+<li>以下设置改为 <code>Enabled</code><br><code>temporary-unexpire-flags-m137</code></li>
 <li>重启浏览器并再次打开 <code>chrome://flags</code></li>
-<li>以下设置改为 <code>Disabled</code><br><code>extension-manifest-v2-deprecation-warning</code><br><code>extension-manifest-v2-deprecation-disabled</code><br><code>extension-manifest-v2-deprecation-unsupported</code>  </li>
+<li>以下设置改为 <code>Disabled</code><br><code>extension-manifest-v2-deprecation-warning</code><br><code>extension-manifest-v2-deprecation-disabled</code><br><code>extension-manifest-v2-deprecation-unsupported</code></li>
 <li>以下设置改为 <code>Enabled</code><br><code>allow-legacy-mv2-extensions</code></li>
 <li>重启浏览器</li>
 </ol>
 <h2 id="通过企业政策管理"><a href="#通过企业政策管理" class="headerlink" title="通过企业政策管理"></a>通过企业政策管理</h2><p>根据 <a target="_blank" rel="noopener" href="https://chromeenterprise.google/intl/zh_cn/policies/?policy=ExtensionManifestV2Availability">ExtensionManifestV2Availability</a> 的描述，可以通过通过企业控制管理进行设置。<br>此方法有一隔弊端是 Chrome 会显示一条 <code>您的浏览器由贵单位管理</code> 的提示，只是因为使用了企业管理的配置，所以会提示。实际并无任何企业对你的浏览器进行管理。<br>打开终端，输入以下内容</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> -p <span class="string">&quot;/Library/Managed Preferences&quot;</span> &amp;&amp; <span class="built_in">sudo</span> <span class="built_in">tee</span> <span class="string">&quot;/Library/Managed Preferences/com.google.Chrome.plist&quot;</span> &gt;/dev/null &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="string">&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot;</span></span><br><span class="line"><span class="string">  &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;\&gt;</span></span><br><span class="line"><span class="string">&lt;plist version=&quot;1.0&quot;&gt;</span></span><br><span class="line"><span class="string">  &lt;dict&gt;</span></span><br><span class="line"><span class="string">    &lt;key&gt;ExtensionManifestV2Availability&lt;/key&gt;</span></span><br><span class="line"><span class="string">    &lt;integer&gt;2&lt;/integer&gt;</span></span><br><span class="line"><span class="string">  &lt;/dict&gt;</span></span><br><span class="line"><span class="string">&lt;/plist&gt;</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure>
+
 <p>完全关闭 Chrome 后再打开，在地址栏输入 <code>chrome://policy/</code> 点击左上角的重新加载政策，然后旧版的扩展就可以继续使用啦。</p>
 
     </div>

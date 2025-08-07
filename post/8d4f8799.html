@@ -307,41 +307,48 @@
 <p>还有现在看到的这个博客，用 Hexo 生成的 GitHub Pages 静态页面，博客本身的代码我不想放到 GitHub 上，所以这时候的我也需要一个私人的 GitLab。除了能实现代码的托管，还能顺便利用 GitLab CI 实现一键发布，每次只要提交了代码，稍等片刻 GitHub Pages 就自动部署好了。</p>
 <h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>上面说了那么多。现在有了 R86S 这样一个性能跟得上的小主机，在东西到货的第二天，就开始了他的折腾之路。</p>
 <h2 id="安装硬件"><a href="#安装硬件" class="headerlink" title="安装硬件"></a>安装硬件</h2><p>因为这个 R86S 只带了一个电源，内置的一个 EMMC 容量只有 128G 且性能堪忧。所以第一步是安装一个自己的 NVME 固态。记得之前有一块买多了的吃灰三星 980 Pro 500G，都没有开封。之前还差点给挂到海鲜市场出掉，现在终于派上用场了。<br>安装好硬盘然后找一个网线，连接好路由器的 LAN 口和 R86S 的随便一个网口。连接好键盘鼠标，就可以插上电源自动上电开机了。</p>
-<h2 id="安装系统"><a href="#安装系统" class="headerlink" title="安装系统"></a>安装系统</h2><p>既然是是要做小型服务器，哪有用桌面操作系统的。所以这里就选择了 <a target="_blank" rel="noopener" href="https://ubuntu.com/download/server">Ubuntu Server 20.04.3 LTS</a>。下载完镜像后，写入到 U盘。然后就可以通过 U盘 启动就可以进安装环节了。<br>安装系统有几个点需要注意一下</p>
+<h2 id="安装系统"><a href="#安装系统" class="headerlink" title="安装系统"></a>安装系统</h2><p>既然是是要做小型服务器，哪有用桌面操作系统的。所以这里就选择了 <a target="_blank" rel="noopener" href="https://ubuntu.com/download/server">Ubuntu Server 20.04.3 LTS</a>。下载完镜像后，写入到 U 盘。然后就可以通过 U 盘 启动就可以进安装环节了。<br>安装系统有几个点需要注意一下</p>
 <ol>
 <li><p>分配 IP 地址的方式</p>
-<p> 在进行网络配置的时候，既可以通过 DHCP 动态分配 IP，也可以手动指定。如果是 DHCP 分配，则后续需要到路由器中绑定一下 Mac 地址和 IP，毕竟我们在内网访问也是需要有一个内网的固定 IP。通过手动指定 IP 地址，要注意不要和现有分配的的地址冲突。手动指定 IP 就不需要后续到路由器绑定 Mac 地址和 IP 了。 </p>
+<p>在进行网络配置的时候，既可以通过 DHCP 动态分配 IP，也可以手动指定。如果是 DHCP 分配，则后续需要到路由器中绑定一下 Mac 地址和 IP，毕竟我们在内网访问也是需要有一个内网的固定 IP。通过手动指定 IP 地址，要注意不要和现有分配的的地址冲突。手动指定 IP 就不需要后续到路由器绑定 Mac 地址和 IP 了。</p>
 </li>
 <li><p>选择安装硬盘</p>
-<p> 因为主板上带一个 EMMC，所以在选择硬盘的时候记得选自己安装的 NVME SSD 上，而且调整根目录大小调整为剩余 SSD 所由空间。否则根目录默认只划分了 100G，后面进入系统后还需要手动扩容。</p>
+<p>因为主板上带一个 EMMC，所以在选择硬盘的时候记得选自己安装的 NVME SSD 上，而且调整根目录大小调整为剩余 SSD 所由空间。否则根目录默认只划分了 100G，后面进入系统后还需要手动扩容。</p>
 </li>
 <li><p>安装后修改网络配置</p>
-<p> 安装完系统后重新启动有可能会出现日志 <code>A start job is running for wait for network to be configured.</code> 导致需要很长时间才能进入系统。这时候需要等进到系统后修改网络配置文件</p>
-<p> <code>/etc/netplan/00-installer-config.yaml</code>（文件名 <code>00-installer-config.yaml</code> 不固定，但是文件名类似的一个 <code>yaml</code> 文件)</p>
-<p> 在每一个设备下面添加 <code>optional: true</code></p>
-<p> 最后的配置应该类似</p>
- <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">network:</span></span><br><span class="line">    <span class="attr">ethernets:</span></span><br><span class="line">        <span class="attr">enp1s0:</span></span><br><span class="line">            <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">            <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">        <span class="attr">enp2s0:</span></span><br><span class="line">            <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">            <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">        <span class="attr">enp3s0:</span></span><br><span class="line">            <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">            <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">version:</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
-<p> 然后应用更改</p>
- <figure class="highlight coq"><table><tr><td class="code"><pre><span class="line">netplan <span class="built_in">apply</span></span><br></pre></td></tr></table></figure></li>
+<p>安装完系统后重新启动有可能会出现日志 <code>A start job is running for wait for network to be configured.</code> 导致需要很长时间才能进入系统。这时候需要等进到系统后修改网络配置文件</p>
+<p><code>/etc/netplan/00-installer-config.yaml</code>（文件名 <code>00-installer-config.yaml</code> 不固定，但是文件名类似的一个 <code>yaml</code> 文件)</p>
+<p>在每一个设备下面添加 <code>optional: true</code></p>
+<p>最后的配置应该类似</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">network:</span></span><br><span class="line">  <span class="attr">ethernets:</span></span><br><span class="line">    <span class="attr">enp1s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp2s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp3s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>然后应用更改</p>
+<figure class="highlight coq"><table><tr><td class="code"><pre><span class="line">netplan <span class="built_in">apply</span></span><br></pre></td></tr></table></figure></li>
 </ol>
-<h2 id="创建-GitLab-备份位置"><a href="#创建-GitLab-备份位置" class="headerlink" title="创建 GitLab 备份位置"></a>创建 GitLab 备份位置</h2><p>上面说到了，这个 R86S 自带一个 128G的 EMMC 存储，虽然性能比较差，但是东西不能浪费了。所以这里我拿来作为一个独立的 GitLab 数据备份存储，即使是主硬盘挂了，还有一份独立的备份存在，而且短时间内 128G 还是够用的。</p>
+<h2 id="创建-GitLab-备份位置"><a href="#创建-GitLab-备份位置" class="headerlink" title="创建 GitLab 备份位置"></a>创建 GitLab 备份位置</h2><p>上面说到了，这个 R86S 自带一个 128G 的 EMMC 存储，虽然性能比较差，但是东西不能浪费了。所以这里我拿来作为一个独立的 GitLab 数据备份存储，即使是主硬盘挂了，还有一份独立的备份存在，而且短时间内 128G 还是够用的。</p>
 <h3 id="创建新的硬盘分区"><a href="#创建新的硬盘分区" class="headerlink" title="创建新的硬盘分区"></a>创建新的硬盘分区</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> cfdisk /dev/mmcblk0        <span class="comment"># mmcblk0 是 EMMC 设备</span></span><br><span class="line"><span class="built_in">sudo</span> mkfs.ext4 /dev/mmcblk0     <span class="comment"># 格式化为 ext4</span></span><br></pre></td></tr></table></figure>
 
 <h3 id="挂载到-mmc"><a href="#挂载到-mmc" class="headerlink" title="挂载到 &#x2F;mmc"></a>挂载到 &#x2F;mmc</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/fstab</span><br><span class="line"><span class="comment"># 添加一行</span></span><br><span class="line">/dev/mmcblk0 /mmc ext4 defaults 0 0</span><br></pre></td></tr></table></figure>
+
 <h2 id="安装-GitLab"><a href="#安装-GitLab" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h2><h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install -y curl openssh-server ca-certificates tzdata perl</span><br></pre></td></tr></table></figure>
+
 <h3 id="添加-GitLab-源"><a href="#添加-GitLab-源" class="headerlink" title="添加 GitLab 源"></a>添加 GitLab 源</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | <span class="built_in">sudo</span> bash</span><br></pre></td></tr></table></figure>
+
 <h3 id="安装-GitLab-1"><a href="#安装-GitLab-1" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install gitlab-ce</span><br></pre></td></tr></table></figure>
+
 <h3 id="获取-root-用户密码"><a href="#获取-root-用户密码" class="headerlink" title="获取 root 用户密码"></a>获取 root 用户密码</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /etc/gitlab/initial_root_password</span><br></pre></td></tr></table></figure>
+
 <p><strong>注意，这个文件后面会被自动删除。因此请及时保管好该密码或者及时进行修改。</strong></p>
 <h3 id="配置-GitLab"><a href="#配置-GitLab" class="headerlink" title="配置 GitLab"></a>配置 GitLab</h3><p>如果上面几步都比较顺利，不出意外，现在应该已经在这个系统中安装好了 GitLab。接下来先进行一些简要地配置。</p>
 <p>GitLab 的配置文件是 <code>/etc/gitlab/gitlab.rb</code></p>
-<p>我家 OpenWrt 主路由在 DHCP 中设置的 <code>本地服务器</code> 和 <code>本地域名</code> 分别为 <code>/home/</code> 和 <code>home</code>，同时我也希望能通过域名访问这个 GitLab 服务器。所以我还添加了一条 <code>自定义挟持域名</code>，其中域名为 <code>git</code>，IP 地址为 R86S 分配的固定IP（比如我家的是 <code>192.168.50.50</code>）。这样我就可以通过域名 <code>http://git.home</code> 来访问这个 GitLab 服务器了。</p>
+<p>我家 OpenWrt 主路由在 DHCP 中设置的 <code>本地服务器</code> 和 <code>本地域名</code> 分别为 <code>/home/</code> 和 <code>home</code>，同时我也希望能通过域名访问这个 GitLab 服务器。所以我还添加了一条 <code>自定义挟持域名</code>，其中域名为 <code>git</code>，IP 地址为 R86S 分配的固定 IP（比如我家的是 <code>192.168.50.50</code>）。这样我就可以通过域名 <code>http://git.home</code> 来访问这个 GitLab 服务器了。</p>
 <p>根据以上前提，这里需要修改的几个地方</p>
 <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">external_url</span> <span class="string">&#x27;http://git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;gitlab_ssh_host&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;time_zone&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;Asia/Shanghai&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;backup_path&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;/mmc&#x27;</span></span><br></pre></td></tr></table></figure>
 
 <p><code>backup_path</code> 即为 <a href="#%E5%88%9B%E5%BB%BA-GitLab-%E5%A4%87%E4%BB%BD%E4%BD%8D%E7%BD%AE">EMMC 设备的挂载点</a></p>
 <p>修改完 <code>gitlab.rb</code> 后需要重新配置 GitLab 才能生效</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
+
 <p>稍等片刻，在浏览器中打开 <a target="_blank" rel="noopener" href="http://git.home/">http://git.home</a> 就可以看到搭建好的 GitLab 了。</p>
 
     </div>

@@ -311,20 +311,25 @@
 <h2 id="生成主密钥"><a href="#生成主密钥" class="headerlink" title="生成主密钥"></a>生成主密钥</h2><p>一般的情况下，我们使用 <code>--gen-key</code> 就可以快速的生成一个密钥对，但是这个是一个简便方法。</p>
 <p>这里我们需要更多的细节设置，所以用 <code>--full-gen-key</code> 来代替</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">gpg --full-gen-key</span><br><span class="line">gpg (GnuPG) 2.4.5; Copyright (C) 2024 g10 Code GmbH</span><br><span class="line">This is free software: you are free to change and redistribute it.</span><br><span class="line">There is NO WARRANTY, to the extent permitted by law.</span><br><span class="line"></span><br><span class="line">请选择您要使用的密钥类型：</span><br><span class="line">   (1) RSA 和 RSA</span><br><span class="line">   (2) DSA 和 Elgamal</span><br><span class="line">   (3) DSA（仅用于签名）</span><br><span class="line">   (4) RSA（仅用于签名）</span><br><span class="line">   (9) ECC（签名和加密） *默认*</span><br><span class="line">  (10) ECC（仅用于签名）</span><br><span class="line"> （14）卡中现有密钥</span><br><span class="line">您的选择是？ 9</span><br></pre></td></tr></table></figure>
+
 <p>在该版本（<code>2.4.5</code>）下可以通过 <code>*默认*</code> 可以看默认的密钥类型为 <code>ECC（签名和加密）</code> 这里我们不需要任何修改。使用默认即可。</p>
 <p>在当前界面输入选项前面括号中的数字 <code>9</code> 之后回车确认，或者不输入任何内容直接回车确认即可。</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">请选择您想要使用的椭圆曲线：</span><br><span class="line">   (1) Curve 25519 *默认*</span><br><span class="line">   (4) NIST P-384</span><br><span class="line">   (6) Brainpool P-256</span><br><span class="line">您的选择是？ 1</span><br></pre></td></tr></table></figure>
+
 <p>类似上一步，选择使用的椭圆曲线，这里选择默认 <code>Curve 25519</code> 即可。</p>
 <p>在当前界面输入 <code>1</code> 之后回车确认，或者不输入任何内容直接回车确认即可。</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">请设定这个密钥的有效期限。</span><br><span class="line">         0 = 密钥永不过期</span><br><span class="line">      &lt;n&gt;  = 密钥在 n 天后过期</span><br><span class="line">      &lt;n&gt;w = 密钥在 n 周后过期</span><br><span class="line">      &lt;n&gt;m = 密钥在 n 月后过期</span><br><span class="line">      &lt;n&gt;y = 密钥在 n 年后过期</span><br><span class="line">密钥的有效期限是？(0) 0</span><br></pre></td></tr></table></figure>
+
 <p>然后这里需要选择密钥的有效期。</p>
 <p>如果是个人使用，可以选择永不过期，这样可以避免以后过期后还需要再次创建一个新的密钥。</p>
 <p>而如果需要配置特定的过期时间。则根据下面的三个选项输入对应的内容即可，比如需要在一周后过期，则输入 <code>1w</code> 3 个月后过期 <code>3m</code></p>
 <p>我这里就选了 <code>0</code> 表示永不过期。输入数字 <code>0</code> 回车后经过二次确认。</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">GnuPG 需要构建用户标识以辨认您的密钥。</span><br><span class="line"></span><br><span class="line">真实姓名：</span><br></pre></td></tr></table></figure>
+
 <p>从这里开始后面的步骤就是输入密钥对应的个人信息了。</p>
 <p>依次输入内容包括 <code>真实姓名</code>, <code>电子邮件地址</code>, <code>注释</code> 其中注释可以省略。</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">GnuPG 需要构建用户标识以辨认您的密钥。</span><br><span class="line"></span><br><span class="line">真实姓名： zebedy</span><br><span class="line">电子邮件地址： zebedy@example.com</span><br><span class="line">注释：</span><br><span class="line">您选定了此用户标识：</span><br><span class="line">    “zebedy &lt;zebedy@example.com&gt;”</span><br><span class="line"></span><br><span class="line">更改姓名（N）、注释（C）、电子邮件地址（E）或确定（O）/退出（Q）？</span><br></pre></td></tr></table></figure>
+
 <p>这里如果确认个人信息输入没问题，就可以输入字母 <code>O</code> 回车确认。</p>
 <p>确定之后根据提示设置主密钥的密码。确定密码后。经过短暂的时间就可以生成一个密钥了。</p>
 <p>这个密码一定要妥善保管，会经常需要使用。</p>
@@ -343,8 +348,8 @@
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">gpg --list-keys --keyid-format=long</span><br><span class="line">gpg: 正在检查信任度数据库</span><br><span class="line">gpg: marginals needed: 3  completes needed: 1  trust model: pgp</span><br><span class="line">gpg: 深度：0  有效性：  4  已签名：  0  信任度：0-，0q，0n，0m，0f，4u</span><br><span class="line">[keyboxd]</span><br><span class="line">---------</span><br><span class="line">pub   ed25519/D188A1DD832AB894 2024-03-24 [SC]</span><br><span class="line">      A31F6E522B93990CA1A1C548D188A1DD832AB894</span><br><span class="line">uid                   [ 绝对 ] zebedy &lt;zebedy@example.com&gt;</span><br><span class="line">sub   cv25519/2978529F4782B600 2024-03-24 [E]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <ul>
-<li>第一行 开头的 <code>pub</code> 表示这个是公钥, <code>ed25519</code> 是上面创建密钥时选择的椭圆曲线方法, 后面的 <code>D188A1DD832AB894</code> 是公钥的16位短摘要, <code>2024-03-24</code> 是生成时间, <code>[SC]</code> 中 <code>S:signing</code> 表示可以用于签名 <code>C:certification</code> 表示可以用于认证。</li>
-<li>第二行 <code>A31F6E522B93990CA1A1C548D188A1DD832AB894</code> 是密钥的40位长摘要。其中上面的短摘要就是长摘要的后16位。</li>
+<li>第一行 开头的 <code>pub</code> 表示这个是公钥, <code>ed25519</code> 是上面创建密钥时选择的椭圆曲线方法, 后面的 <code>D188A1DD832AB894</code> 是公钥的 16 位短摘要, <code>2024-03-24</code> 是生成时间, <code>[SC]</code> 中 <code>S:signing</code> 表示可以用于签名 <code>C:certification</code> 表示可以用于认证。</li>
+<li>第二行 <code>A31F6E522B93990CA1A1C548D188A1DD832AB894</code> 是密钥的 40 位长摘要。其中上面的短摘要就是长摘要的后 16 位。</li>
 <li>第三行 <code>uid</code> 是用户信息，<code>[ 绝对 ]</code> 表示该密钥的信任等级是最高级别: 绝对信任。后面分别是输入的名字，注释和电子邮件</li>
 <li>第四行 <code>sub</code> 表示这个是子公钥，是创建主密钥的时候自动生成的一个子密钥，最后的<code>[E]</code> 中 <code>E:encryption</code> 表示可用于加密</li>
 </ul>
@@ -355,28 +360,36 @@
 <p>通过上面知道主密钥的摘要是 <code>D188A1DD832AB894</code> (这里用长短摘要都可以。但是为了方便，后面就都用短摘要。也可以直接使用 <code>uid</code> 中的姓名)</p>
 <p>接下来就需要用这个主密钥生成一个子密钥。因为需要用到高级自定义，所以需要加上 <code>--expert</code></p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">gpg --expert --edit-key D188A1DD832AB894 <span class="comment"># 或者是 gpg --expert --edit-key zebedy</span></span><br><span class="line">gpg (GnuPG) 2.4.5; Copyright (C) 2024 g10 Code GmbH</span><br><span class="line">This is free software: you are free to change and redistribute it.</span><br><span class="line">There is NO WARRANTY, to the extent permitted by law.</span><br><span class="line"></span><br><span class="line">私钥可用。</span><br><span class="line"></span><br><span class="line">sec  ed25519/D188A1DD832AB894</span><br><span class="line">     创建于：2024-03-24  有效至：永不       可用于：SC</span><br><span class="line">     信任度：绝对        有效性：绝对</span><br><span class="line">ssb  cv25519/2978529F4782B600</span><br><span class="line">     创建于：2024-03-24  有效至：永不       可用于：E</span><br><span class="line">[ 绝对 ] (1). zebedy &lt;zebedy@example.com&gt;</span><br><span class="line"></span><br><span class="line">gpg&gt;</span><br></pre></td></tr></table></figure>
+
 <p>可以看到这里 <code>shell</code> 变成了 <code>gpg&gt;</code> 表示进入了与 <code>GPG</code> 的交互</p>
 <p>输入 <code>addkey</code> 添加一个新的子密钥</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">gpg&gt; addkey</span><br><span class="line">请选择您要使用的密钥类型：</span><br><span class="line">   (3) DSA（仅用于签名）</span><br><span class="line">   (4) RSA（仅用于签名）</span><br><span class="line">   (5) ElGamal（仅用于加密）</span><br><span class="line">   (6) RSA（仅用于加密）</span><br><span class="line">   (7) DSA（自定义用途）</span><br><span class="line">   (8) RSA（自定义用途）</span><br><span class="line">  (10) ECC（仅用于签名）</span><br><span class="line">  (11) ECC（自定义用途）</span><br><span class="line">  (12) ECC（仅用于加密）</span><br><span class="line">  (13) 现有密钥</span><br><span class="line"> （14）卡中现有密钥</span><br><span class="line">您的选择是？ 8</span><br></pre></td></tr></table></figure>
+
 <p>输入 <code>8</code> 回车确认，使用 <code>RSA（自定义用途）</code> 选项手动配置这个密钥。</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">RSA 密钥的可实现的功能： 签名（Sign） 加密（Encrypt） 身份验证（Authenticate）</span><br><span class="line">目前启用的功能： 签名（Sign） 加密（Encrypt）</span><br><span class="line"></span><br><span class="line">   (S) 签名功能开关</span><br><span class="line">   (E) 加密功能开关</span><br><span class="line">   (A) 身份验证功能开关</span><br><span class="line">   (Q) 已完成</span><br><span class="line"></span><br><span class="line">您的选择是？ S</span><br></pre></td></tr></table></figure>
+
 <p>这里可以看到这个子密钥目前启用的功能有 <code>签名（Sign）</code> 和 <code>加密（Encrypt）</code></p>
 <p>但是 <code>SSH</code> 鉴权不需要这两个功能，所以我们先要取消这两个功能。</p>
 <p>输入 <code>S</code> 回车后取消 <code>签名（Sign）</code> 的功能</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">RSA 密钥的可实现的功能： 签名（Sign） 加密（Encrypt） 身份验证（Authenticate）</span><br><span class="line">目前启用的功能： 加密（Encrypt）</span><br><span class="line"></span><br><span class="line">   (S) 签名功能开关</span><br><span class="line">   (E) 加密功能开关</span><br><span class="line">   (A) 身份验证功能开关</span><br><span class="line">   (Q) 已完成</span><br><span class="line"></span><br><span class="line">您的选择是？ E</span><br></pre></td></tr></table></figure>
+
 <p>现在子密钥目前启用的功能就只有 <code>加密（Encrypt）</code> 了，再次输入 <code>E</code> 回车。</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">RSA 密钥的可实现的功能： 签名（Sign） 加密（Encrypt） 身份验证（Authenticate）</span><br><span class="line">目前启用的功能：</span><br><span class="line"></span><br><span class="line">   (S) 签名功能开关</span><br><span class="line">   (E) 加密功能开关</span><br><span class="line">   (A) 身份验证功能开关</span><br><span class="line">   (Q) 已完成</span><br><span class="line"></span><br><span class="line">您的选择是？ A</span><br></pre></td></tr></table></figure>
+
 <p>现在已启用功能就没有了任何内容，输入 <code>A</code> 回车后开启 <code>SSH</code> 鉴权需要的功能。</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">RSA 密钥的可实现的功能： 签名（Sign） 加密（Encrypt） 身份验证（Authenticate）</span><br><span class="line">目前启用的功能： 身份验证（Authenticate）</span><br><span class="line"></span><br><span class="line">   (S) 签名功能开关</span><br><span class="line">   (E) 加密功能开关</span><br><span class="line">   (A) 身份验证功能开关</span><br><span class="line">   (Q) 已完成</span><br><span class="line"></span><br><span class="line">您的选择是？ Q</span><br></pre></td></tr></table></figure>
 
 <p>然后输入 <code>Q</code> 结束自定义功能，进入 <code>RSA</code> 密钥选项。</p>
 <p>因为添加子密钥的时候选择的是 <code>RSA</code> 密钥，所以这里需要指定密钥长度。长度越长，安全性越高。我这里就选择 <code>4096</code></p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">RSA 密钥的长度应在 1024 位与 4096 位之间。</span><br><span class="line">您想要使用的密钥长度？(3072) 4096</span><br></pre></td></tr></table></figure>
+
 <p>然后设置子密钥的有效期。因为也是个人长期使用，所以选择 <code>0 密钥永不过期</code></p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">请设定这个密钥的有效期限。</span><br><span class="line">         0 = 密钥永不过期</span><br><span class="line">      &lt;n&gt;  = 密钥在 n 天后过期</span><br><span class="line">      &lt;n&gt;w = 密钥在 n 周后过期</span><br><span class="line">      &lt;n&gt;m = 密钥在 n 月后过期</span><br><span class="line">      &lt;n&gt;y = 密钥在 n 年后过期</span><br><span class="line">密钥的有效期限是？(0) 0</span><br></pre></td></tr></table></figure>
+
 <p>然后经过两次输入 <code>y</code> 的确认后，会提示输入主密钥的密码。因为创建子密钥需要用到主密钥的私钥，所以需要用到主密钥的密码。</p>
 <p>输入完正确密码后，经过短暂时间就生成了一个 <code>RSA</code> 密钥。</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">我们需要生成大量的随机字节。在质数生成期间做些其他操作（敲打键盘</span><br><span class="line">、移动鼠标、读写硬盘之类的）将会是一个不错的主意；这会让随机数</span><br><span class="line">发生器有更好的机会获得足够的熵。</span><br><span class="line"></span><br><span class="line">sec  ed25519/D188A1DD832AB894</span><br><span class="line">     创建于：2024-03-24  有效至：永不       可用于：SC</span><br><span class="line">     信任度：绝对        有效性：绝对</span><br><span class="line">ssb  cv25519/2978529F4782B600</span><br><span class="line">     创建于：2024-03-24  有效至：永不       可用于：E</span><br><span class="line">ssb  rsa4096/EFA3B0684ECE9D91</span><br><span class="line">     创建于：2024-03-24  有效至：永不       可用于：AR</span><br><span class="line">[ 绝对 ] (1). zebedy &lt;zebedy@example.com&gt;</span><br><span class="line"></span><br><span class="line">gpg&gt;</span><br></pre></td></tr></table></figure>
+
 <p>和上面相比可以看到已经多了一个摘要为 <code>EFA3B0684ECE9D91</code> 的子密钥。</p>
 <p>还有最后一步，输入 <code>save</code> 回车保存就退出 <code>GPG</code> 的交互 <code>shell</code> 了。</p>
 <p>至此，子密钥创建完成。</p>
@@ -385,6 +398,7 @@
 
 <p>相比上面可以看到到了一个 <code>EFA3B0684ECE9D91</code> 的子密钥</p>
 <h4 id="配置-SSH"><a href="#配置-SSH" class="headerlink" title="配置 SSH"></a>配置 SSH</h4><h5 id="启用-GPG-Agent-的-SSH-支持"><a href="#启用-GPG-Agent-的-SSH-支持" class="headerlink" title="启用 GPG Agent 的 SSH 支持"></a>启用 GPG Agent 的 SSH 支持</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">vim ~/.gnupg/gpg-agent.conf <span class="comment"># 文件可能不存在，如不存在则创建</span></span><br></pre></td></tr></table></figure>
+
 <p>在文件中单独一行添加 <code>enable-ssh-support</code></p>
 <h5 id="设置-GPG-Agent-替代-SSH-Agent"><a href="#设置-GPG-Agent-替代-SSH-Agent" class="headerlink" title="设置 GPG Agent 替代 SSH Agent"></a>设置 GPG Agent 替代 SSH Agent</h5><p>修改对应 shell 的配置文件 (我使用的是 <code>zsh</code>，自己根据使用的 <code>shell</code> 调整)</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">vim ~/.zshrc</span><br></pre></td></tr></table></figure>
@@ -398,10 +412,12 @@
 <p>找到上一步创建的子密钥 <code>EFA3B0684ECE9D91</code> 他的 <code>Keygrip = 9C0935998C1D9F9BDE3030BB1C1A10A4454E56F8</code></p>
 <p>编辑 <code>~/.gnupg/sshcontrol</code> 文件</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">vim ~/.gnupg/sshcontrol</span><br></pre></td></tr></table></figure>
+
 <p>将这个 <code>9C0935998C1D9F9BDE3030BB1C1A10A4454E56F8</code> 添加到单独一行，保存。</p>
 <p>然后重启终端</p>
 <p>检查 <code>SSH Key</code> 是否存在</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">ssh-add -l</span><br><span class="line">4096 SHA256:GvaU9MfvKVMa9FVM+KN28z+MDCML6429dWeILycSPPw (none) (RSA)</span><br></pre></td></tr></table></figure>
+
 <p>看到类似内容就表示添加成功</p>
 <h5 id="导出-SSH-公钥"><a href="#导出-SSH-公钥" class="headerlink" title="导出 SSH 公钥"></a>导出 SSH 公钥</h5><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">gpg --export-ssh-key EFA3B0684ECE9D91 <span class="comment"># 或者是 gpg --export-ssh-key zebedy</span></span><br><span class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC6guDA+iEFZe2op48auILxCkN6IRWJstpp1X/iNtohEcUpBxJ3g0qMKiMQnFHOTsL0PCci2Ifmg740DE5RWC+QPhAiJCl/VT6nUK4wT+wx+0CoseQEg9RLWnq6+WYXi2GLEKZLIdxvpcrsm6IaEIUk8Z8CMbuJocFrOeAGsV9F9QsRIFyqGNw8v6/+rBDDZdfGbKrp54heNM61YtvVDtSSCgMq0iFW8mlxR1F3egaiffJid/LWWlDht15ndB8C+5ZIpK/Tbr6bHy9VWnbXOmxP4MBL4SyTUkEgvAqMEG5PWiS6PsfUbkvWTNRx6TG5RsZ7Xu0AVcB6//ZEHkjZeIeW9glMf7tC3H8bhpadDcDusPCeJv04TuAkFjYZVUSCnvR1qVUxe6VR9rhE6tBi86YGngvIRcWHjVe7o1CiQLSFAp9T5vD1HjRo8Q6pnKP4sq66jXH61MrhLMhLQt3RVryWe2AlPYtcYPlWRrl4uj3o8TKNQDhBFO7tMssHo474eC50epzpdOoC4etzHcIIVmMKSnvSl1Z46LUgkmcgL4Wj0NTqBWx58KFKjpYAT5dcZisvUsGM6pbFgFJRLRUcjibiR3vm3H34p08vaLYW5ldOJKwTf59rGiRI/ileY+1xpBsbc48PBAyX13433Lgw9TnRvjd+Ovkma7PU/QoJPKm+Sw== openpgp:0x4ECE9D91</span><br></pre></td></tr></table></figure>
 
@@ -435,7 +451,7 @@
 <h4 id="配置-Git"><a href="#配置-Git" class="headerlink" title="配置 Git"></a>配置 Git</h4><p>给 Git 全局配置签名 Key</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">git config --global user.signingkey 0623CAE2AAFF25C2!</span><br></pre></td></tr></table></figure>
 
-<p>如果不需要自动使用 GPG 签名代码，可以每次在 <code>commit</code> 的时候使用 <code>-S</code> 参数（大写S）进行签名</p>
+<p>如果不需要自动使用 GPG 签名代码，可以每次在 <code>commit</code> 的时候使用 <code>-S</code> 参数（大写 S）进行签名</p>
 <p>如果想提交的时候自动签名，可以进行配置。</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">git config --global commit.gpgsign <span class="literal">true</span></span><br></pre></td></tr></table></figure>
 
