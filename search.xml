@@ -1,32 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Garmin 国行码表使用 OSM 地图</title>
-    <url>/post/16e3b020.html</url>
-    <content><![CDATA[<p>国行的 Garmin 码表下载并安装 OSM 地图作为骑行地图，具体步骤可以参考下图</p>
-<span id="more"></span>
-
-<ol>
-<li>前往 <a href="https://alternativaslibres.org/en/downloads.php#Asia">alternativaslibres</a> 下载 China (Local Language-Non Unicode) OSM Base Map 地图<img src="https://images.zabrian.com/f342b77b-7fc2-439c-3b4f-f6f7c3d2db01/origin" class="" width="400" height="203" title="下载地图"></li>
-<li>将地图拷贝到 <a href="https://support.garmin.com/en-US/?faq=HXl90IjTSb4SD1ibBSc1p7">Garmin MapInstall</a> 地图目录<img src="https://images.zabrian.com/0539744c-0129-4376-212f-24f31b219301/origin" class="" width="400" height="240" title="拷贝地图到 MapInstall"></li>
-<li>使用 <a href="https://support.garmin.com/en-US/?faq=HXl90IjTSb4SD1ibBSc1p7">Garmin MapInstall</a> 将地图安装到 Garmin 码表<img src="https://images.zabrian.com/39b195df-d206-4241-2f52-2e4e9473f301/origin" class="" width="400" height="291" title="安装地图到码表">
-<img src="https://images.zabrian.com/86e86061-da08-4cec-d07f-bdd08a752701/origin" class="" width="400" height="294" title="安装地图到码表"></li>
-<li>将安装上步中安装到码表的 OSM 地图从码表复制到本地任意位置 (OSM 地图在码表位置 Garmin&#x2F;Maps&#x2F;OSM-China.img)</li>
-<li>使用 <a href="https://www.gmaptool.eu/en/content/gmaptool">GMapTool</a> 修改地图<img src="https://images.zabrian.com/9eb7d3e6-29dd-4457-e8fe-3540b675d701/origin" class="" width="400" height="291" title="修改 OSM 地图"></li>
-<li>将修改过的地图重新复制为 Garmin 码表中的 OSM-China.img<img src="https://images.zabrian.com/305fdb31-32fa-42b5-ec83-6bbb7e34a401/origin" class="" width="400" height="240" title="替换 OSM 地图"></li>
-<li>在码表上查看 OSM 地图信息<img src="https://images.zabrian.com/94b6cd8c-a2ac-428c-ea92-3687b8f0b301/origin" class="" width="360" height="600" title="码表查看 OSM 地图信息">
-<img src="https://images.zabrian.com/cbde2151-c864-4c46-78e7-c94f3a867801/origin" class="" width="360" height="600" title="码表查看 OSM 地图信息"></li>
-<li>在码表中启用 OSM 地图 (切记需要关闭 Garmin 默认中国地图，否则会导致地图偏移)<img src="https://images.zabrian.com/edb0de2c-fd52-4fc3-c5d8-871ba7ed1e01/origin" class="" width="360" height="600" title="码表启用 OSM 地图"></li>
-</ol>
-]]></content>
-  </entry>
-  <entry>
     <title>Cloudflare 使用 Workers 建立 Images 代理</title>
     <url>/post/ec93b507.html</url>
     <content><![CDATA[<p>最早这个博客是托管在 GitHub pages 上的，绑定的域名是在阿里云注册的，几个月前偶然一次机会，在 Cloudflare 上注册了一个自己喜欢的域名。于是就也通过 Cloudflare pages 托管了相同的 GitHub pages 仓库，因此目前使用 <a href="https://blog.zabrian.com/">Cloudflare pages</a> 或者 <a href="https://blog.zebedy.com/">GitHub pages</a> 均可访问，内容都来自同一个 GitHub repo</p>
 <span id="more"></span>
 
-<h1 id="使用-Images"><a href="#使用-Images" class="headerlink" title="使用 Images"></a>使用 Images</h1><p>就在我无聊把玩赛博菩萨的各种功能的时候，发现 Images 的定价还算很实惠，于是乎开通了 Images Stream Bundle Basic 套餐，包含预付费 $5.00&#x2F;月 100,000 张图片和 1,000 分钟视频存储以及后付费 $1.00&#x2F;100,000 张图片的交付。<br>既然都订阅了，然后就想着把博客现在的图片都迁移到 Images 上来。但是吧，问题就在于 Images 的图片是可以公共读的。直接放到博客上万一哪天被刷流量了，得不偿失。研究了一下发现 Images 是可以生成带有过期时间的签名 URL 的，可是问题是我的博客是静态博客，图片链接都需要写死在 <code>&lt;img&gt;</code> 标签里面。左思右想之下想到了一个折中的办法。<br>总体思路就是上传的图片打开 <strong>需要已签名的 URL</strong> 然后该图片就必须通过签名 URL 访问，然后实现一个 Worker 判断 URL 是否包含签名信息，如果不包含，则通过 URL 接收 <code>图像 ID(imageID)</code> 和 <code>变体(variant)</code> 然后对 URL 实现签名，生成一个带签名的 URL 并 302 重定向回 Worker。如果 URL 包含签名信息，则请求图片资源并返回。<br><img src="https://images.zabrian.com/7e3e9326-11fe-4a25-4a3e-19fe143c3701/origin" title="工作流程" alt="工作流程" style="zoom:25%;" /><br>思路有了那就开始，首先新建一个 Worker 代码如下</p>
+<h1 id="使用-Images"><a href="#使用-Images" class="headerlink" title="使用 Images"></a>使用 Images</h1><p>就在我无聊把玩赛博菩萨的各种功能的时候，发现 Images 的定价还算很实惠，于是乎开通了 Images Stream Bundle Basic 套餐，包含预付费 $5.00&#x2F;月 100,000 张图片和 1,000 分钟视频存储以及后付费 $1.00&#x2F;100,000 张图片的交付。<br>既然都订阅了，然后就想着把博客现在的图片都迁移到 Images 上来。但是吧，问题就在于 Images 的图片是可以公共读的。直接放到博客上万一哪天被刷流量了，得不偿失。研究了一下发现 Images 是可以生成带有过期时间的签名 URL 的，可是问题是我的博客是静态博客，图片链接都需要写死在 <code>&lt;img&gt;</code> 标签里面。左思右想之下想到了一个折中的办法。<br>总体思路就是上传的图片打开 <strong>需要已签名的 URL</strong> 然后该图片就必须通过签名 URL 访问，然后实现一个 Worker 判断 URL 是否包含签名信息，如果不包含，则通过 URL 接收 <code>图像 ID(imageID)</code> 和 <code>变体(variant)</code> 然后对 URL 实现签名，生成一个带签名的 URL 并 302 重定向回 Worker。如果 URL 包含签名信息，则请求图片资源并返回。</p>
+<img src="https://images.zabrian.com/2d0fc541-8fd3-48d7-d763-e1fee14d3401/origin" title="流程图" style="zoom:42%;" />
+
+<p>思路有了那就开始，首先新建一个 Worker 代码如下</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="variable constant_">ACCOUNT_HASH</span> = <span class="string">&quot;此处填写 Images 帐户哈希&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">KEY</span> = <span class="string">&quot;此处填写 Image 账户 API 令牌&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">IMAGE_CUSTOM_DOMAIN</span> = <span class="string">&quot;此处填写 Worker 绑定的自定义域名&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">EXPIRATION</span> = <span class="number">60</span>; <span class="comment">// 签名图片过期时间 1 min </span></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">ALLOWED_REFERERS</span> = []; <span class="comment">// 此处填写请求 Referer 白名单作为防盗链</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">IMAGE_DELIVERY_DOMAIN</span> = <span class="string">&quot;imagedelivery.net&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">bufferToHex</span> = (<span class="params">buffer</span>) =&gt;</span><br><span class="line">  [...<span class="keyword">new</span> <span class="title class_">Uint8Array</span>(buffer)]</span><br><span class="line">    .<span class="title function_">map</span>(<span class="function">(<span class="params">x</span>) =&gt;</span> x.<span class="title function_">toString</span>(<span class="number">16</span>).<span class="title function_">padStart</span>(<span class="number">2</span>, <span class="string">&quot;0&quot;</span>))</span><br><span class="line">    .<span class="title function_">join</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">generateSignedUrl</span>(<span class="params">url</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> encoder = <span class="keyword">new</span> <span class="title class_">TextEncoder</span>();</span><br><span class="line">  <span class="keyword">const</span> secretKey = encoder.<span class="title function_">encode</span>(<span class="variable constant_">KEY</span>);</span><br><span class="line">  <span class="keyword">const</span> key = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">importKey</span>(</span><br><span class="line">    <span class="string">&quot;raw&quot;</span>,</span><br><span class="line">    secretKey,</span><br><span class="line">    &#123; <span class="attr">name</span>: <span class="string">&quot;HMAC&quot;</span>, <span class="attr">hash</span>: <span class="string">&quot;SHA-256&quot;</span> &#125;,</span><br><span class="line">    <span class="literal">false</span>,</span><br><span class="line">    [<span class="string">&quot;sign&quot;</span>]</span><br><span class="line">  );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> exp = <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Date</span>.<span class="title function_">now</span>() / <span class="number">1000</span>) + <span class="variable constant_">EXPIRATION</span>;</span><br><span class="line">  url.<span class="property">searchParams</span>.<span class="title function_">set</span>(<span class="string">&quot;exp&quot;</span>, exp);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> stringToSign = url.<span class="property">pathname</span> + <span class="string">&quot;?&quot;</span> + url.<span class="property">searchParams</span>.<span class="title function_">toString</span>();</span><br><span class="line">  <span class="keyword">const</span> mac = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">sign</span>(</span><br><span class="line">    <span class="string">&quot;HMAC&quot;</span>,</span><br><span class="line">    key,</span><br><span class="line">    encoder.<span class="title function_">encode</span>(stringToSign)</span><br><span class="line">  );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> signature = <span class="title function_">bufferToHex</span>(<span class="keyword">new</span> <span class="title class_">Uint8Array</span>(mac).<span class="property">buffer</span>);</span><br><span class="line">  url.<span class="property">searchParams</span>.<span class="title function_">set</span>(<span class="string">&quot;sig&quot;</span>, signature);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> url;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="keyword">async</span> <span class="title function_">fetch</span>(<span class="params">request</span>) &#123;</span><br><span class="line">    <span class="comment">// 检查 Referer (只有 ALLOWED_REFERERS 不为空时才检查)</span></span><br><span class="line">    <span class="keyword">const</span> referer = request.<span class="property">headers</span>.<span class="title function_">get</span>(<span class="string">&quot;Referer&quot;</span>) || <span class="string">&quot;&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable constant_">ALLOWED_REFERERS</span>.<span class="property">length</span> &amp;&amp;!<span class="variable constant_">ALLOWED_REFERERS</span>.<span class="title function_">some</span>(<span class="function">(<span class="params">allow</span>) =&gt;</span> referer.<span class="title function_">startsWith</span>(allow))) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Forbidden&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">403</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 解析路径</span></span><br><span class="line">    <span class="keyword">const</span> url = <span class="keyword">new</span> <span class="title function_">URL</span>(request.<span class="property">url</span>);</span><br><span class="line">    <span class="keyword">const</span> match = url.<span class="property">pathname</span>.<span class="title function_">match</span>(<span class="regexp">/^\/([^/]+)\/([^/]+)$/</span>);</span><br><span class="line">    <span class="keyword">if</span> (!match) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Bad Request&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">400</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> [, imageID, variant] = match;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!url.<span class="property">searchParams</span>.<span class="title function_">has</span>(<span class="string">&quot;exp&quot;</span>) || !url.<span class="property">searchParams</span>.<span class="title function_">has</span>(<span class="string">&quot;sig&quot;</span>)) &#123;</span><br><span class="line">      <span class="comment">// 无签名 - 生成签名并重定向</span></span><br><span class="line">      <span class="keyword">const</span> deliveryUrl = <span class="keyword">new</span> <span class="title function_">URL</span>(</span><br><span class="line">        <span class="string">`https://<span class="subst">$&#123;IMAGE_DELIVERY_DOMAIN&#125;</span>/<span class="subst">$&#123;ACCOUNT_HASH&#125;</span>/<span class="subst">$&#123;imageID&#125;</span>/<span class="subst">$&#123;variant&#125;</span>`</span></span><br><span class="line">      );</span><br><span class="line">      <span class="keyword">const</span> signedUrl = <span class="keyword">await</span> <span class="title function_">generateSignedUrl</span>(deliveryUrl);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> redirectUrl = <span class="keyword">new</span> <span class="title function_">URL</span>(</span><br><span class="line">        <span class="string">`https://<span class="subst">$&#123;IMAGE_CUSTOM_DOMAIN&#125;</span>/<span class="subst">$&#123;imageID&#125;</span>/<span class="subst">$&#123;variant&#125;</span>`</span></span><br><span class="line">      );</span><br><span class="line">      redirectUrl.<span class="property">search</span> = signedUrl.<span class="property">search</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> <span class="title class_">Response</span>.<span class="title function_">redirect</span>(redirectUrl.<span class="title function_">toString</span>(), <span class="number">302</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 有签名 - 直接请求图片</span></span><br><span class="line">      <span class="keyword">const</span> imageUrl = <span class="keyword">new</span> <span class="title function_">URL</span>(</span><br><span class="line">        <span class="string">`https://<span class="subst">$&#123;IMAGE_DELIVERY_DOMAIN&#125;</span>/<span class="subst">$&#123;ACCOUNT_HASH&#125;</span>/<span class="subst">$&#123;imageID&#125;</span>/<span class="subst">$&#123;variant&#125;</span>`</span></span><br><span class="line">      );</span><br><span class="line">      imageUrl.<span class="property">search</span> = url.<span class="property">search</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> resp = <span class="keyword">await</span> <span class="title function_">fetch</span>(imageUrl.<span class="title function_">toString</span>(), request);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(resp.<span class="property">body</span>, &#123;</span><br><span class="line">        <span class="attr">status</span>: resp.<span class="property">status</span>,</span><br><span class="line">        <span class="attr">headers</span>: resp.<span class="property">headers</span>,</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>然后将 <code>Worker.js</code> 中 <code>IMAGE_CUSTOM_DOMAIN</code> 的域名绑定到这个 Worker 上。<br>在 Images 上传一张图片，打开 <strong>需要已签名的 URL</strong> 然后获取到他的<code>图像 ID</code>，可以在 Images 里面自定义一个<code>变体</code>，然后就可以通过 <code>https://IMAGE_CUSTOM_DOMAIN/&#123;imageID&#125;/&#123;variant&#125;</code> 访问该图片，此时会自动跳转到 <code>https://IMAGE_CUSTOM_DOMAIN/&#123;imageID&#125;/&#123;variant&#125;?exp=&#123;exp&#125;&amp;sig=&#123;sig&#125;</code> 其中 <code>sig</code> 就是签名信息，<code>exp</code> 是该链接的过期时间。如果填写了 <code>ALLOWED_REFERERS</code> 则请求必须携带对应的 <code>Referer</code> 否则会 <code>403</code></p>
 <p>现在 Cloudflare 的流程就没有问题了，接下来解决静态博客的问题。我是用的 Hexo 的静态博客，文章中插入图片需要使用 <code>&lt;img&gt;</code> 标签。每次都需要将本地图片传到 Cloudflare Images 并且编辑图像手动打开 <strong>需要已签名的 URL</strong> 然后再获取到对应的图像 ID 再替换为 URL 略显麻烦。因此手动创建了一个脚本自动化实现以上功能，我只需要在 <code>&lt;img&gt;</code> 标签中添加图片的本地文件路径，然后写好博客之后调用脚本就会自动将文章中引用的 img 图片上传到 Cloudflare Images 并且打开 <strong>需要已签名的 URL</strong> 然后根据返回的图像 ID 自动拼接 http 链接并替换原文 <code>&lt;img&gt;</code> 标签的本地文件地址。</p>
@@ -50,42 +33,51 @@
 ]]></content>
   </entry>
   <entry>
-    <title>OpenWrt 配置记录</title>
-    <url>/post/465f36a1.html</url>
-    <content><![CDATA[<p>这里会增量记录 OpenWrt 相关的一些技巧或者配置方法。</p>
+    <title>Garmin 国行码表使用 OSM 地图</title>
+    <url>/post/16e3b020.html</url>
+    <content><![CDATA[<p>国行的 Garmin 码表下载并安装 OSM 地图作为骑行地图，具体步骤可以参考下图</p>
 <span id="more"></span>
 
-<h1 id="内网设备直接访问光猫"><a href="#内网设备直接访问光猫" class="headerlink" title="内网设备直接访问光猫"></a>内网设备直接访问光猫</h1><p>在光猫桥接的情况下，一般 OpenWrt 和光猫的因为不在一个网段下，所以 OpenWrt 分配的 IP 并不能直接访问光猫。但是通过对 OpenWrt 防火墙进行相关的的配置可以实现访问光猫</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ul>
-<li>OpenWrt WAN 口: eth0</li>
-<li>光猫IP: 192.168.1.1</li>
-</ul>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>登录 OpenWrt 后台。在 <code>网络</code> -&gt; <code>防火墙</code> -&gt; <code>自定义规则</code> 下添加以下内容</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">ifconfig eth0 192.168.1.10 netmask 255.255.255.0 broadcast 192.168.1.255</span><br><span class="line">iptables -I forwarding_rule -d 192.168.1.1 -j ACCEPT</span><br><span class="line">iptables -t nat -I postrouting_rule -d 192.168.1.1 -j MASQUERADE</span><br></pre></td></tr></table></figure>
-
-<p>解释一下:</p>
 <ol>
-<li>第一行 <code>eth0</code> 是 OpenWrt WAN 口</li>
-<li>第一行 <code>192.168.1.10</code> 是手动分配给 <code>eth0</code> 一个光猫所在网段的 IP，可以时其他的地址，只要不和当前光猫网段下 IP 冲突就行</li>
-<li>第二行和第三行 <code>192.168.1.1</code> 是光猫的 IP 地址</li>
+<li>前往 <a href="https://alternativaslibres.org/en/downloads.php#Asia">alternativaslibres</a> 下载 China (Local Language-Non Unicode) OSM Base Map 地图</li>
 </ol>
-<p>然后重启 OpenWrt，此时内网设备就可以通过浏览器访问 <code>192.168.1.1</code> 登录光猫后台了。</p>
-<h1 id="开启-Dnsmasq-日志"><a href="#开启-Dnsmasq-日志" class="headerlink" title="开启 Dnsmasq 日志"></a>开启 Dnsmasq 日志</h1><p>编辑 <code>dnsmasq</code> 配置 <code>/etc/dnsmasq.conf</code> 文件</p>
-<p>添加以下内容</p>
-<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line"><span class="built_in">log</span>-queries</span><br><span class="line"><span class="built_in">log</span>-facility=<span class="regexp">/tmp/</span>dnsmasq.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+   <img src="https://images.zabrian.com/5d8fc582-7edf-470d-9555-49b0d7b22301/origin" title="下载地图" style="zoom:16%;" />
 
-<p>重启 dnsmasq 服务</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">/etc/init.d/dnsmasq restart</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>将地图拷贝到 <a href="https://support.garmin.com/en-US/?faq=HXl90IjTSb4SD1ibBSc1p7">Garmin MapInstall</a> 地图目录</li>
+</ol>
+   <img src="https://images.zabrian.com/411bc2e8-9d67-4ab3-e86f-8078aa991a01/origin" title="拷贝地图到 MapInstall/Maps" style="zoom:31%;" />
 
-<p>添加日志解析器</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">tail</span> -f -n 1 /tmp/dnsmasq.log</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>使用 <a href="https://support.garmin.com/en-US/?faq=HXl90IjTSb4SD1ibBSc1p7">Garmin MapInstall</a> 将地图安装到 Garmin 码表</li>
+</ol>
+   <img src="https://images.zabrian.com/1f8cbf0b-194c-47f9-271b-93641ab49b01/origin" title="安装地图到码表" style="zoom:45%;" />
+   <img src="https://images.zabrian.com/cabc6a26-ca42-4871-f91b-4db90d355e01/origin" title="安装地图到码表" style="zoom:45%;" />
 
-<h1 id="系统日志中屏蔽-crontab-相关日志"><a href="#系统日志中屏蔽-crontab-相关日志" class="headerlink" title="系统日志中屏蔽 crontab 相关日志"></a>系统日志中屏蔽 crontab 相关日志</h1><p>编辑系统配置 <code>/etc/config/system</code></p>
-<p>在 <code>system</code> 段中修改相关配置为以下内容</p>
-<figure class="highlight gams"><table><tr><td class="code"><pre><span class="line"><span class="keyword">option</span> cronloglevel <span class="string">&#x27;4&#x27;</span></span><br><span class="line"><span class="keyword">option</span> conloglevel <span class="string">&#x27;9&#x27;</span></span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li><p>将安装上步中安装到码表的 OSM 地图从码表复制到本地任意位置 (OSM 地图在码表位置 Garmin&#x2F;Maps&#x2F;OSM-China.img)</p>
+</li>
+<li><p>使用 <a href="https://www.gmaptool.eu/en/content/gmaptool">GMapTool</a> 修改地图</p>
+</li>
+</ol>
+   <img src="https://images.zabrian.com/669f2c84-6bd4-429c-1285-a558db9ab201/origin" title="修改 OSM 地图" style="zoom:32%;" />
 
-<p>然后重启 crontab 服务即可</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">/etc/init.d/cron restart</span><br></pre></td></tr></table></figure>]]></content>
+<ol start="6">
+<li>将修改过的地图重新复制为 Garmin 码表中的 OSM-China.img</li>
+</ol>
+   <img src="https://images.zabrian.com/3d3e5f60-aeb8-4b64-500e-c1bb2da1e701/origin" title="替换 OSM 地图" style="zoom:31%;" />
+
+<ol start="7">
+<li>在码表上查看 OSM 地图信息</li>
+</ol>
+   <img src="https://images.zabrian.com/d0c46ab3-57ed-4b71-1d29-47678ee19a01/origin" title="码表查看 OSM 地图信息" style="zoom:100%;" />
+   <img src="https://images.zabrian.com/49b09a5b-cc37-4e47-7379-8ace9a8a2701/origin" title="码表查看 OSM 地图信息" style="zoom:100%;" />
+
+<ol start="8">
+<li>在码表中启用 OSM 地图 (切记需要关闭 Garmin 默认中国地图，否则会导致地图偏移)</li>
+</ol>
+   <img src="https://images.zabrian.com/970fa57b-d976-4602-ccd3-4e387bafa401/origin" title="码表启用 OSM 地图" style="zoom:100%;" />
+]]></content>
   </entry>
   <entry>
     <title>GitLab 自动部署 GitHub Pages 博客</title>
@@ -133,12 +125,8 @@
  <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install gitlab-runner</span><br></pre></td></tr></table></figure>
 
 <p>如果一切顺利，gitlab-runner 就安装好了，可以运行 <code>sudo gitlab-runner -v</code> 如果没有错误，则说明 gitlab-runner 安装成功。</p>
-<h2 id="注册-Runner"><a href="#注册-Runner" class="headerlink" title="注册 Runner"></a>注册 Runner</h2><p>首先使用 <code>root</code> 用户登录 gitlab -&gt; 点击左上方 <code>Menu</code> -&gt; 进入 <code>Admin</code> -&gt; 点击左侧面板 <code>Overview</code> 下的 <code>Runners</code></p>
-<img src="https://images.zabrian.com/aeb5e5d1-d0fe-401b-9dfc-d7db0f6b6801/origin" class="" width="110" height="304">
-
-<p>然后点击右上方 Register an instance runner，复制 Registration token</p>
-<img src="https://images.zabrian.com/46491ad3-0fea-4fbb-d572-f349a75a1f01/origin" class="" width="243" height="184">
-
+<h2 id="注册-Runner"><a href="#注册-Runner" class="headerlink" title="注册 Runner"></a>注册 Runner</h2><p>首先使用 <code>root</code> 用户登录 gitlab -&gt; 点击左上方 <code>Menu</code> -&gt; 进入 <code>Admin</code> -&gt; 点击左侧面板 <code>Overview</code> 下的 <code>Runners</code><br><img src="https://images.zabrian.com/4dc2c2e2-dffb-44f5-2a7e-4140ab776f01/origin" title="GitLab-Admin-Runners" style="zoom:100%;" /></p>
+<p>然后点击右上方 Register an instance runner，复制 Registration token<br><img src="https://images.zabrian.com/fc6c425a-3304-44c8-a670-b425588c6101/origin" title="Register an instance runner" style="zoom:100%;" /></p>
 <p>再次通过 ssh 连接 GitLab 服务器注册一个共享 Runner</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-runner register</span><br><span class="line">Enter the GitLab instance URL (<span class="keyword">for</span> example, https://gitlab.com/):</span><br><span class="line">http://git.home/            <span class="comment"># 本地 GitLab 域名或者IP</span></span><br><span class="line">Enter the registration token:</span><br><span class="line">xxxxxxxxxxxxxxxx            <span class="comment"># 上面获取到的 token</span></span><br><span class="line">Enter a description <span class="keyword">for</span> the runner:</span><br><span class="line">[ubuntu]: node              <span class="comment"># runner 自定一个名字</span></span><br><span class="line">Enter tags <span class="keyword">for</span> the runner (comma-separated):</span><br><span class="line">node                        <span class="comment"># runner tag 的名字，通过 tag 指定运行 runner</span></span><br><span class="line">Registering runner... succeeded                     runner=xxxxxx</span><br><span class="line">Enter an executor: custom, ssh, docker-ssh+machine, kubernetes, docker, docker-ssh, parallels, shell, virtualbox, docker+machine:</span><br><span class="line">docker                      <span class="comment"># 这里选择 docker</span></span><br><span class="line">Enter the default Docker image (<span class="keyword">for</span> example, ruby:2.6):</span><br><span class="line">node:17                     <span class="comment"># docker 镜像以及版本</span></span><br><span class="line">Runner registered successfully. Feel free to start it, but <span class="keyword">if</span> it<span class="string">&#x27;s running already the config should be automatically reloaded!</span></span><br></pre></td></tr></table></figure>
 
@@ -149,9 +137,7 @@
 <p>公钥为 <code>blog.pub</code>，私钥为 <code>blog</code></p>
 <h2 id="GitHub-添加-Deploy-keys"><a href="#GitHub-添加-Deploy-keys" class="headerlink" title="GitHub 添加 Deploy keys"></a>GitHub 添加 Deploy keys</h2><p>登录 GitHub，进入部署的博客仓库，点击 <code>Settings</code> -&gt; <code>Deploy keys</code> -&gt; <code>Add deploy key</code></p>
 <p>将 <code>blog.pub</code> 公钥的内容全部复制到 <code>Key</code> 中，然后 <code>Title</code> 处自定义一个名字</p>
-<h2 id="GitLab-配置-CI-CD"><a href="#GitLab-配置-CI-CD" class="headerlink" title="GitLab 配置 CI&#x2F;CD"></a>GitLab 配置 CI&#x2F;CD</h2><p>进入 GitLab 博客项目，点击 <code>Settings</code> 下的 <code>CI/CD</code>，右侧展开 <code>Runners</code> 选项卡，右侧 <code>Shared runners</code> 打开 <code>Enable shared runners for this project</code> 选项</p>
-<img src="https://images.zabrian.com/44fc33ab-5ee7-41bb-f734-60846638a801/origin" class="" width="795" height="413">
-
+<h2 id="GitLab-配置-CI-CD"><a href="#GitLab-配置-CI-CD" class="headerlink" title="GitLab 配置 CI&#x2F;CD"></a>GitLab 配置 CI&#x2F;CD</h2><p>进入 GitLab 博客项目，点击 <code>Settings</code> 下的 <code>CI/CD</code>，右侧展开 <code>Runners</code> 选项卡，右侧 <code>Shared runners</code> 打开 <code>Enable shared runners for this project</code> 选项<br><img src="https://images.zabrian.com/6f66496d-6e87-463b-1fe6-657a77a5d801/origin" title="Enable shared runners for this project" style="zoom:25%;" /></p>
 <p>然后再展开到下方 <code>Variables</code> </p>
 <p>添加两个环境变量分别是</p>
 <ul>
@@ -161,7 +147,7 @@
 <ul>
 <li><code>SSH_PRIVATE_KEY</code><br> <a href="#%E5%88%9B%E5%BB%BA-SSH-%E5%AF%86%E9%92%A5%E5%AF%B9">创建 SSH 密钥对</a> 中的私钥 <code>blog</code> 内容</li>
 </ul>
-<img src="https://images.zabrian.com/21e99a98-9877-4284-8212-8deb61e26f01/origin" class="" width="853" height="343">
+<img src="https://images.zabrian.com/5f546e74-b6d1-4751-a4d7-c80d71e37801/origin" title="GitLab-CICD-Settings-Variables" style="zoom:47%;" />
 
 <h2 id="项目-gitlab-ci-yml-配置"><a href="#项目-gitlab-ci-yml-配置" class="headerlink" title="项目 .gitlab-ci.yml 配置"></a>项目 <code>.gitlab-ci.yml</code> 配置</h2><p>经过以上配置，现在离成功有一步之遥。</p>
 <p>在 GitLab 博客源码项目根目录下创建一个 <code>.gitlab-ci.yml</code> 的配置文件</p>
@@ -177,9 +163,9 @@
 <span id="more"></span>
 
 <p>一开始想到了可能是我的 <code>OSS</code> 防盗链。跑去看了一下，我已经添加了对应的 <code>Referer</code> 域名。一开始还以为是添加 <code>Referer</code> 生效需要时间，于是乎过了几个小时再打开问题依旧。<br>最诡异的是，打开 <code>Cloudflare Pages</code> 默认的 <code>pages.dev</code> 域名的时候，图片就是正常的。排查了一下，然后就发现了端倪。<br>问题来自通过绑定的自定义域名访问的时候，图片请求的 Header 中没有 <code>Referer</code> 字段。众所周知，所谓的防盗链其实就是检查 <code>Referer</code> 字段是不是在白名单中。那么问题来这了，为什么 <code>pages.dev</code> 域名中请求图片有 <code>Referer</code> 但是自定义域名没有？<br>再次稍加观察发现了一个现象</p>
-<img src="https://images.zabrian.com/200b1aca-b6ba-44f9-d6e9-c81a9905f201/origin" class="" width="700" height="253" title="自定义域名">
+<img src="https://images.zabrian.com/538e6269-12f2-4f3a-0bf1-bf030ba01501/origin" title="自定义域名" style="zoom:18%;" />
 
-<img src="https://images.zabrian.com/952f6760-9048-417f-7575-0c83a63d8b01/origin" class="" width="700" height="287" title="pages.dev 域名">  
+<img src="https://images.zabrian.com/a95cabc7-4b98-47be-7bdb-bc59cbb46101/origin" title="pages.dev 域名" style="zoom:21%;" />
 
 <p>原因就在这里</p>
 <ul>
@@ -206,6 +192,44 @@
     <title>Hello World</title>
     <url>/post/4a17b156.html</url>
     <content><![CDATA[<center>Hello World</center>]]></content>
+  </entry>
+  <entry>
+    <title>OpenWrt 配置记录</title>
+    <url>/post/465f36a1.html</url>
+    <content><![CDATA[<p>这里会增量记录 OpenWrt 相关的一些技巧或者配置方法。</p>
+<span id="more"></span>
+
+<h1 id="内网设备直接访问光猫"><a href="#内网设备直接访问光猫" class="headerlink" title="内网设备直接访问光猫"></a>内网设备直接访问光猫</h1><p>在光猫桥接的情况下，一般 OpenWrt 和光猫的因为不在一个网段下，所以 OpenWrt 分配的 IP 并不能直接访问光猫。但是通过对 OpenWrt 防火墙进行相关的的配置可以实现访问光猫</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ul>
+<li>OpenWrt WAN 口: eth0</li>
+<li>光猫IP: 192.168.1.1</li>
+</ul>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>登录 OpenWrt 后台。在 <code>网络</code> -&gt; <code>防火墙</code> -&gt; <code>自定义规则</code> 下添加以下内容</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">ifconfig eth0 192.168.1.10 netmask 255.255.255.0 broadcast 192.168.1.255</span><br><span class="line">iptables -I forwarding_rule -d 192.168.1.1 -j ACCEPT</span><br><span class="line">iptables -t nat -I postrouting_rule -d 192.168.1.1 -j MASQUERADE</span><br></pre></td></tr></table></figure>
+
+<p>解释一下:</p>
+<ol>
+<li>第一行 <code>eth0</code> 是 OpenWrt WAN 口</li>
+<li>第一行 <code>192.168.1.10</code> 是手动分配给 <code>eth0</code> 一个光猫所在网段的 IP，可以时其他的地址，只要不和当前光猫网段下 IP 冲突就行</li>
+<li>第二行和第三行 <code>192.168.1.1</code> 是光猫的 IP 地址</li>
+</ol>
+<p>然后重启 OpenWrt，此时内网设备就可以通过浏览器访问 <code>192.168.1.1</code> 登录光猫后台了。</p>
+<h1 id="开启-Dnsmasq-日志"><a href="#开启-Dnsmasq-日志" class="headerlink" title="开启 Dnsmasq 日志"></a>开启 Dnsmasq 日志</h1><p>编辑 <code>dnsmasq</code> 配置 <code>/etc/dnsmasq.conf</code> 文件</p>
+<p>添加以下内容</p>
+<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line"><span class="built_in">log</span>-queries</span><br><span class="line"><span class="built_in">log</span>-facility=<span class="regexp">/tmp/</span>dnsmasq.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+
+<p>重启 dnsmasq 服务</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">/etc/init.d/dnsmasq restart</span><br></pre></td></tr></table></figure>
+
+<p>添加日志解析器</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">tail</span> -f -n 1 /tmp/dnsmasq.log</span><br></pre></td></tr></table></figure>
+
+<h1 id="系统日志中屏蔽-crontab-相关日志"><a href="#系统日志中屏蔽-crontab-相关日志" class="headerlink" title="系统日志中屏蔽 crontab 相关日志"></a>系统日志中屏蔽 crontab 相关日志</h1><p>编辑系统配置 <code>/etc/config/system</code></p>
+<p>在 <code>system</code> 段中修改相关配置为以下内容</p>
+<figure class="highlight gams"><table><tr><td class="code"><pre><span class="line"><span class="keyword">option</span> cronloglevel <span class="string">&#x27;4&#x27;</span></span><br><span class="line"><span class="keyword">option</span> conloglevel <span class="string">&#x27;9&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后重启 crontab 服务即可</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">/etc/init.d/cron restart</span><br></pre></td></tr></table></figure>]]></content>
   </entry>
   <entry>
     <title>macOS Chrome &#39;这些扩展程序不再受支持，因此已停用&#39; 解决办法</title>
@@ -381,6 +405,93 @@
 ]]></content>
   </entry>
   <entry>
+    <title>北京联通异地宽带办理指南</title>
+    <url>/post/de583f28.html</url>
+    <content><![CDATA[<p>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。</p>
+<ul>
+<li>1000 Mbps 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30元</li>
+<li>500 Mbps 无合约 166 元&#x2F;月</li>
+</ul>
+<p>因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。</p>
+<span id="more"></span>
+
+<p>北京地区的异地宽带分两种</p>
+<ul>
+<li>300 Mbps 60 元&#x2F;月</li>
+<li>500 Mbps 80 元&#x2F;月</li>
+</ul>
+<img src="https://images.zabrian.com/8ec6254c-3291-42f6-69b0-2c8d53f22901/origin" title="异地宽带套餐" style="zoom:62%;" />
+
+<h1 id="办卡"><a href="#办卡" class="headerlink" title="办卡"></a>办卡</h1><p>既然是异地宽带，首先是需要一个异地手机卡。在某宝找了一个办卡，选了一个 19 块钱的套餐，反正就是能办多便宜就多便宜。19 差不多就是能在开卡的最便宜了。异地选的天津，主要就是离北京近，方便。</p>
+<p>然后记得询问一下卡是不是能正常改套餐办宽带啥的，别办物联网卡就行，要办的一定是正常的手机卡。然后配送地址写一个天津的地址，千万不能写异地，因为天津联通不能异地配送。必须要天津本地的地址。为了方便，我就直接写到了天津站。</p>
+<p>然后就是提交身份证啥的审核，当天审核通过下午显示就分配了小哥上门送卡。然后就是打电话给小哥改一下时间。毕竟当天下午已经 3 点了，还在上班咋，可能到天津取卡。</p>
+<p>然后我就约到了周六下午 3 点了。然后就是买了周六 14:09 ~ 14:42 从北京到天津的去程，15:22 ~ 15:52 从天津到北京南的返程。一共花了 100 过点。</p>
+<p>当天上车之后给小哥打了个电话，说了下是专程来办卡的，返程时间比较紧，希望能尽快到。小哥表示没问题。然后我快到站的时候小哥来电话了说他已经到了（d&#x3D;(´▽｀)&#x3D;b）</p>
+<p>然后就和小哥在车站里面碰上面了。拍照办卡一气呵成，全程花了不到 5 分钟。交了 500 块钱话费结束。然后返程回家。</p>
+<h1 id="改套餐"><a href="#改套餐" class="headerlink" title="改套餐"></a>改套餐</h1><p>开卡的时候选的是 19 块钱的套餐，第二天第一件事就是改到 8 元保号套餐。所以上面办卡的时候需要确认卡片套餐能否修改（有的有合约，不能修改或者得过几个月才能修改）可以直接打电话给联通，转到人工改。但是我嫌打电话麻烦，下载了联通app，用新办的手机卡登录，右上角在线客服修改套餐到 8 元保号套餐就行。客服会告诉你会有专属经理 48h 内联系，但是我的当天下午就来电联系了，确认修改后次月就生效了。</p>
+<img src="https://images.zabrian.com/83d18cc4-1a34-43d3-043c-b63386745e01/origin" title="联系客服修改套餐" style="zoom:62%;" />
+
+<h1 id="办宽带"><a href="#办宽带" class="headerlink" title="办宽带"></a>办宽带</h1><p>这里办宽带一定要从联通 app 上办理，去营业厅是办不了这个价格的异地宽带。</p>
+<p>app 里面的位置在这里</p>
+<img src="https://images.zabrian.com/8d192054-73d8-4156-87f5-c8f5eed0fd01/origin" title="异地同享专区" style="zoom:62%;" />
+
+<p>然后选择全国一家亲异地宽带</p>
+<img src="https://images.zabrian.com/32f222f5-5e1f-4b39-5329-848898dd2f01/origin" title="全国一家亲异地宽带" style="zoom:62%;" />
+
+<p>然后进去之后选择宽带办理的城市，我这里就是北京，然后就会有能办理的类型，包括 300 Mbps 和 500 Mbps 选好之后填写下面的具体的内容，提交预约即可。</p>
+<p>然后过了几个小时就有联通的电话了，确定办理的宽带后，表示北京有一个 300 块钱的安装费。次月从话费里面扣除。确定无误后客服给我发了一个短信，里面有个链接。需要上传身份证正反面和拍摄一张免冠自拍照。然后就等着分配小哥吧。</p>
+<h1 id="上门安装"><a href="#上门安装" class="headerlink" title="上门安装"></a>上门安装</h1><p>到了预约的那天，小哥上门。确认了信息之后就开始装光猫啥的。在这个途中，因为现在北京天气已经很热了，小哥又是中午上门的。递上瓶水，拿个板凳坐会儿。要是抽烟可以再递个烟啥的。之后就开始表达自己想要公网 IP 的诉求（毕竟求人办事儿，所以前面就客气点）小哥问了个原因，我说家里有监控需要。然后小哥还拍了个监控的照片，并且还说：“现在公网 IP 不好拿，需要有明确的需求才能申请，你这个要用监控。但其实现在监控这个理由不怎么能过了。你要是有明确诉求可以给你申请。”（反正就是一边表达不好搞，但是一边还都给申请了）然后就顺便连桥接一起给办了，顺便加了一下小哥私人的微信（虽然现在一般都是要加企微，但是小哥还是给了他私人的微信）最后装好后他那走了个测速，安装 500 M 实际测速能到 650。还不错。最后记了一下宽带的密码，搞定。从上门到最后小哥走一共花了不到 10 min，外加一瓶水的钱。</p>
+<h1 id="办理上行提速"><a href="#办理上行提速" class="headerlink" title="办理上行提速"></a>办理上行提速</h1><p>500 Mbps 的宽带下行对应上行才给 30 Mbps 是真的拉跨，但是可以办理加速包: <a href="https://wokuan.114menhu.com/">沃宽</a></p>
+<p>用办理宽带的异地手机号登录</p>
+<img src="https://images.zabrian.com/29685c89-0b86-439b-be44-1ea181ba1601/origin" title="沃宽登陆界面" style="zoom:39%;" />
+
+<p>然后在左侧【我的宽带】中添加当前宽带</p>
+<img src="https://images.zabrian.com/214b8dce-750d-4fea-cb68-b81701392d01/origin" title="沃宽添加宽带" style="zoom:40%;" />
+
+<p>添加成功后再左侧 【我要购买】中应该可以看到一个【宽带上行提速包 100 M】这里一次最多可以购买 6 个（连续半年，到期后可以继续购买）</p>
+<img src="https://images.zabrian.com/13a412ea-2b2b-4be8-4013-821b35e6d201/origin" title="购买上行提速包" style="zoom:40%;" />
+
+<p>购买成功后，在左侧【首页】点击【点我提速】就可以了，无需重启光猫即可享受 100 Mbps 的上行速率了。</p>
+<img src="https://images.zabrian.com/1b239e28-26bc-43cd-e168-d7970cc88701/origin" title="上行提速" style="zoom:39%;" />
+
+<h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>最后算一下成本</p>
+<ul>
+<li>一次性成本：来回 100 元路费 + 装机费 300 元（唯一的坑点） &#x3D; 400 元</li>
+<li>周期性成本：每月异地号码套餐 8 元 + 宽带费用 80 元 + 上行加速包 30 元 &#x3D; 118 元</li>
+</ul>
+<p>总体还是比 500 Mbps 的融合套便宜很多的。</p>
+<p>最后附上 speedtest 和 ustc 的测速结果吧</p>
+<img src="https://images.zabrian.com/ac825486-02e6-43f8-1e06-419808a0da01/origin" title="SpeedTest 测速" style="zoom:100%;" />
+
+<img src="https://images.zabrian.com/8cb09a0c-3136-4487-8e35-a242c3ecf601/origin" title="USTC 测速" style="zoom:85%;" />
+]]></content>
+  </entry>
+  <entry>
+    <title>更改 macOS 强调色</title>
+    <url>/post/c59c6467.html</url>
+    <content><![CDATA[<p>Apple 在 <a href="https://www.apple.com/imac-24">iMac 24”</a> Mac 中首次使用了新的强调色，这些强调色是这些 Mac 独有的。但是现在只要是 macOS 11.3.1 以上的系统，即使不是 iMac 24” 机器，也可以使用这些特有的强调色。</p>
+<span id="more"></span>
+
+<p>首先需要开启基于硬件的强调色 <code>NSColorSimulateHardwareAccent</code> 功能</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulateHardwareAccent -bool YES</span><br></pre></td></tr></table></figure>
+<p>然后通过 <code>NSColorSimulatedHardwareEnclosureNumber</code> 选择其中任意一种颜色。其中可选的颜色选项为 3 到 8 (包含 3 和 8)</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulatedHardwareEnclosureNumber -int 3</span><br></pre></td></tr></table></figure>
+<p>然后重新启动电脑或者退出登录重新登录即可生效。<br>然后在 <strong>系统设置</strong> -&gt; <strong>外观选项卡</strong> -&gt; <strong>强调色</strong> 和 <strong>高亮标记颜色</strong> 选项中会出现一个 <strong>这台Mac</strong> 的颜色选项，其中颜色即为上面设置的颜色。</p>
+<p>以下是 <code>NSColorSimulatedHardwareEnclosureNumber</code> 不同值的实际效果</p>
+<img src="https://images.zabrian.com/c5f66aed-fff8-43e1-940d-8388311a0a01/origin" title="颜色 3" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/38169874-ea75-4086-24b1-ccd6416e9701/origin" title="颜色 4" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/1683833a-7ee4-416a-5659-2a31fbe46001/origin" title="颜色 5" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/fe160cc7-b5cb-435d-374b-6cb2e744d901/origin" title="颜色 6" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/5a1dfe77-2619-435a-290f-d058a032b601/origin" title="颜色 7" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/6dcb7e11-165d-4547-1bd4-ff7e02a8c001/origin" title="颜色 8" style="zoom:57%;" />
+]]></content>
+  </entry>
+  <entry>
     <title>搭建家庭私人 GitLab 服务器</title>
     <url>/post/8d4f8799.html</url>
     <content><![CDATA[<p>大概今年（2022）一月中旬的时候入手了一个 <a href="https://r86s.net/">R86S</a> 的小主机。因为错过了众筹的车，所以是直接下的单。最后入手了 16G 的黑色千兆版本。不上万兆一个原因是家里没有这个需求，还有一个就是万兆版的没有 NVME 硬盘位，这一点对我还是刚需。</p>
@@ -430,93 +541,6 @@
 <p>修改完 <code>gitlab.rb</code> 后需要重新配置 GitLab 才能生效</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
 <p>稍等片刻，在浏览器中打开 <a href="http://git.home/">http://git.home</a> 就可以看到搭建好的 GitLab 了。</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>北京联通异地宽带办理指南</title>
-    <url>/post/de583f28.html</url>
-    <content><![CDATA[<p>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。</p>
-<ul>
-<li>1000 Mbps 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30元</li>
-<li>500 Mbps 无合约 166 元&#x2F;月</li>
-</ul>
-<p>因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。</p>
-<span id="more"></span>
-
-<p>北京地区的异地宽带分两种</p>
-<ul>
-<li>300 Mbps 60 元&#x2F;月</li>
-<li>500 Mbps 80 元&#x2F;月</li>
-</ul>
-<img src="https://images.zabrian.com/305fa63c-206d-4d6d-88e8-1a04ab95f301/origin" class="" width="256" height="298">
-
-<h1 id="办卡"><a href="#办卡" class="headerlink" title="办卡"></a>办卡</h1><p>既然是异地宽带，首先是需要一个异地手机卡。在某宝找了一个办卡，选了一个 19 块钱的套餐，反正就是能办多便宜就多便宜。19 差不多就是能在开卡的最便宜了。异地选的天津，主要就是离北京近，方便。</p>
-<p>然后记得询问一下卡是不是能正常改套餐办宽带啥的，别办物联网卡就行，要办的一定是正常的手机卡。然后配送地址写一个天津的地址，千万不能写异地，因为天津联通不能异地配送。必须要天津本地的地址。为了方便，我就直接写到了天津站。</p>
-<p>然后就是提交身份证啥的审核，当天审核通过下午显示就分配了小哥上门送卡。然后就是打电话给小哥改一下时间。毕竟当天下午已经 3 点了，还在上班咋，可能到天津取卡。</p>
-<p>然后我就约到了周六下午 3 点了。然后就是买了周六 14:09 ~ 14:42 从北京到天津的去程，15:22 ~ 15:52 从天津到北京南的返程。一共花了 100 过点。</p>
-<p>当天上车之后给小哥打了个电话，说了下是专程来办卡的，返程时间比较紧，希望能尽快到。小哥表示没问题。然后我快到站的时候小哥来电话了说他已经到了（d&#x3D;(´▽｀)&#x3D;b）</p>
-<p>然后就和小哥在车站里面碰上面了。拍照办卡一气呵成，全程花了不到 5 分钟。交了 500 块钱话费结束。然后返程回家。</p>
-<h1 id="改套餐"><a href="#改套餐" class="headerlink" title="改套餐"></a>改套餐</h1><p>开卡的时候选的是 19 块钱的套餐，第二天第一件事就是改到 8 元保号套餐。所以上面办卡的时候需要确认卡片套餐能否修改（有的有合约，不能修改或者得过几个月才能修改）可以直接打电话给联通，转到人工改。但是我嫌打电话麻烦，下载了联通app，用新办的手机卡登录，右上角在线客服修改套餐到 8 元保号套餐就行。客服会告诉你会有专属经理 48h 内联系，但是我的当天下午就来电联系了，确认修改后次月就生效了。</p>
-<img src="https://images.zabrian.com/14d5a8f4-cbf5-4f35-ac49-783c437d9a01/origin" class="" width="214" height="464">
-
-<h1 id="办宽带"><a href="#办宽带" class="headerlink" title="办宽带"></a>办宽带</h1><p>这里办宽带一定要从联通 app 上办理，去营业厅是办不了这个价格的异地宽带。</p>
-<p>app 里面的位置在这里</p>
-<img src="https://images.zabrian.com/2376f0ec-77de-436a-b154-5c7361214801/origin" class="" width="214" height="464">
-
-<p>然后选择全国一家亲异地宽带</p>
-<img src="https://images.zabrian.com/3c7a486c-a93e-41d4-1ee5-a68881bca401/origin" class="" width="214" height="464">
-
-<p>然后进去之后选择宽带办理的城市，我这里就是北京，然后就会有能办理的类型，包括 300 Mbps 和 500 Mbps 选好之后填写下面的具体的内容，提交预约即可。</p>
-<p>然后过了几个小时就有联通的电话了，确定办理的宽带后，表示北京有一个 300 块钱的安装费。次月从话费里面扣除。确定无误后客服给我发了一个短信，里面有个链接。需要上传身份证正反面和拍摄一张免冠自拍照。然后就等着分配小哥吧。</p>
-<h1 id="上门安装"><a href="#上门安装" class="headerlink" title="上门安装"></a>上门安装</h1><p>到了预约的那天，小哥上门。确认了信息之后就开始装光猫啥的。在这个途中，因为现在北京天气已经很热了，小哥又是中午上门的。递上瓶水，拿个板凳坐会儿。要是抽烟可以再递个烟啥的。之后就开始表达自己想要公网 IP 的诉求（毕竟求人办事儿，所以前面就客气点）小哥问了个原因，我说家里有监控需要。然后小哥还拍了个监控的照片，并且还说：“现在公网 IP 不好拿，需要有明确的需求才能申请，你这个要用监控。但其实现在监控这个理由不怎么能过了。你要是有明确诉求可以给你申请。”（反正就是一边表达不好搞，但是一边还都给申请了）然后就顺便连桥接一起给办了，顺便加了一下小哥私人的微信（虽然现在一般都是要加企微，但是小哥还是给了他私人的微信）最后装好后他那走了个测速，安装 500 M 实际测速能到 650。还不错。最后记了一下宽带的密码，搞定。从上门到最后小哥走一共花了不到 10 min，外加一瓶水的钱。</p>
-<h1 id="办理上行提速"><a href="#办理上行提速" class="headerlink" title="办理上行提速"></a>办理上行提速</h1><p>500 Mbps 的宽带下行对应上行才给 30 Mbps 是真的拉跨，但是可以办理加速包: <a href="https://wokuan.114menhu.com/">沃宽</a></p>
-<p>用办理宽带的异地手机号登录</p>
-<img src="https://images.zabrian.com/e340ff51-4d60-4d71-6c36-a231c2e96001/origin" class="" width="412" height="207">
-
-<p>然后在左侧【我的宽带】中添加当前宽带</p>
-<img src="https://images.zabrian.com/5a27d8f8-8ae6-465a-5123-7688e550a101/origin" class="" width="400" height="211">
-
-<p>添加成功后再左侧 【我要购买】中应该可以看到一个【宽带上行提速包 100 M】这里一次最多可以购买 6 个（连续半年，到期后可以继续购买）</p>
-<img src="https://images.zabrian.com/047c42d8-e186-4be5-9af7-ac93c4d4c701/origin" class="" width="400" height="287">
-
-<p>购买成功后，在左侧【首页】点击【点我提速】就可以了，无需重启光猫即可享受 100 Mbps 的上行速率了。</p>
-<img src="https://images.zabrian.com/8168b6f4-383d-4512-8650-56e4ddadc301/origin" class="" width="405" height="175">
-
-<h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>最后算一下成本</p>
-<ul>
-<li>一次性成本：来回 100 元路费 + 装机费 300 元（唯一的坑点） &#x3D; 400 元</li>
-<li>周期性成本：每月异地号码套餐 8 元 + 宽带费用 80 元 + 上行加速包 30 元 &#x3D; 118 元</li>
-</ul>
-<p>总体还是比 500 Mbps 的融合套便宜很多的。</p>
-<p>最后附上 speedtest 和 ustc 的测速结果吧</p>
-<img src="https://images.zabrian.com/57b85808-6291-4b07-50fc-a1f9b2c3b801/origin" class="" width="500" height="266">
-
-<img src="https://images.zabrian.com/f86b17d8-a483-4e6b-e4df-bc358644e801/origin" class="" width="315" height="329">
-]]></content>
-  </entry>
-  <entry>
-    <title>更改 macOS 强调色</title>
-    <url>/post/c59c6467.html</url>
-    <content><![CDATA[<p>Apple 在 <a href="https://www.apple.com/imac-24">iMac 24”</a> Mac 中首次使用了新的强调色，这些强调色是这些 Mac 独有的。但是现在只要是 macOS 11.3.1 以上的系统，即使不是 iMac 24” 机器，也可以使用这些特有的强调色。</p>
-<span id="more"></span>
-
-<p>首先需要开启基于硬件的强调色 <code>NSColorSimulateHardwareAccent</code> 功能</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulateHardwareAccent -bool YES</span><br></pre></td></tr></table></figure>
-<p>然后通过 <code>NSColorSimulatedHardwareEnclosureNumber</code> 选择其中任意一种颜色。其中可选的颜色选项为 3 到 8 (包含 3 和 8)</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulatedHardwareEnclosureNumber -int 3</span><br></pre></td></tr></table></figure>
-<p>然后重新启动电脑或者退出登录重新登录即可生效。<br>然后在 <strong>系统设置</strong> -&gt; <strong>外观选项卡</strong> -&gt; <strong>强调色</strong> 和 <strong>高亮标记颜色</strong> 选项中会出现一个 <strong>这台Mac</strong> 的颜色选项，其中颜色即为上面设置的颜色。</p>
-<p>以下是 <code>NSColorSimulatedHardwareEnclosureNumber</code> 不同值的实际效果</p>
-<img src="https://images.zabrian.com/9764758d-db36-4078-115c-d32e84659901/origin" class="" width="700" height="230" title="3 - 黄色">
-
-<img src="https://images.zabrian.com/d8b1d077-120f-4553-8f8b-58be7c14d001/origin" class="" width="700" height="230" title="4 - 绿色">
-
-<img src="https://images.zabrian.com/06fc0f4e-7333-4ed4-363e-a58fd530cc01/origin" class="" width="700" height="230" title="5 - 蓝色">
-
-<img src="https://images.zabrian.com/f76fe55c-bd90-43f2-cbbd-5e0b96c30d01/origin" class="" width="700" height="230" title="6 - 粉色">
-
-<img src="https://images.zabrian.com/cef880d0-fab9-4e0f-e713-6251dea6f001/origin" class="" width="700" height="230" title="7 - 紫色">
-
-<img src="https://images.zabrian.com/55141a1b-ad75-40f8-4613-57d604e02001/origin" class="" width="700" height="230" title="8 - 橙色">
 ]]></content>
   </entry>
   <entry>
