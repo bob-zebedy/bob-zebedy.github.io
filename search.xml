@@ -176,7 +176,7 @@
     <content><![CDATA[<p>在 <a href="/post/ec93b507.html" title="Cloudflare 使用 Workers 建立 Images 代理">Cloudflare 使用 Workers 建立 Images 代理</a> 一文中。使用 Workers 搭建了一个 Images 代理，通过设置 <code>Referer</code> 和 URL 签名有效期实现简易的防盗链以及防刷流量。但是这些措施只能做到防君子不防小人，其实很轻易的就可以通过代码自动实现刷图片流量。为了避免这种情况，想着能不能使用 <code>Cloudflare Turnstile</code> 阻挡非人类请求的流量。但是研究了一下发现 <code>Cloudflare Turnstile</code> 需要 <strong><a href="https://developers.cloudflare.com/turnstile/get-started/server-side-validation/">服务端代码验证</a></strong> 但是很显然，<code>Hexo</code> 这种纯静态博客没有后端服务，所以思索了一下决定还是使用 Workers 实现一个支持静态网页的 <code>Cloudflare Turnstile</code> 方案。</p>
 <span id="more"></span>
 
-<p>思路就是将原始博客通过 <code>Cloudflare Pages</code> 托管并绑定一个自定义域名(比如 <code>source.example.com</code>)作为静态页面的源站，然后再创建一个 blog 的 Workers (绑定自定义域名 <code>blog.example.com</code>) 作为代理站，在这个 blog 的 Workers 中实现 <code>Cloudflare Turnstile</code> 的服务端验证逻辑，验证通过则注入一个 <code>JWT Token</code> 实现在有效期内就无需再次验证。</p>
+<p>思路就是将原始博客通过 <code>Cloudflare Pages</code> 托管并绑定一个自定义域名比如 <code>source.example.com</code> 作为静态页面的源站，然后再创建一个 blog 的 Workers (绑定自定义域名 <code>blog.example.com</code>) 作为代理站，在这个 blog 的 Workers 中实现 <code>Cloudflare Turnstile</code> 的服务端验证逻辑，验证通过则注入一个 <code>JWT Token</code> 实现在有效期内就无需再次验证。</p>
 <ol>
 <li>打开 <a href="https://dash.cloudflare.com/">Cloudflare Dashboard</a> 点击左侧的 <strong>Turnstile</strong> 在右侧点击 <strong>添加小组件</strong><img src="https://images.zabrian.com/d0a19b46-f067-4866-2f22-f3d224d3a301/origin" title="Turnstile 首页" style="zoom:16%;" /></li>
 <li>按照实际情况填写信息，域名则添加静态页面的代理域名 (上文中的 <code>blog.example.com</code> 而不是 <code>source.example.com</code>)，下方选择 <strong>托管</strong> 和 <strong>否</strong><img src="https://images.zabrian.com/b0bdf585-c029-4e0c-ffb8-6b1fe7c34401/origin" title="Turnstile 添加组件" style="zoom:16%;" /></li>
@@ -265,68 +265,6 @@
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> -p <span class="string">&quot;/Library/Managed Preferences&quot;</span> &amp;&amp; <span class="built_in">sudo</span> <span class="built_in">tee</span> <span class="string">&quot;/Library/Managed Preferences/com.google.Chrome.plist&quot;</span> &gt;/dev/null &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="string">&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot;</span></span><br><span class="line"><span class="string">  &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;\&gt;</span></span><br><span class="line"><span class="string">&lt;plist version=&quot;1.0&quot;&gt;</span></span><br><span class="line"><span class="string">  &lt;dict&gt;</span></span><br><span class="line"><span class="string">    &lt;key&gt;ExtensionManifestV2Availability&lt;/key&gt;</span></span><br><span class="line"><span class="string">    &lt;integer&gt;2&lt;/integer&gt;</span></span><br><span class="line"><span class="string">  &lt;/dict&gt;</span></span><br><span class="line"><span class="string">&lt;/plist&gt;</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure>
 
 <p>完全关闭 Chrome 后再打开，在地址栏输入 <code>chrome://policy/</code> 点击左上角的重新加载政策，然后旧版的扩展就可以继续使用啦。</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>北京联通异地宽带办理指南</title>
-    <url>/post/de583f28.html</url>
-    <content><![CDATA[<p>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。</p>
-<ul>
-<li>1000 Mbps 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30 元</li>
-<li>500 Mbps 无合约 166 元&#x2F;月</li>
-</ul>
-<p>因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。</p>
-<span id="more"></span>
-
-<p>北京地区的异地宽带分两种</p>
-<ul>
-<li>300 Mbps 60 元&#x2F;月</li>
-<li>500 Mbps 80 元&#x2F;月</li>
-</ul>
-<img src="https://images.zabrian.com/8ec6254c-3291-42f6-69b0-2c8d53f22901/origin" title="异地宽带套餐" style="zoom:62%;" />
-
-<h1 id="办卡"><a href="#办卡" class="headerlink" title="办卡"></a>办卡</h1><p>既然是异地宽带，首先是需要一个异地手机卡。在某宝找了一个办卡，选了一个 19 块钱的套餐，反正就是能办多便宜就多便宜。19 差不多就是能在开卡的最便宜了。异地选的天津，主要就是离北京近，方便。</p>
-<p>然后记得询问一下卡是不是能正常改套餐办宽带啥的，别办物联网卡就行，要办的一定是正常的手机卡。然后配送地址写一个天津的地址，千万不能写异地，因为天津联通不能异地配送。必须要天津本地的地址。为了方便，我就直接写到了天津站。</p>
-<p>然后就是提交身份证啥的审核，当天审核通过下午显示就分配了小哥上门送卡。然后就是打电话给小哥改一下时间。毕竟当天下午已经 3 点了，还在上班咋，可能到天津取卡。</p>
-<p>然后我就约到了周六下午 3 点了。然后就是买了周六 14:09 ~ 14:42 从北京到天津的去程，15:22 ~ 15:52 从天津到北京南的返程。一共花了 100 过点。</p>
-<p>当天上车之后给小哥打了个电话，说了下是专程来办卡的，返程时间比较紧，希望能尽快到。小哥表示没问题。然后我快到站的时候小哥来电话了说他已经到了（d&#x3D;(´▽ ｀)&#x3D;b）</p>
-<p>然后就和小哥在车站里面碰上面了。拍照办卡一气呵成，全程花了不到 5 分钟。交了 500 块钱话费结束。然后返程回家。</p>
-<h1 id="改套餐"><a href="#改套餐" class="headerlink" title="改套餐"></a>改套餐</h1><p>开卡的时候选的是 19 块钱的套餐，第二天第一件事就是改到 8 元保号套餐。所以上面办卡的时候需要确认卡片套餐能否修改（有的有合约，不能修改或者得过几个月才能修改）可以直接打电话给联通，转到人工改。但是我嫌打电话麻烦，下载了联通 app，用新办的手机卡登录，右上角在线客服修改套餐到 8 元保号套餐就行。客服会告诉你会有专属经理 48h 内联系，但是我的当天下午就来电联系了，确认修改后次月就生效了。</p>
-<img src="https://images.zabrian.com/83d18cc4-1a34-43d3-043c-b63386745e01/origin" title="联系客服修改套餐" style="zoom:62%;" />
-
-<h1 id="办宽带"><a href="#办宽带" class="headerlink" title="办宽带"></a>办宽带</h1><p>这里办宽带一定要从联通 app 上办理，去营业厅是办不了这个价格的异地宽带。</p>
-<p>app 里面的位置在这里</p>
-<img src="https://images.zabrian.com/8d192054-73d8-4156-87f5-c8f5eed0fd01/origin" title="异地同享专区" style="zoom:62%;" />
-
-<p>然后选择全国一家亲异地宽带</p>
-<img src="https://images.zabrian.com/32f222f5-5e1f-4b39-5329-848898dd2f01/origin" title="全国一家亲异地宽带" style="zoom:62%;" />
-
-<p>然后进去之后选择宽带办理的城市，我这里就是北京，然后就会有能办理的类型，包括 300 Mbps 和 500 Mbps 选好之后填写下面的具体的内容，提交预约即可。</p>
-<p>然后过了几个小时就有联通的电话了，确定办理的宽带后，表示北京有一个 300 块钱的安装费。次月从话费里面扣除。确定无误后客服给我发了一个短信，里面有个链接。需要上传身份证正反面和拍摄一张免冠自拍照。然后就等着分配小哥吧。</p>
-<h1 id="上门安装"><a href="#上门安装" class="headerlink" title="上门安装"></a>上门安装</h1><p>到了预约的那天，小哥上门。确认了信息之后就开始装光猫啥的。在这个途中，因为现在北京天气已经很热了，小哥又是中午上门的。递上瓶水，拿个板凳坐会儿。要是抽烟可以再递个烟啥的。之后就开始表达自己想要公网 IP 的诉求（毕竟求人办事儿，所以前面就客气点）小哥问了个原因，我说家里有监控需要。然后小哥还拍了个监控的照片，并且还说：“现在公网 IP 不好拿，需要有明确的需求才能申请，你这个要用监控。但其实现在监控这个理由不怎么能过了。你要是有明确诉求可以给你申请。”（反正就是一边表达不好搞，但是一边还都给申请了）然后就顺便连桥接一起给办了，顺便加了一下小哥私人的微信（虽然现在一般都是要加企微，但是小哥还是给了他私人的微信）最后装好后他那走了个测速，安装 500 M 实际测速能到 650。还不错。最后记了一下宽带的密码，搞定。从上门到最后小哥走一共花了不到 10 min，外加一瓶水的钱。</p>
-<h1 id="办理上行提速"><a href="#办理上行提速" class="headerlink" title="办理上行提速"></a>办理上行提速</h1><p>500 Mbps 的宽带下行对应上行才给 30 Mbps 是真的拉跨，但是可以办理加速包: <a href="https://wokuan.114menhu.com/">沃宽</a></p>
-<p>用办理宽带的异地手机号登录</p>
-<img src="https://images.zabrian.com/29685c89-0b86-439b-be44-1ea181ba1601/origin" title="沃宽登陆界面" style="zoom:39%;" />
-
-<p>然后在左侧【我的宽带】中添加当前宽带</p>
-<img src="https://images.zabrian.com/214b8dce-750d-4fea-cb68-b81701392d01/origin" title="沃宽添加宽带" style="zoom:40%;" />
-
-<p>添加成功后再左侧 【我要购买】中应该可以看到一个【宽带上行提速包 100 M】这里一次最多可以购买 6 个（连续半年，到期后可以继续购买）</p>
-<img src="https://images.zabrian.com/13a412ea-2b2b-4be8-4013-821b35e6d201/origin" title="购买上行提速包" style="zoom:40%;" />
-
-<p>购买成功后，在左侧【首页】点击【点我提速】就可以了，无需重启光猫即可享受 100 Mbps 的上行速率了。</p>
-<img src="https://images.zabrian.com/1b239e28-26bc-43cd-e168-d7970cc88701/origin" title="上行提速" style="zoom:39%;" />
-
-<h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>最后算一下成本</p>
-<ul>
-<li>一次性成本：来回 100 元路费 + 装机费 300 元（唯一的坑点） &#x3D; 400 元</li>
-<li>周期性成本：每月异地号码套餐 8 元 + 宽带费用 80 元 + 上行加速包 30 元 &#x3D; 118 元</li>
-</ul>
-<p>总体还是比 500 Mbps 的融合套便宜很多的。</p>
-<p>最后附上 speedtest 和 ustc 的测速结果吧</p>
-<img src="https://images.zabrian.com/ac825486-02e6-43f8-1e06-419808a0da01/origin" title="SpeedTest 测速" style="zoom:100%;" />
-
-<img src="https://images.zabrian.com/8cb09a0c-3136-4487-8e35-a242c3ecf601/origin" title="USTC 测速" style="zoom:85%;" />
 ]]></content>
   </entry>
   <entry>
@@ -496,6 +434,68 @@
 
 <p>同时 <code>push</code> 到 <code>GitHub</code> 上后也可以看到提交有一个 <code>verified</code> 的标记。</p>
 <p>至此，创建用于代码签名的子密钥结束。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>北京联通异地宽带办理指南</title>
+    <url>/post/de583f28.html</url>
+    <content><![CDATA[<p>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。</p>
+<ul>
+<li>1000 Mbps 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30 元</li>
+<li>500 Mbps 无合约 166 元&#x2F;月</li>
+</ul>
+<p>因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。</p>
+<span id="more"></span>
+
+<p>北京地区的异地宽带分两种</p>
+<ul>
+<li>300 Mbps 60 元&#x2F;月</li>
+<li>500 Mbps 80 元&#x2F;月</li>
+</ul>
+<img src="https://images.zabrian.com/8ec6254c-3291-42f6-69b0-2c8d53f22901/origin" title="异地宽带套餐" style="zoom:62%;" />
+
+<h1 id="办卡"><a href="#办卡" class="headerlink" title="办卡"></a>办卡</h1><p>既然是异地宽带，首先是需要一个异地手机卡。在某宝找了一个办卡，选了一个 19 块钱的套餐，反正就是能办多便宜就多便宜。19 差不多就是能在开卡的最便宜了。异地选的天津，主要就是离北京近，方便。</p>
+<p>然后记得询问一下卡是不是能正常改套餐办宽带啥的，别办物联网卡就行，要办的一定是正常的手机卡。然后配送地址写一个天津的地址，千万不能写异地，因为天津联通不能异地配送。必须要天津本地的地址。为了方便，我就直接写到了天津站。</p>
+<p>然后就是提交身份证啥的审核，当天审核通过下午显示就分配了小哥上门送卡。然后就是打电话给小哥改一下时间。毕竟当天下午已经 3 点了，还在上班咋，可能到天津取卡。</p>
+<p>然后我就约到了周六下午 3 点了。然后就是买了周六 14:09 ~ 14:42 从北京到天津的去程，15:22 ~ 15:52 从天津到北京南的返程。一共花了 100 过点。</p>
+<p>当天上车之后给小哥打了个电话，说了下是专程来办卡的，返程时间比较紧，希望能尽快到。小哥表示没问题。然后我快到站的时候小哥来电话了说他已经到了（d&#x3D;(´▽ ｀)&#x3D;b）</p>
+<p>然后就和小哥在车站里面碰上面了。拍照办卡一气呵成，全程花了不到 5 分钟。交了 500 块钱话费结束。然后返程回家。</p>
+<h1 id="改套餐"><a href="#改套餐" class="headerlink" title="改套餐"></a>改套餐</h1><p>开卡的时候选的是 19 块钱的套餐，第二天第一件事就是改到 8 元保号套餐。所以上面办卡的时候需要确认卡片套餐能否修改（有的有合约，不能修改或者得过几个月才能修改）可以直接打电话给联通，转到人工改。但是我嫌打电话麻烦，下载了联通 app，用新办的手机卡登录，右上角在线客服修改套餐到 8 元保号套餐就行。客服会告诉你会有专属经理 48h 内联系，但是我的当天下午就来电联系了，确认修改后次月就生效了。</p>
+<img src="https://images.zabrian.com/83d18cc4-1a34-43d3-043c-b63386745e01/origin" title="联系客服修改套餐" style="zoom:62%;" />
+
+<h1 id="办宽带"><a href="#办宽带" class="headerlink" title="办宽带"></a>办宽带</h1><p>这里办宽带一定要从联通 app 上办理，去营业厅是办不了这个价格的异地宽带。</p>
+<p>app 里面的位置在这里</p>
+<img src="https://images.zabrian.com/8d192054-73d8-4156-87f5-c8f5eed0fd01/origin" title="异地同享专区" style="zoom:62%;" />
+
+<p>然后选择全国一家亲异地宽带</p>
+<img src="https://images.zabrian.com/32f222f5-5e1f-4b39-5329-848898dd2f01/origin" title="全国一家亲异地宽带" style="zoom:62%;" />
+
+<p>然后进去之后选择宽带办理的城市，我这里就是北京，然后就会有能办理的类型，包括 300 Mbps 和 500 Mbps 选好之后填写下面的具体的内容，提交预约即可。</p>
+<p>然后过了几个小时就有联通的电话了，确定办理的宽带后，表示北京有一个 300 块钱的安装费。次月从话费里面扣除。确定无误后客服给我发了一个短信，里面有个链接。需要上传身份证正反面和拍摄一张免冠自拍照。然后就等着分配小哥吧。</p>
+<h1 id="上门安装"><a href="#上门安装" class="headerlink" title="上门安装"></a>上门安装</h1><p>到了预约的那天，小哥上门。确认了信息之后就开始装光猫啥的。在这个途中，因为现在北京天气已经很热了，小哥又是中午上门的。递上瓶水，拿个板凳坐会儿。要是抽烟可以再递个烟啥的。之后就开始表达自己想要公网 IP 的诉求（毕竟求人办事儿，所以前面就客气点）小哥问了个原因，我说家里有监控需要。然后小哥还拍了个监控的照片，并且还说：“现在公网 IP 不好拿，需要有明确的需求才能申请，你这个要用监控。但其实现在监控这个理由不怎么能过了。你要是有明确诉求可以给你申请。”（反正就是一边表达不好搞，但是一边还都给申请了）然后就顺便连桥接一起给办了，顺便加了一下小哥私人的微信（虽然现在一般都是要加企微，但是小哥还是给了他私人的微信）最后装好后他那走了个测速，安装 500 M 实际测速能到 650。还不错。最后记了一下宽带的密码，搞定。从上门到最后小哥走一共花了不到 10 min，外加一瓶水的钱。</p>
+<h1 id="办理上行提速"><a href="#办理上行提速" class="headerlink" title="办理上行提速"></a>办理上行提速</h1><p>500 Mbps 的宽带下行对应上行才给 30 Mbps 是真的拉跨，但是可以办理加速包: <a href="https://wokuan.114menhu.com/">沃宽</a></p>
+<p>用办理宽带的异地手机号登录</p>
+<img src="https://images.zabrian.com/29685c89-0b86-439b-be44-1ea181ba1601/origin" title="沃宽登陆界面" style="zoom:39%;" />
+
+<p>然后在左侧【我的宽带】中添加当前宽带</p>
+<img src="https://images.zabrian.com/214b8dce-750d-4fea-cb68-b81701392d01/origin" title="沃宽添加宽带" style="zoom:40%;" />
+
+<p>添加成功后再左侧 【我要购买】中应该可以看到一个【宽带上行提速包 100 M】这里一次最多可以购买 6 个（连续半年，到期后可以继续购买）</p>
+<img src="https://images.zabrian.com/13a412ea-2b2b-4be8-4013-821b35e6d201/origin" title="购买上行提速包" style="zoom:40%;" />
+
+<p>购买成功后，在左侧【首页】点击【点我提速】就可以了，无需重启光猫即可享受 100 Mbps 的上行速率了。</p>
+<img src="https://images.zabrian.com/1b239e28-26bc-43cd-e168-d7970cc88701/origin" title="上行提速" style="zoom:39%;" />
+
+<h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>最后算一下成本</p>
+<ul>
+<li>一次性成本：来回 100 元路费 + 装机费 300 元（唯一的坑点） &#x3D; 400 元</li>
+<li>周期性成本：每月异地号码套餐 8 元 + 宽带费用 80 元 + 上行加速包 30 元 &#x3D; 118 元</li>
+</ul>
+<p>总体还是比 500 Mbps 的融合套便宜很多的。</p>
+<p>最后附上 speedtest 和 ustc 的测速结果吧</p>
+<img src="https://images.zabrian.com/ac825486-02e6-43f8-1e06-419808a0da01/origin" title="SpeedTest 测速" style="zoom:100%;" />
+
+<img src="https://images.zabrian.com/8cb09a0c-3136-4487-8e35-a242c3ecf601/origin" title="USTC 测速" style="zoom:85%;" />
 ]]></content>
   </entry>
   <entry>
