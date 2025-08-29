@@ -3,7 +3,7 @@
   <entry>
     <title>Cloudflare Workers 通用 Turnstile 验证模块</title>
     <url>/post/7b67508c.html</url>
-    <content><![CDATA[<p>最近使用 Cloudflare Workers 实现了两个有意思的东西，一个是 <a href="https://surl.zabrian.com/">短链接生成器</a> 还有一个是 <a href="https://note.zabrian.com/">在线笔记本</a> 都是使用了 <code>Cloudflare KV</code> 进行数据存储，根据 <a href="https://developers.cloudflare.com/kv/platform/pricing/">Cloudflare KV 定价文档</a> 免费计划每天是有次数限制的。为了避免互联网上各种扫描器的请求导致消耗限额，就需要过滤一波非人类请求了。</p>
+    <content><![CDATA[<p>最近使用 Cloudflare Workers 实现了一个<a href="https://cloud-note.app/">在线笔记本</a> 使用 <code>Cloudflare KV</code> 进行数据存储，根据 <a href="https://developers.cloudflare.com/kv/platform/pricing/">Cloudflare KV 定价文档</a> 免费计划每天是有次数限制的。为了避免互联网上各种扫描器的请求导致消耗限额，就需要过滤一波非人类请求了。</p>
 <span id="more"></span>
 
 <p>而在不久前，我刚刚使用 <code>Cloudflare Turnstile</code> 给博客增加了一下人工验证，可以如法炮制给这个也加上。但是以后每一个 <code>worker</code> 想还用验证都需要重复添加 <code>Turnstile</code> 的代码，所以就把这个逻辑给抽出来组成一个单独的模块了。</p>
@@ -48,26 +48,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Garmin 国行码表使用 OSM 地图</title>
-    <url>/post/16e3b020.html</url>
-    <content><![CDATA[<p>国行的 Garmin 码表下载并安装 OSM 地图作为骑行地图，具体步骤可以参考下图</p>
-<span id="more"></span>
-<h1 id="自行制作"><a href="#自行制作" class="headerlink" title="自行制作"></a>自行制作</h1><ol>
-<li>前往 <a href="https://alternativaslibres.org/en/downloads.php#Asia">alternativaslibres</a> 下载 China (Local Language-Non Unicode) OSM Base Map 地图<img src="https://images.zabrian.com/5d8fc582-7edf-470d-9555-49b0d7b22301/origin" title="下载地图" style="zoom:16%;" /></li>
-<li>将地图拷贝到 <a href="https://support.garmin.com/en-US/?faq=HXl90IjTSb4SD1ibBSc1p7">Garmin MapInstall</a> 地图目录<img src="https://images.zabrian.com/411bc2e8-9d67-4ab3-e86f-8078aa991a01/origin" title="拷贝地图到 MapInstall/Maps" style="zoom:31%;" /></li>
-<li>使用 <a href="https://support.garmin.com/en-US/?faq=HXl90IjTSb4SD1ibBSc1p7">Garmin MapInstall</a> 将地图安装到 Garmin 码表<img src="https://images.zabrian.com/1f8cbf0b-194c-47f9-271b-93641ab49b01/origin" title="安装地图到码表" style="zoom:45%;" />
-<img src="https://images.zabrian.com/cabc6a26-ca42-4871-f91b-4db90d355e01/origin" title="安装地图到码表" style="zoom:45%;" /></li>
-<li>将安装上步中安装到码表的 OSM 地图从码表复制到本地任意位置 (OSM 地图在码表位置 Garmin&#x2F;Maps&#x2F;OSM-China.img)</li>
-<li>使用 <a href="https://www.gmaptool.eu/en/content/gmaptool">GMapTool</a> 修改地图<img src="https://images.zabrian.com/669f2c84-6bd4-429c-1285-a558db9ab201/origin" title="修改 OSM 地图" style="zoom:32%;" /></li>
-<li>将修改过的地图重新复制为 Garmin 码表中的 OSM-China.img<img src="https://images.zabrian.com/3d3e5f60-aeb8-4b64-500e-c1bb2da1e701/origin" title="替换 OSM 地图" style="zoom:31%;" /></li>
-<li>在码表上查看 OSM 地图信息<img src="https://images.zabrian.com/d0c46ab3-57ed-4b71-1d29-47678ee19a01/origin" title="码表查看 OSM 地图信息" style="zoom:100%;" />
-<img src="https://images.zabrian.com/49b09a5b-cc37-4e47-7379-8ace9a8a2701/origin" title="码表查看 OSM 地图信息" style="zoom:100%;" /></li>
-<li>在码表中启用 OSM 地图 (切记需要关闭 Garmin 默认中国地图，否则会导致地图偏移)<img src="https://images.zabrian.com/970fa57b-d976-4602-ccd3-4e387bafa401/origin" title="码表启用 OSM 地图" style="zoom:100%;" /></li>
-</ol>
-<h1 id="直接下载"><a href="#直接下载" class="headerlink" title="直接下载"></a>直接下载</h1><p>如果你觉得上面的步骤很麻烦，可以通过以下链接下载我已经制作好的，只需要拷贝对应的 <code>img</code> 到佳明码表 <code>Garmin/Maps/</code> 即可<br><a href="https://pan.baidu.com/s/1UZNBkkxPZqy94UW-Bu9UAg?pwd=9999">https://pan.baidu.com/s/1UZNBkkxPZqy94UW-Bu9UAg?pwd=9999</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>Cloudflare 设置引用站点策略</title>
     <url>/post/e6a2e300.html</url>
     <content><![CDATA[<p>前几日，把我的博客部署在 <code>Cloudflare Pages</code> 上面了。同时绑定了一个托管在 <code>Cloudflare</code> 上面的域名，到这里一切顺利。<br>但是当我兴致勃勃的打开博客的时候发现了一个问题，为什么图片全 403 了？</p>
@@ -97,6 +77,26 @@
 </li>
 </ol>
 <p>这样就可以了，此时再访问自定义域名，发现图片就正常携带了 <code>Referer</code></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Garmin 国行码表使用 OSM 地图</title>
+    <url>/post/16e3b020.html</url>
+    <content><![CDATA[<p>国行的 Garmin 码表下载并安装 OSM 地图作为骑行地图，具体步骤可以参考下图</p>
+<span id="more"></span>
+<h1 id="自行制作"><a href="#自行制作" class="headerlink" title="自行制作"></a>自行制作</h1><ol>
+<li>前往 <a href="https://alternativaslibres.org/en/downloads.php#Asia">alternativaslibres</a> 下载 China (Local Language-Non Unicode) OSM Base Map 地图<img src="https://images.zabrian.com/5d8fc582-7edf-470d-9555-49b0d7b22301/origin" title="下载地图" style="zoom:16%;" /></li>
+<li>将地图拷贝到 <a href="https://support.garmin.com/en-US/?faq=HXl90IjTSb4SD1ibBSc1p7">Garmin MapInstall</a> 地图目录<img src="https://images.zabrian.com/411bc2e8-9d67-4ab3-e86f-8078aa991a01/origin" title="拷贝地图到 MapInstall/Maps" style="zoom:31%;" /></li>
+<li>使用 <a href="https://support.garmin.com/en-US/?faq=HXl90IjTSb4SD1ibBSc1p7">Garmin MapInstall</a> 将地图安装到 Garmin 码表<img src="https://images.zabrian.com/1f8cbf0b-194c-47f9-271b-93641ab49b01/origin" title="安装地图到码表" style="zoom:45%;" />
+<img src="https://images.zabrian.com/cabc6a26-ca42-4871-f91b-4db90d355e01/origin" title="安装地图到码表" style="zoom:45%;" /></li>
+<li>将安装上步中安装到码表的 OSM 地图从码表复制到本地任意位置 (OSM 地图在码表位置 Garmin&#x2F;Maps&#x2F;OSM-China.img)</li>
+<li>使用 <a href="https://www.gmaptool.eu/en/content/gmaptool">GMapTool</a> 修改地图<img src="https://images.zabrian.com/669f2c84-6bd4-429c-1285-a558db9ab201/origin" title="修改 OSM 地图" style="zoom:32%;" /></li>
+<li>将修改过的地图重新复制为 Garmin 码表中的 OSM-China.img<img src="https://images.zabrian.com/3d3e5f60-aeb8-4b64-500e-c1bb2da1e701/origin" title="替换 OSM 地图" style="zoom:31%;" /></li>
+<li>在码表上查看 OSM 地图信息<img src="https://images.zabrian.com/d0c46ab3-57ed-4b71-1d29-47678ee19a01/origin" title="码表查看 OSM 地图信息" style="zoom:100%;" />
+<img src="https://images.zabrian.com/49b09a5b-cc37-4e47-7379-8ace9a8a2701/origin" title="码表查看 OSM 地图信息" style="zoom:100%;" /></li>
+<li>在码表中启用 OSM 地图 (切记需要关闭 Garmin 默认中国地图，否则会导致地图偏移)<img src="https://images.zabrian.com/970fa57b-d976-4602-ccd3-4e387bafa401/origin" title="码表启用 OSM 地图" style="zoom:100%;" /></li>
+</ol>
+<h1 id="直接下载"><a href="#直接下载" class="headerlink" title="直接下载"></a>直接下载</h1><p>如果你觉得上面的步骤很麻烦，可以通过以下链接下载我已经制作好的，只需要拷贝对应的 <code>img</code> 到佳明码表 <code>Garmin/Maps/</code> 即可<br><a href="https://pan.baidu.com/s/1UZNBkkxPZqy94UW-Bu9UAg?pwd=9999">https://pan.baidu.com/s/1UZNBkkxPZqy94UW-Bu9UAg?pwd=9999</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -511,33 +511,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>更改 macOS 强调色</title>
-    <url>/post/c59c6467.html</url>
-    <content><![CDATA[<p>Apple 在 <a href="https://www.apple.com/imac-24">iMac 24”</a> Mac 中首次使用了新的强调色，这些强调色是这些 Mac 独有的。但是现在只要是 macOS 11.3.1 以上的系统，即使不是 iMac 24” 机器，也可以使用这些特有的强调色。</p>
-<span id="more"></span>
-
-<p>首先需要开启基于硬件的强调色 <code>NSColorSimulateHardwareAccent</code> 功能</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulateHardwareAccent -bool YES</span><br></pre></td></tr></table></figure>
-
-<p>然后通过 <code>NSColorSimulatedHardwareEnclosureNumber</code> 选择其中任意一种颜色。其中可选的颜色选项为 3 到 8 (包含 3 和 8)</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulatedHardwareEnclosureNumber -int 3</span><br></pre></td></tr></table></figure>
-
-<p>然后重新启动电脑或者退出登录重新登录即可生效。<br>然后在 <strong>系统设置</strong> -&gt; <strong>外观选项卡</strong> -&gt; <strong>强调色</strong> 和 <strong>高亮标记颜色</strong> 选项中会出现一个 <strong>这台 Mac</strong> 的颜色选项，其中颜色即为上面设置的颜色。</p>
-<p>以下是 <code>NSColorSimulatedHardwareEnclosureNumber</code> 不同值的实际效果</p>
-<img src="https://images.zabrian.com/c5f66aed-fff8-43e1-940d-8388311a0a01/origin" title="颜色 3" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/38169874-ea75-4086-24b1-ccd6416e9701/origin" title="颜色 4" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/1683833a-7ee4-416a-5659-2a31fbe46001/origin" title="颜色 5" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/fe160cc7-b5cb-435d-374b-6cb2e744d901/origin" title="颜色 6" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/5a1dfe77-2619-435a-290f-d058a032b601/origin" title="颜色 7" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/6dcb7e11-165d-4547-1bd4-ff7e02a8c001/origin" title="颜色 8" style="zoom:57%;" />
-]]></content>
-  </entry>
-  <entry>
     <title>搭建家庭私人 GitLab 服务器</title>
     <url>/post/8d4f8799.html</url>
     <content><![CDATA[<p>大概今年（2022）一月中旬的时候入手了一个 <a href="https://r86s.net/">R86S</a> 的小主机。因为错过了众筹的车，所以是直接下的单。最后入手了 16G 的黑色千兆版本。不上万兆一个原因是家里没有这个需求，还有一个就是万兆版的没有 NVME 硬盘位，这一点对我还是刚需。</p>
@@ -594,6 +567,33 @@
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
 
 <p>稍等片刻，在浏览器中打开 <a href="http://git.home/">http://git.home</a> 就可以看到搭建好的 GitLab 了。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>更改 macOS 强调色</title>
+    <url>/post/c59c6467.html</url>
+    <content><![CDATA[<p>Apple 在 <a href="https://www.apple.com/imac-24">iMac 24”</a> Mac 中首次使用了新的强调色，这些强调色是这些 Mac 独有的。但是现在只要是 macOS 11.3.1 以上的系统，即使不是 iMac 24” 机器，也可以使用这些特有的强调色。</p>
+<span id="more"></span>
+
+<p>首先需要开启基于硬件的强调色 <code>NSColorSimulateHardwareAccent</code> 功能</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulateHardwareAccent -bool YES</span><br></pre></td></tr></table></figure>
+
+<p>然后通过 <code>NSColorSimulatedHardwareEnclosureNumber</code> 选择其中任意一种颜色。其中可选的颜色选项为 3 到 8 (包含 3 和 8)</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulatedHardwareEnclosureNumber -int 3</span><br></pre></td></tr></table></figure>
+
+<p>然后重新启动电脑或者退出登录重新登录即可生效。<br>然后在 <strong>系统设置</strong> -&gt; <strong>外观选项卡</strong> -&gt; <strong>强调色</strong> 和 <strong>高亮标记颜色</strong> 选项中会出现一个 <strong>这台 Mac</strong> 的颜色选项，其中颜色即为上面设置的颜色。</p>
+<p>以下是 <code>NSColorSimulatedHardwareEnclosureNumber</code> 不同值的实际效果</p>
+<img src="https://images.zabrian.com/c5f66aed-fff8-43e1-940d-8388311a0a01/origin" title="颜色 3" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/38169874-ea75-4086-24b1-ccd6416e9701/origin" title="颜色 4" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/1683833a-7ee4-416a-5659-2a31fbe46001/origin" title="颜色 5" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/fe160cc7-b5cb-435d-374b-6cb2e744d901/origin" title="颜色 6" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/5a1dfe77-2619-435a-290f-d058a032b601/origin" title="颜色 7" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/6dcb7e11-165d-4547-1bd4-ff7e02a8c001/origin" title="颜色 8" style="zoom:57%;" />
 ]]></content>
   </entry>
   <entry>
