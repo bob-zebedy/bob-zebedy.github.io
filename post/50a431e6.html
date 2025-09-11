@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/red/pace-theme-flash.css">
   <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.zebedy.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.9.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.zebedy.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.9.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 <meta name="description" content="在 Cloudflare 使用 Workers 建立 Images 代理 一文中。使用 Workers 搭建了一个 Images 代理，通过设置 Referer 和 URL 签名有效期实现简易的防盗链以及防刷流量。但是这些措施只能做到防君子不防小人，其实很轻易的就可以通过代码自动实现刷图片流量。为了避免这种情况，想着能不能使用 Cloudflare Turnstile 阻挡非人类请求的流量。但是研">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hexo 静态博客使用 Cloudflare Turnstile">
@@ -300,12 +300,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>在 <a href="/post/ec93b507.html" title="Cloudflare 使用 Workers 建立 Images 代理">Cloudflare 使用 Workers 建立 Images 代理</a> 一文中。使用 Workers 搭建了一个 Images 代理，通过设置 <code>Referer</code> 和 URL 签名有效期实现简易的防盗链以及防刷流量。但是这些措施只能做到防君子不防小人，其实很轻易的就可以通过代码自动实现刷图片流量。为了避免这种情况，想着能不能使用 <code>Cloudflare Turnstile</code> 阻挡非人类请求的流量。但是研究了一下发现 <code>Cloudflare Turnstile</code> 需要 <strong><a target="_blank" rel="noopener" href="https://developers.cloudflare.com/turnstile/get-started/server-side-validation/">服务端代码验证</a></strong> 但是很显然，<code>Hexo</code> 这种纯静态博客没有后端服务，所以思索了一下决定还是使用 Workers 实现一个支持静态网页的 <code>Cloudflare Turnstile</code> 方案。</p>
+        <p>在 <a href="/post/ec93b507.html" title="Cloudflare 使用 Workers 建立 Images 代理">Cloudflare 使用 Workers 建立 Images 代理</a> 一文中。使用 Workers 搭建了一个 Images 代理，通过设置 <code>Referer</code> 和 URL 签名有效期实现简易的防盗链以及防刷流量。但是这些措施只能做到防君子不防小人，其实很轻易的就可以通过代码自动实现刷图片流量。为了避免这种情况，想着能不能使用 <code>Cloudflare Turnstile</code> 阻挡非人类请求的流量。但是研究了一下发现 <code>Cloudflare Turnstile</code> 需要 <strong><span class="exturl" data-url="aHR0cHM6Ly9kZXZlbG9wZXJzLmNsb3VkZmxhcmUuY29tL3R1cm5zdGlsZS9nZXQtc3RhcnRlZC9zZXJ2ZXItc2lkZS12YWxpZGF0aW9uLw==">服务端代码验证<i class="fa fa-external-link-alt"></i></span></strong> 但是很显然，<code>Hexo</code> 这种纯静态博客没有后端服务，所以思索了一下决定还是使用 Workers 实现一个支持静态网页的 <code>Cloudflare Turnstile</code> 方案。</p>
 <span id="more"></span>
 
 <p>思路就是将原始博客通过 <code>Cloudflare Pages</code> 托管并绑定一个自定义域名比如 <code>source.example.com</code> 作为静态页面的源站，然后再创建一个 blog 的 Workers (绑定自定义域名 <code>blog.example.com</code>) 作为代理站，在这个 blog 的 Workers 中实现 <code>Cloudflare Turnstile</code> 的服务端验证逻辑，验证通过则注入一个 <code>JWT Token</code> 实现在有效期内就无需再次验证。</p>
 <ol>
-<li>打开 <a target="_blank" rel="noopener" href="https://dash.cloudflare.com/">Cloudflare Dashboard</a> 点击左侧的 <strong>Turnstile</strong> 在右侧点击 <strong>添加小组件</strong><img src="https://images.zabrian.com/d0a19b46-f067-4866-2f22-f3d224d3a301/origin" title="Turnstile 首页" style="zoom:16%;" /></li>
+<li>打开 <span class="exturl" data-url="aHR0cHM6Ly9kYXNoLmNsb3VkZmxhcmUuY29tLw==">Cloudflare Dashboard<i class="fa fa-external-link-alt"></i></span> 点击左侧的 <strong>Turnstile</strong> 在右侧点击 <strong>添加小组件</strong><img src="https://images.zabrian.com/d0a19b46-f067-4866-2f22-f3d224d3a301/origin" title="Turnstile 首页" style="zoom:16%;" /></li>
 <li>按照实际情况填写信息，域名则添加静态页面的代理域名 (上文中的 <code>blog.example.com</code> 而不是 <code>source.example.com</code>)，下方选择 <strong>托管</strong> 和 <strong>否</strong><img src="https://images.zabrian.com/b0bdf585-c029-4e0c-ffb8-6b1fe7c34401/origin" title="Turnstile 添加组件" style="zoom:16%;" /></li>
 <li>添加完成后确认已经添加正确的域名，并且生成两个需要用到的数据: <strong>站点密钥</strong> 和 <strong>密钥</strong> 无需马上记下来，后续还可以再次查看。<img src="https://images.zabrian.com/517237f3-678a-463f-a7f8-8fd73f39cf01/origin" title="查看信息" style="zoom:16%;" /></li>
 <li>配置 <code>Cloudflare Pages</code> 源站点绑定 <code>source.example.com</code> 域名，并确认源站点可以正常访问。</li>
@@ -334,7 +334,7 @@
       <a href="https://blog.zebedy.com/post/50a431e6.html" title="Hexo 静态博客使用 Cloudflare Turnstile">https://blog.zebedy.com/post/50a431e6.html</a>
   </li>
   <li class="post-copyright-license">
-    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpoLWhhbnM="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
   </li>
 </ul>
 </div>
