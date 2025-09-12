@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.ico">
+  <link rel="mask-icon" href="/images/avatar.ico" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/red/pace-theme-flash.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.zebedy.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.9.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="最近使用 Cloudflare Workers 实现了一个在线笔记本 和 短链接服务 分别使用了 Cloudflare KV 和 Cloudflare D1 进行数据存储，根据 Cloudflare KV 定价文档 免费计划每天是有次数限制的。为了避免互联网上各种扫描器的请求导致消耗限额，就需要过滤一波非人类请求了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cloudflare Workers 通用 Turnstile 验证模块">
+<meta property="og:url" content="https://blog.zebedy.com/post/7b67508c.html">
+<meta property="og:site_name" content="Undefined">
+<meta property="og:description" content="最近使用 Cloudflare Workers 实现了一个在线笔记本 和 短链接服务 分别使用了 Cloudflare KV 和 Cloudflare D1 进行数据存储，根据 Cloudflare KV 定价文档 免费计划每天是有次数限制的。为了避免互联网上各种扫描器的请求导致消耗限额，就需要过滤一波非人类请求了。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-08-27T03:56:21.000Z">
+<meta property="article:modified_time" content="2025-09-11T02:14:06.000Z">
+<meta property="article:author" content="Zebedy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://blog.zebedy.com/post/7b67508c.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.zebedy.com/post/7b67508c.html","path":"post/7b67508c.html","title":"Cloudflare Workers 通用 Turnstile 验证模块"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Cloudflare Workers 通用 Turnstile 验证模块 | Undefined</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EV574LFH56"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-EV574LFH56","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Undefined" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Undefined</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Life is but a span</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>订阅</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zebedy"
+      src="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin">
+  <p class="site-author-name" itemprop="name">Zebedy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+
+      <div class="twopeople">
+        <div class="container" style="height:200px;">
+          <canvas class="illo" width="800" height="800" style="max-width: 200px; max-height: 200px; touch-action: none; width: 640px; height: 640px;"></canvas>
+        </div>
+        <script src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/twopeople1.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/zdog.dist.js"></script>
+        <script id="rendered-js" src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/twopeople.js"></script>
+        <style>
+          .twopeople{
+            margin: 0;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
+          canvas {
+            display: block;
+            margin: 0 auto;
+            cursor: move;
+         }
+        </style>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.zebedy.com/post/7b67508c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin">
+      <meta itemprop="name" content="Zebedy">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Undefined">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Cloudflare Workers 通用 Turnstile 验证模块
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-08-27 11:56:21" itemprop="dateCreated datePublished" datetime="2025-08-27T11:56:21+08:00">2025-08-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-09-11 10:14:06" itemprop="dateModified" datetime="2025-09-11T10:14:06+08:00">2025-09-11</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="vercount_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="vercount_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>8.9k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>8 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>最近使用 Cloudflare Workers 实现了一个<span class="exturl" data-url="aHR0cHM6Ly9jbG91ZC1ub3RlLmFwcC8=">在线笔记本<i class="fa fa-external-link-alt"></i></span> 和 <span class="exturl" data-url="aHR0cHM6Ly85bG5rLmlvLw==">短链接服务<i class="fa fa-external-link-alt"></i></span> 分别使用了 <code>Cloudflare KV</code> 和 <code>Cloudflare D1</code> 进行数据存储，根据 <span class="exturl" data-url="aHR0cHM6Ly9kZXZlbG9wZXJzLmNsb3VkZmxhcmUuY29tL2t2L3BsYXRmb3JtL3ByaWNpbmcv">Cloudflare KV 定价文档<i class="fa fa-external-link-alt"></i></span> 免费计划每天是有次数限制的。为了避免互联网上各种扫描器的请求导致消耗限额，就需要过滤一波非人类请求了。</p>
+<span id="more"></span>
+
+<p>而在不久前，我刚刚使用 <code>Cloudflare Turnstile</code> 给博客增加了一下人工验证，可以如法炮制给这个也加上。但是以后每一个 <code>worker</code> 想还用验证都需要重复添加 <code>Turnstile</code> 的代码，所以就把这个逻辑给抽出来组成一个单独的模块了。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Cloudflare Workers 通用 Turnstile 验证模块</span></span><br><span class="line"><span class="comment"> * 提供完整的 Turnstile 验证、JWT Token 管理和 Cookie 处理功能</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 默认配置</span></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">DEFAULT_CONFIG</span> = &#123;</span><br><span class="line">  <span class="attr">TURNSTILE_URL</span>: <span class="string">&quot;https://challenges.cloudflare.com/turnstile/v0/siteverify&quot;</span>,</span><br><span class="line">  <span class="attr">TURNSTILE_EXPIRE</span>: <span class="number">3600</span>,</span><br><span class="line">  <span class="attr">JWT_ALGORITHM</span>: <span class="string">&quot;HS256&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 生成 JWT Token</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Object</span>&#125; <span class="variable">payload</span> - JWT payload</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">secret</span> - JWT secret key</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type">Promise&lt;string&gt;</span>&#125; JWT token</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">generateToken</span>(<span class="params">payload, secret</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> header = <span class="title function_">btoa</span>(</span><br><span class="line">    <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(&#123; <span class="attr">alg</span>: <span class="variable constant_">DEFAULT_CONFIG</span>.<span class="property">JWT_ALGORITHM</span>, <span class="attr">typ</span>: <span class="string">&quot;JWT&quot;</span> &#125;)</span><br><span class="line">  ).<span class="title function_">replace</span>(<span class="regexp">/=/g</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> encodedPayload = <span class="title function_">btoa</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(payload)).<span class="title function_">replace</span>(<span class="regexp">/=/g</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> data = <span class="string">`<span class="subst">$&#123;header&#125;</span>.<span class="subst">$&#123;encodedPayload&#125;</span>`</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> key = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">importKey</span>(</span><br><span class="line">    <span class="string">&quot;raw&quot;</span>,</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">TextEncoder</span>().<span class="title function_">encode</span>(secret),</span><br><span class="line">    &#123; <span class="attr">name</span>: <span class="string">&quot;HMAC&quot;</span>, <span class="attr">hash</span>: <span class="string">&quot;SHA-256&quot;</span> &#125;,</span><br><span class="line">    <span class="literal">false</span>,</span><br><span class="line">    [<span class="string">&quot;sign&quot;</span>]</span><br><span class="line">  );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> signature = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">sign</span>(</span><br><span class="line">    <span class="string">&quot;HMAC&quot;</span>,</span><br><span class="line">    key,</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">TextEncoder</span>().<span class="title function_">encode</span>(data)</span><br><span class="line">  );</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`<span class="subst">$&#123;data&#125;</span>.<span class="subst">$&#123;btoa(</span></span></span><br><span class="line"><span class="subst"><span class="string">    <span class="built_in">String</span>.fromCharCode(...<span class="keyword">new</span> <span class="built_in">Uint8Array</span>(signature))</span></span></span><br><span class="line"><span class="subst"><span class="string">  ).replace(/=/g, <span class="string">&quot;&quot;</span>)&#125;</span>`</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 验证 JWT Token</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">token</span> - JWT token</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">secret</span> - JWT secret key</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type">Promise&lt;boolean&gt;</span>&#125; 验证结果（true 表示有效，false 表示无效）</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">verifyToken</span>(<span class="params">token, secret</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`JWT Token 获取: <span class="subst">$&#123;token&#125;</span>`</span>);</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> [header, payload, signature] = token.<span class="title function_">split</span>(<span class="string">&quot;.&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (!header || !payload || !signature) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> data = <span class="string">`<span class="subst">$&#123;header&#125;</span>.<span class="subst">$&#123;payload&#125;</span>`</span>;</span><br><span class="line">    <span class="keyword">const</span> key = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">importKey</span>(</span><br><span class="line">      <span class="string">&quot;raw&quot;</span>,</span><br><span class="line">      <span class="keyword">new</span> <span class="title class_">TextEncoder</span>().<span class="title function_">encode</span>(secret),</span><br><span class="line">      &#123; <span class="attr">name</span>: <span class="string">&quot;HMAC&quot;</span>, <span class="attr">hash</span>: <span class="string">&quot;SHA-256&quot;</span> &#125;,</span><br><span class="line">      <span class="literal">false</span>,</span><br><span class="line">      [<span class="string">&quot;verify&quot;</span>]</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> expectedSignature = <span class="title class_">Uint8Array</span>.<span class="title function_">from</span>(</span><br><span class="line">      <span class="title function_">atob</span>(signature + <span class="string">&quot;===&quot;</span>.<span class="title function_">substring</span>(<span class="number">0</span>, (<span class="number">4</span> - (signature.<span class="property">length</span> % <span class="number">4</span>)) % <span class="number">4</span>)),</span><br><span class="line">      <span class="function">(<span class="params">c</span>) =&gt;</span> c.<span class="title function_">charCodeAt</span>(<span class="number">0</span>)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> isValid = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">verify</span>(</span><br><span class="line">      <span class="string">&quot;HMAC&quot;</span>,</span><br><span class="line">      key,</span><br><span class="line">      expectedSignature,</span><br><span class="line">      <span class="keyword">new</span> <span class="title class_">TextEncoder</span>().<span class="title function_">encode</span>(data)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`JWT Token 有效: <span class="subst">$&#123;isValid&#125;</span>`</span>);</span><br><span class="line">    <span class="keyword">if</span> (!isValid) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> decodedPayload = <span class="title class_">JSON</span>.<span class="title function_">parse</span>(</span><br><span class="line">      <span class="title function_">atob</span>(payload + <span class="string">&quot;===&quot;</span>.<span class="title function_">substring</span>(<span class="number">0</span>, (<span class="number">4</span> - (payload.<span class="property">length</span> % <span class="number">4</span>)) % <span class="number">4</span>))</span><br><span class="line">    );</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`JWT Token 解码: <span class="subst">$&#123;<span class="built_in">JSON</span>.stringify(decodedPayload)&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> isExpired = decodedPayload.<span class="property">exp</span> &gt; <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Date</span>.<span class="title function_">now</span>() / <span class="number">1000</span>);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`JWT Token 过期: <span class="subst">$&#123;!isExpired&#125;</span>`</span>);</span><br><span class="line">    <span class="keyword">return</span> isExpired;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`JWT Token 失败: <span class="subst">$&#123;e&#125;</span>`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 验证 Turnstile Response</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">response</span> - Turnstile response token</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">remoteip</span> - 客户端 IP</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">secretKey</span> - Turnstile secret key</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type">Promise&lt;boolean&gt;</span>&#125; 验证结果（true 表示有效，false 表示无效）</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">verifyTurnstile</span>(<span class="params">response, remoteip, secretKey</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Turnstile 质询: <span class="subst">$&#123;remoteip&#125;</span>`</span>);</span><br><span class="line">  <span class="keyword">const</span> formData = <span class="keyword">new</span> <span class="title class_">FormData</span>();</span><br><span class="line">  formData.<span class="title function_">append</span>(<span class="string">&quot;secret&quot;</span>, secretKey);</span><br><span class="line">  formData.<span class="title function_">append</span>(<span class="string">&quot;response&quot;</span>, response);</span><br><span class="line">  formData.<span class="title function_">append</span>(<span class="string">&quot;remoteip&quot;</span>, remoteip);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> result = <span class="title function_">await</span> (</span><br><span class="line">    <span class="keyword">await</span> <span class="title function_">fetch</span>(<span class="variable constant_">DEFAULT_CONFIG</span>.<span class="property">TURNSTILE_URL</span>, &#123;</span><br><span class="line">      <span class="attr">method</span>: <span class="string">&quot;POST&quot;</span>,</span><br><span class="line">      <span class="attr">body</span>: formData,</span><br><span class="line">    &#125;)</span><br><span class="line">  ).<span class="title function_">json</span>();</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Turnstile 结果: <span class="subst">$&#123;<span class="built_in">JSON</span>.stringify(result)&#125;</span>`</span>);</span><br><span class="line">  <span class="keyword">return</span> result.<span class="property">success</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 检查请求是否已通过验证</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Request</span>&#125; <span class="variable">request</span> - 请求对象</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">cookieName</span> - Cookie名 称</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">jwtSecret</span> - JWT secret key</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type">Promise&lt;boolean&gt;</span>&#125; 验证结果（true 表示有效，false 表示无效）</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">isVerified</span>(<span class="params">request, cookieName, jwtSecret</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> cookie = request.<span class="property">headers</span>.<span class="title function_">get</span>(<span class="string">&quot;Cookie&quot;</span>) || <span class="string">&quot;&quot;</span>;</span><br><span class="line">  <span class="keyword">const</span> match = cookie.<span class="title function_">match</span>(<span class="keyword">new</span> <span class="title class_">RegExp</span>(<span class="string">`<span class="subst">$&#123;cookieName&#125;</span>=([^;]+)`</span>));</span><br><span class="line">  <span class="keyword">return</span> match ? <span class="keyword">await</span> <span class="title function_">verifyToken</span>(match[<span class="number">1</span>], jwtSecret) : <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 生成 Turnstile 验证页面 HTML</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Object</span>&#125; <span class="variable">options</span> - 配置选项</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; options.siteKey - Turnstile site key</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; [options.title] - 页面标题</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; [options.logo] - Logo文本</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; [options.description] - 描述文本</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type">string</span>&#125; HTML字符串</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getTurnstileHTML</span>(<span class="params">&#123;</span></span><br><span class="line"><span class="params">  siteKey,</span></span><br><span class="line"><span class="params">  title = <span class="string">&quot;安全验证&quot;</span>,</span></span><br><span class="line"><span class="params">  logo = <span class="string">&quot;🔒&quot;</span>,</span></span><br><span class="line"><span class="params">  description = <span class="string">&quot;请完成以下验证后继续使用&quot;</span>,</span></span><br><span class="line"><span class="params">&#125;</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="string">&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;title&gt;<span class="subst">$&#123;title&#125;</span>&lt;/title&gt;</span></span><br><span class="line"><span class="string">&lt;script src=&quot;https://challenges.cloudflare.com/turnstile/v0/api.js&quot; async defer&gt;&lt;/script&gt;</span></span><br><span class="line"><span class="string">&lt;style&gt;</span></span><br><span class="line"><span class="string">body&#123;font-family:system-ui;background:linear-gradient(135deg,#667eea,#764ba2);margin:0;padding:0;min-height:100vh;display:flex;align-items:center;justify-content:center&#125;</span></span><br><span class="line"><span class="string">.container&#123;background:white;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.1);padding:40px;width:400px;text-align:center&#125;</span></span><br><span class="line"><span class="string">.logo&#123;font-size:24px;font-weight:bold;color:#333;margin-bottom:24px&#125;</span></span><br><span class="line"><span class="string">.title&#123;color:#333;margin-bottom:16px;font-size:18px&#125;</span></span><br><span class="line"><span class="string">.description&#123;color:#666;margin-bottom:24px;font-size:14px&#125;</span></span><br><span class="line"><span class="string">.turnstile-container&#123;display:flex;justify-content:center;margin:20px 0;min-height:65px&#125;</span></span><br><span class="line"><span class="string">&lt;/style&gt;</span></span><br><span class="line"><span class="string">&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;container&quot;&gt;&lt;div class=&quot;logo&quot;&gt;<span class="subst">$&#123;logo&#125;</span>&lt;/div&gt;&lt;h2 class=&quot;title&quot;&gt;<span class="subst">$&#123;title&#125;</span>&lt;/h2&gt;&lt;p class=&quot;description&quot;&gt;<span class="subst">$&#123;description&#125;</span>&lt;/p&gt;</span></span><br><span class="line"><span class="string">&lt;form method=&quot;POST&quot;&gt;&lt;div class=&quot;turnstile-container&quot;&gt;&lt;div class=&quot;cf-turnstile&quot; data-sitekey=&quot;<span class="subst">$&#123;siteKey&#125;</span>&quot; data-callback=&quot;onSuccess&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/form&gt;&lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;script&gt;function onSuccess()&#123;document.querySelector(&#x27;form&#x27;).submit();&#125;&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;`</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 设置验证成功的响应</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">targetPath</span> - 重定向目标路径</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">cookieName</span> - Cookie名称</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">string</span>&#125; <span class="variable">jwtSecret</span> - JWT secret key</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">number</span>&#125; [expireTime] - 过期时间（秒）</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> &#123;<span class="type">Promise&lt;Response&gt;</span>&#125; 重定向响应</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">setSuccessResponse</span>(<span class="params"></span></span><br><span class="line"><span class="params">  targetPath,</span></span><br><span class="line"><span class="params">  cookieName,</span></span><br><span class="line"><span class="params">  jwtSecret,</span></span><br><span class="line"><span class="params">  expireTime</span></span><br><span class="line"><span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> payload = &#123;</span><br><span class="line">    <span class="attr">verified</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">iat</span>: <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Date</span>.<span class="title function_">now</span>() / <span class="number">1000</span>),</span><br><span class="line">    <span class="attr">exp</span>: <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Date</span>.<span class="title function_">now</span>() / <span class="number">1000</span>) + expireTime,</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> token = <span class="keyword">await</span> <span class="title function_">generateToken</span>(payload, jwtSecret);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Cookie 设置: <span class="subst">$&#123;token&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;&quot;</span>, &#123;</span><br><span class="line">    <span class="attr">status</span>: <span class="number">302</span>,</span><br><span class="line">    <span class="attr">headers</span>: &#123;</span><br><span class="line">      <span class="title class_">Location</span>: targetPath,</span><br><span class="line">      <span class="string">&quot;Set-Cookie&quot;</span>: <span class="string">`<span class="subst">$&#123;cookieName&#125;</span>=<span class="subst">$&#123;token&#125;</span>; Path=/; Max-Age=<span class="subst">$&#123;expireTime&#125;</span>; HttpOnly; SameSite=Lax; Secure`</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Turnstile 验证中间件</span></span><br><span class="line"><span class="comment"> * 使用示例：</span></span><br><span class="line"><span class="comment"> * ```javascript</span></span><br><span class="line"><span class="comment"> * import &#123; turnstileMiddleware &#125; from &#x27;./shared/turnstile-auth.js&#x27;;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * const turnstileAuth = turnstileMiddleware(&#123;</span></span><br><span class="line"><span class="comment"> *   cookieName: &#x27;my_app_verified&#x27;,</span></span><br><span class="line"><span class="comment"> *   logo: &#x27;📝 MyApp&#x27;,</span></span><br><span class="line"><span class="comment"> *   skipPaths: [&#x27;/api/public&#x27;]</span></span><br><span class="line"><span class="comment"> * &#125;);</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * export default &#123;</span></span><br><span class="line"><span class="comment"> *   async fetch(request, env) &#123;</span></span><br><span class="line"><span class="comment"> *     const authResult = await turnstileAuth(request, env);</span></span><br><span class="line"><span class="comment"> *     if (authResult) return authResult;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *     // 验证通过，处理业务逻辑</span></span><br><span class="line"><span class="comment"> *     return new Response(&#x27;Hello World&#x27;);</span></span><br><span class="line"><span class="comment"> *   &#125;</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> * ```</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 环境变量配置：</span></span><br><span class="line"><span class="comment"> * - TURNSTILE_SITE_KEY: Turnstile 站点 Key</span></span><br><span class="line"><span class="comment"> * - TURNSTILE_SECRET_KEY: Turnstile 站点密钥</span></span><br><span class="line"><span class="comment"> * - TURNSTILE_EXPIRE: Turnstile 过期时间（秒），默认 3600（1小时）</span></span><br><span class="line"><span class="comment"> * - JWT_SECRET: JWT 签名密钥</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">turnstileMiddleware</span>(<span class="params">options = &#123;&#125;</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123;</span><br><span class="line">    cookieName = <span class="string">&quot;app_verified&quot;</span>,</span><br><span class="line">    logo = <span class="string">&quot;🔒&quot;</span>,</span><br><span class="line">    title = <span class="string">&quot;安全验证&quot;</span>,</span><br><span class="line">    description = <span class="string">&quot;请完成以下验证后继续使用&quot;</span>,</span><br><span class="line">    skipPaths = [],</span><br><span class="line">    skipMethods = [<span class="string">&quot;OPTIONS&quot;</span>],</span><br><span class="line">  &#125; = options;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">turnstileAuth</span>(<span class="params">request, env</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> url = <span class="keyword">new</span> <span class="title function_">URL</span>(request.<span class="property">url</span>);</span><br><span class="line">    <span class="keyword">const</span> &#123; pathname, search &#125; = url;</span><br><span class="line">    <span class="keyword">const</span> &#123; method &#125; = request;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (</span><br><span class="line">      skipMethods.<span class="title function_">includes</span>(method) ||</span><br><span class="line">      skipPaths.<span class="title function_">some</span>(<span class="function">(<span class="params">path</span>) =&gt;</span> pathname.<span class="title function_">startsWith</span>(path))</span><br><span class="line">    ) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!(<span class="keyword">await</span> <span class="title function_">isVerified</span>(request, cookieName, env.<span class="property">JWT_SECRET</span>))) &#123;</span><br><span class="line">      <span class="keyword">if</span> (method === <span class="string">&quot;POST&quot;</span>) &#123;</span><br><span class="line">        <span class="keyword">const</span> formData = <span class="keyword">await</span> request.<span class="title function_">formData</span>();</span><br><span class="line">        <span class="keyword">const</span> remoteip = request.<span class="property">headers</span>.<span class="title function_">get</span>(<span class="string">&quot;CF-Connecting-IP&quot;</span>);</span><br><span class="line">        <span class="keyword">const</span> response = formData.<span class="title function_">get</span>(<span class="string">&quot;cf-turnstile-response&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (</span><br><span class="line">          <span class="keyword">await</span> <span class="title function_">verifyTurnstile</span>(response, remoteip, env.<span class="property">TURNSTILE_SECRET_KEY</span>)</span><br><span class="line">        ) &#123;</span><br><span class="line">          <span class="keyword">const</span> expireTime =</span><br><span class="line">            <span class="built_in">parseInt</span>(env.<span class="property">TURNSTILE_EXPIRE</span>) || <span class="variable constant_">DEFAULT_CONFIG</span>.<span class="property">TURNSTILE_EXPIRE</span>;</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">await</span> <span class="title function_">setSuccessResponse</span>(</span><br><span class="line">            pathname + search,</span><br><span class="line">            cookieName,</span><br><span class="line">            env.<span class="property">JWT_SECRET</span>,</span><br><span class="line">            expireTime</span><br><span class="line">          );</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;验证失败&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">403</span> &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;跳转 Turnstile 页面&quot;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(</span><br><span class="line">        <span class="title function_">getTurnstileHTML</span>(&#123;</span><br><span class="line">          <span class="attr">siteKey</span>: env.<span class="property">TURNSTILE_SITE_KEY</span>,</span><br><span class="line">          title,</span><br><span class="line">          logo,</span><br><span class="line">          description,</span><br><span class="line">        &#125;),</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">headers</span>: &#123; <span class="string">&quot;content-type&quot;</span>: <span class="string">&quot;text/html; charset=utf-8&quot;</span> &#125;,</span><br><span class="line">        &#125;</span><br><span class="line">      );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用起来也很方便，只需要将以上代码保存找一个合适的位置，在 <code>worker</code> 代码中引用，并且通过在 <code>wrangler.jsonc</code> 中设置 <code>TURNSTILE_SITE_KEY</code>(必须) <code>TURNSTILE_SECRET_KEY</code>(必须) <code>JWT_SECRET</code>(必须) <code>TURNSTILE_EXPIRE</code>(可选) 这几个环境变量，剩下的按照代码中的示例使用即可。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zebedy
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://blog.zebedy.com/post/7b67508c.html" title="Cloudflare Workers 通用 Turnstile 验证模块">https://blog.zebedy.com/post/7b67508c.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpoLWhhbnM="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/fbb67a4e.html" rel="prev" title="Windy 自定义色层">
+                  <i class="fa fa-chevron-left"></i> Windy 自定义色层
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/958b861f.html" rel="next" title="iPhone 17 壁纸">
+                  iPhone 17 壁纸 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2022 – 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zebedy</span>
+</div>
+<div class="vercount">
+    <span class="post-meta-item" id="vercount_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="vercount_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="vercount_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="vercount_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <span id="runtime_span"></span>
+  <script>
+    var now = new Date();
+    function show_runtime() {
+      var born = new Date("Sat Feb 05 2022 08:00:00 GMT+0800 (中国标准时间)");
+      now.setTime(now.getTime() + 250);
+      days = Math.floor((now - born) / 1000 / 60 / 60 / 24);
+      hours = Math.floor((now - born) / 1000 / 60 / 60 - (24 * days));
+      if (String(hours).length == 1) { hours = "0" + hours; }
+      minutes = Math.floor((now - born) / 1000 / 60 - (24 * 60 * days) - (60 * hours));
+      if (String(minutes).length == 1) { minutes = "0" + minutes; }
+      seconds = Math.round((now - born) / 1000 - (24 * 60 * 60 * days) - (60 * 60 * hours) - (60 * minutes));
+      if (String(seconds).length == 1) { seconds = "0" + seconds; }
+      document.getElementById("runtime_span").innerHTML = days + " 天 " + hours + " 小时 " + minutes + " 分 " + seconds + " 秒";
+    }
+    setInterval("show_runtime()", 250);
+  </script>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"neutral","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.8/dist/mermaid.min.js","integrity":"sha256-QmSAc2kIaUjleIJ46X7qPW2zrpCbXlMz3YIGgWpQ1Jo="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+  <script async src="https://events.vercount.one/js"></script>
+
+
+
+
+
+    <script type="text/javascript" src="/js/crash-cheat.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/js/oneko.js"></script>
+  
+</body>
+</html>

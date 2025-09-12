@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.ico">
+  <link rel="mask-icon" href="/images/avatar.ico" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/red/pace-theme-flash.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.zebedy.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.9.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="最早这个博客是托管在 GitHub pages 上的，绑定的域名是在阿里云注册的，几个月前偶然一次机会，在 Cloudflare 上注册了一个自己喜欢的域名。于是就也通过 Cloudflare pages 托管了相同的 GitHub pages 仓库，因此目前使用 Cloudflare pages 或者 GitHub pages 均可访问，内容都来自同一个 GitHub repo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cloudflare 使用 Workers 建立 Images 代理">
+<meta property="og:url" content="https://blog.zebedy.com/post/ec93b507.html">
+<meta property="og:site_name" content="Undefined">
+<meta property="og:description" content="最早这个博客是托管在 GitHub pages 上的，绑定的域名是在阿里云注册的，几个月前偶然一次机会，在 Cloudflare 上注册了一个自己喜欢的域名。于是就也通过 Cloudflare pages 托管了相同的 GitHub pages 仓库，因此目前使用 Cloudflare pages 或者 GitHub pages 均可访问，内容都来自同一个 GitHub repo">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.zabrian.com/2d0fc541-8fd3-48d7-d763-e1fee14d3401/origin">
+<meta property="article:published_time" content="2025-07-30T09:04:15.000Z">
+<meta property="article:modified_time" content="2025-08-22T08:52:45.000Z">
+<meta property="article:author" content="Zebedy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.zabrian.com/2d0fc541-8fd3-48d7-d763-e1fee14d3401/origin">
+
+
+<link rel="canonical" href="https://blog.zebedy.com/post/ec93b507.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.zebedy.com/post/ec93b507.html","path":"post/ec93b507.html","title":"Cloudflare 使用 Workers 建立 Images 代理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Cloudflare 使用 Workers 建立 Images 代理 | Undefined</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EV574LFH56"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-EV574LFH56","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Undefined" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Undefined</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Life is but a span</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>订阅</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-Images"><span class="nav-text">使用 Images</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-R2"><span class="nav-text">使用 R2</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zebedy"
+      src="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin">
+  <p class="site-author-name" itemprop="name">Zebedy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+
+      <div class="twopeople">
+        <div class="container" style="height:200px;">
+          <canvas class="illo" width="800" height="800" style="max-width: 200px; max-height: 200px; touch-action: none; width: 640px; height: 640px;"></canvas>
+        </div>
+        <script src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/twopeople1.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/zdog.dist.js"></script>
+        <script id="rendered-js" src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/twopeople.js"></script>
+        <style>
+          .twopeople{
+            margin: 0;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
+          canvas {
+            display: block;
+            margin: 0 auto;
+            cursor: move;
+         }
+        </style>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.zebedy.com/post/ec93b507.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin">
+      <meta itemprop="name" content="Zebedy">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Undefined">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Cloudflare 使用 Workers 建立 Images 代理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-07-30 17:04:15" itemprop="dateCreated datePublished" datetime="2025-07-30T17:04:15+08:00">2025-07-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-08-22 16:52:45" itemprop="dateModified" datetime="2025-08-22T16:52:45+08:00">2025-08-22</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="vercount_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="vercount_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>10k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>9 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>最早这个博客是托管在 GitHub pages 上的，绑定的域名是在阿里云注册的，几个月前偶然一次机会，在 Cloudflare 上注册了一个自己喜欢的域名。于是就也通过 Cloudflare pages 托管了相同的 GitHub pages 仓库，因此目前使用 <span class="exturl" data-url="aHR0cHM6Ly9ibG9nLnphYnJpYW4uY29tLw==">Cloudflare pages<i class="fa fa-external-link-alt"></i></span> 或者 <a href="https://blog.zebedy.com/">GitHub pages</a> 均可访问，内容都来自同一个 GitHub repo</p>
+<span id="more"></span>
+
+<h1 id="使用-Images"><a href="#使用-Images" class="headerlink" title="使用 Images"></a>使用 Images</h1><p>就在我无聊把玩赛博菩萨的各种功能的时候，发现 Images 的定价还算很实惠，于是乎开通了 Images Stream Bundle Basic 套餐，包含预付费 $5.00&#x2F;月 100,000 张图片和 1,000 分钟视频存储以及后付费 $1.00&#x2F;100,000 张图片的交付。<br>既然都订阅了，然后就想着把博客现在的图片都迁移到 Images 上来。但是吧，问题就在于 Images 的图片是可以公共读的。直接放到博客上万一哪天被刷流量了，得不偿失。研究了一下发现 Images 是可以生成带有过期时间的签名 URL 的，可是问题是我的博客是静态博客，图片链接都需要写死在 <code>&lt;img&gt;</code> 标签里面。左思右想之下想到了一个折中的办法。<br>总体思路就是上传的图片打开 <strong>需要已签名的 URL</strong> 然后该图片就必须通过签名 URL 访问，然后实现一个 Worker 判断 URL 是否包含签名信息，如果不包含，则通过 URL 接收 <code>图像 ID(imageID)</code> 和 <code>变体(variant)</code> 然后对 URL 实现签名，生成一个带签名的 URL 并 302 重定向回 Worker。如果 URL 包含签名信息，则请求图片资源并返回。</p>
+<img src="https://images.zabrian.com/2d0fc541-8fd3-48d7-d763-e1fee14d3401/origin" title="流程图" style="zoom:42%;" />
+
+<p>思路有了那就开始，首先新建一个 Worker 代码如下</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="variable constant_">ACCOUNT_HASH</span> = <span class="string">&quot;此处填写 Images 帐户哈希&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">KEY</span> = <span class="string">&quot;此处填写 Image 账户 API 令牌&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">IMAGE_CUSTOM_DOMAIN</span> = <span class="string">&quot;此处填写 Worker 绑定的自定义域名&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">EXPIRATION</span> = <span class="number">60</span>; <span class="comment">// 签名图片过期时间 1 min</span></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">ALLOWED_REFERERS</span> = []; <span class="comment">// 此处填写请求 Referer 白名单作为防盗链</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">IMAGE_DELIVERY_DOMAIN</span> = <span class="string">&quot;imagedelivery.net&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">bufferToHex</span> = (<span class="params">buffer</span>) =&gt;</span><br><span class="line">  [...<span class="keyword">new</span> <span class="title class_">Uint8Array</span>(buffer)]</span><br><span class="line">    .<span class="title function_">map</span>(<span class="function">(<span class="params">x</span>) =&gt;</span> x.<span class="title function_">toString</span>(<span class="number">16</span>).<span class="title function_">padStart</span>(<span class="number">2</span>, <span class="string">&quot;0&quot;</span>))</span><br><span class="line">    .<span class="title function_">join</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">generateSignedUrl</span>(<span class="params">url</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> encoder = <span class="keyword">new</span> <span class="title class_">TextEncoder</span>();</span><br><span class="line">  <span class="keyword">const</span> secretKey = encoder.<span class="title function_">encode</span>(<span class="variable constant_">KEY</span>);</span><br><span class="line">  <span class="keyword">const</span> key = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">importKey</span>(</span><br><span class="line">    <span class="string">&quot;raw&quot;</span>,</span><br><span class="line">    secretKey,</span><br><span class="line">    &#123; <span class="attr">name</span>: <span class="string">&quot;HMAC&quot;</span>, <span class="attr">hash</span>: <span class="string">&quot;SHA-256&quot;</span> &#125;,</span><br><span class="line">    <span class="literal">false</span>,</span><br><span class="line">    [<span class="string">&quot;sign&quot;</span>]</span><br><span class="line">  );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> exp = <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Date</span>.<span class="title function_">now</span>() / <span class="number">1000</span>) + <span class="variable constant_">EXPIRATION</span>;</span><br><span class="line">  url.<span class="property">searchParams</span>.<span class="title function_">set</span>(<span class="string">&quot;exp&quot;</span>, exp);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> stringToSign = url.<span class="property">pathname</span> + <span class="string">&quot;?&quot;</span> + url.<span class="property">searchParams</span>.<span class="title function_">toString</span>();</span><br><span class="line">  <span class="keyword">const</span> mac = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">sign</span>(</span><br><span class="line">    <span class="string">&quot;HMAC&quot;</span>,</span><br><span class="line">    key,</span><br><span class="line">    encoder.<span class="title function_">encode</span>(stringToSign)</span><br><span class="line">  );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> signature = <span class="title function_">bufferToHex</span>(<span class="keyword">new</span> <span class="title class_">Uint8Array</span>(mac).<span class="property">buffer</span>);</span><br><span class="line">  url.<span class="property">searchParams</span>.<span class="title function_">set</span>(<span class="string">&quot;sig&quot;</span>, signature);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> url;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="keyword">async</span> <span class="title function_">fetch</span>(<span class="params">request</span>) &#123;</span><br><span class="line">    <span class="comment">// 检查 Referer (只有 ALLOWED_REFERERS 不为空时才检查)</span></span><br><span class="line">    <span class="keyword">const</span> referer = request.<span class="property">headers</span>.<span class="title function_">get</span>(<span class="string">&quot;Referer&quot;</span>) || <span class="string">&quot;&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable constant_">ALLOWED_REFERERS</span>.<span class="property">length</span> &amp;&amp; !<span class="variable constant_">ALLOWED_REFERERS</span>.<span class="title function_">some</span>(<span class="function">(<span class="params">allow</span>) =&gt;</span> referer.<span class="title function_">startsWith</span>(allow))) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Forbidden&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">403</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 解析路径</span></span><br><span class="line">    <span class="keyword">const</span> url = <span class="keyword">new</span> <span class="title function_">URL</span>(request.<span class="property">url</span>);</span><br><span class="line">    <span class="keyword">const</span> match = url.<span class="property">pathname</span>.<span class="title function_">match</span>(<span class="regexp">/^\/([^/]+)\/([^/]+)$/</span>);</span><br><span class="line">    <span class="keyword">if</span> (!match) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Bad Request&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">400</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> [, imageID, variant] = match;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!url.<span class="property">searchParams</span>.<span class="title function_">has</span>(<span class="string">&quot;exp&quot;</span>) || !url.<span class="property">searchParams</span>.<span class="title function_">has</span>(<span class="string">&quot;sig&quot;</span>)) &#123;</span><br><span class="line">      <span class="comment">// 无签名 - 生成签名并重定向</span></span><br><span class="line">      <span class="keyword">const</span> deliveryUrl = <span class="keyword">new</span> <span class="title function_">URL</span>(</span><br><span class="line">        <span class="string">`https://<span class="subst">$&#123;IMAGE_DELIVERY_DOMAIN&#125;</span>/<span class="subst">$&#123;ACCOUNT_HASH&#125;</span>/<span class="subst">$&#123;imageID&#125;</span>/<span class="subst">$&#123;variant&#125;</span>`</span></span><br><span class="line">      );</span><br><span class="line">      <span class="keyword">const</span> signedUrl = <span class="keyword">await</span> <span class="title function_">generateSignedUrl</span>(deliveryUrl);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> redirectUrl = <span class="keyword">new</span> <span class="title function_">URL</span>(</span><br><span class="line">        <span class="string">`https://<span class="subst">$&#123;IMAGE_CUSTOM_DOMAIN&#125;</span>/<span class="subst">$&#123;imageID&#125;</span>/<span class="subst">$&#123;variant&#125;</span>`</span></span><br><span class="line">      );</span><br><span class="line">      redirectUrl.<span class="property">search</span> = signedUrl.<span class="property">search</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> <span class="title class_">Response</span>.<span class="title function_">redirect</span>(redirectUrl.<span class="title function_">toString</span>(), <span class="number">302</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 有签名 - 直接请求图片</span></span><br><span class="line">      <span class="keyword">const</span> imageUrl = <span class="keyword">new</span> <span class="title function_">URL</span>(</span><br><span class="line">        <span class="string">`https://<span class="subst">$&#123;IMAGE_DELIVERY_DOMAIN&#125;</span>/<span class="subst">$&#123;ACCOUNT_HASH&#125;</span>/<span class="subst">$&#123;imageID&#125;</span>/<span class="subst">$&#123;variant&#125;</span>`</span></span><br><span class="line">      );</span><br><span class="line">      imageUrl.<span class="property">search</span> = url.<span class="property">search</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> resp = <span class="keyword">await</span> <span class="title function_">fetch</span>(imageUrl.<span class="title function_">toString</span>(), request);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(resp.<span class="property">body</span>, &#123;</span><br><span class="line">        <span class="attr">status</span>: resp.<span class="property">status</span>,</span><br><span class="line">        <span class="attr">headers</span>: resp.<span class="property">headers</span>,</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>然后将 <code>Worker.js</code> 中 <code>IMAGE_CUSTOM_DOMAIN</code> 的域名绑定到这个 Worker 上。<br>在 Images 上传一张图片，打开 <strong>需要已签名的 URL</strong> 然后获取到他的<code>图像 ID</code>，可以在 Images 里面自定义一个<code>变体</code>，然后就可以通过 <code>https://IMAGE_CUSTOM_DOMAIN/&#123;imageID&#125;/&#123;variant&#125;</code> 访问该图片，此时会自动跳转到 <code>https://IMAGE_CUSTOM_DOMAIN/&#123;imageID&#125;/&#123;variant&#125;?exp=&#123;exp&#125;&amp;sig=&#123;sig&#125;</code> 其中 <code>sig</code> 就是签名信息，<code>exp</code> 是该链接的过期时间。如果填写了 <code>ALLOWED_REFERERS</code> 则请求必须携带对应的 <code>Referer</code> 否则会 <code>403</code></p>
+<p>现在 Cloudflare 的流程就没有问题了，接下来解决静态博客的问题。我是用的 Hexo 的静态博客，文章中插入图片需要使用 <code>&lt;img&gt;</code> 标签。每次都需要将本地图片传到 Cloudflare Images 并且编辑图像手动打开 <strong>需要已签名的 URL</strong> 然后再获取到对应的图像 ID 再替换为 URL 略显麻烦。因此手动创建了一个脚本自动化实现以上功能，我只需要在 <code>&lt;img&gt;</code> 标签中添加图片的本地文件路径，然后写好博客之后调用脚本就会自动将文章中引用的 img 图片上传到 Cloudflare Images 并且打开 <strong>需要已签名的 URL</strong> 然后根据返回的图像 ID 自动拼接 http 链接并替换原文 <code>&lt;img&gt;</code> 标签的本地文件地址。</p>
+<p>在本地 Hexo 项目下创建一个 <code>tools/upload-images.js</code> 文件</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env node</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&quot;fs&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&quot;path&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> axios = <span class="built_in">require</span>(<span class="string">&quot;axios&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">FormData</span> = <span class="built_in">require</span>(<span class="string">&quot;form-data&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> sharp = <span class="built_in">require</span>(<span class="string">&quot;sharp&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Cloudflare Images API 配置</span></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">CF_ACCOUNT_ID</span> = <span class="string">&quot;此处填写 Image 帐户 ID&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">CF_API_TOKEN</span> = <span class="string">&quot;此处填写 Cloudflare API Token&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">CF_IMAGES_API_URL</span> = <span class="string">`https://api.cloudflare.com/client/v4/accounts/<span class="subst">$&#123;CF_ACCOUNT_ID&#125;</span>/images/v1`</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">IMAGE_BASE_URL</span> = <span class="string">&quot;此处填写 Worker 带 https 的 URL 地址&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">MAX_WIDTH</span> = <span class="number">800</span>; <span class="comment">// 图像的最大宽度</span></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">MAX_HEIGHT</span> = <span class="number">600</span>; <span class="comment">// 图像的最大高度</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> abbrlink = process.<span class="property">argv</span>[<span class="number">2</span>];</span><br><span class="line"><span class="keyword">if</span> (!abbrlink) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&quot;请提供 abbrlink\n  例如: npm run upload e6a2e300&quot;</span>);</span><br><span class="line">  process.<span class="title function_">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 根据 abbrlink 查找对应的文章文件</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">findPostByAbbrlink</span>(<span class="params">abbrlink</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> postsDir = path.<span class="title function_">join</span>(__dirname, <span class="string">&quot;../source/_posts&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> files = fs.<span class="title function_">readdirSync</span>(postsDir);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> file <span class="keyword">of</span> files) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!file.<span class="title function_">endsWith</span>(<span class="string">&quot;.md&quot;</span>)) <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> filePath = path.<span class="title function_">join</span>(postsDir, file);</span><br><span class="line">    <span class="keyword">const</span> content = fs.<span class="title function_">readFileSync</span>(filePath, <span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 解析 front matter</span></span><br><span class="line">    <span class="keyword">const</span> frontMatterMatch = content.<span class="title function_">match</span>(<span class="regexp">/^---\n([\s\S]*?)\n---/</span>);</span><br><span class="line">    <span class="keyword">if</span> (frontMatterMatch) &#123;</span><br><span class="line">      <span class="keyword">const</span> frontMatter = frontMatterMatch[<span class="number">1</span>];</span><br><span class="line">      <span class="keyword">const</span> abbrlinkMatch = frontMatter.<span class="title function_">match</span>(<span class="regexp">/abbrlink:\s*([a-fA-F0-9]+)/</span>);</span><br><span class="line">      <span class="keyword">if</span> (abbrlinkMatch &amp;&amp; abbrlinkMatch[<span class="number">1</span>] === abbrlink) &#123;</span><br><span class="line">        <span class="keyword">return</span> filePath;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 计算合适的图片尺寸和缩放比例</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">calculateOptimalSize</span>(<span class="params">imagePath</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> metadata = <span class="keyword">await</span> <span class="title function_">sharp</span>(imagePath).<span class="title function_">metadata</span>();</span><br><span class="line">  <span class="keyword">const</span> &#123; width, height &#125; = metadata;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (width &lt;= <span class="variable constant_">MAX_WIDTH</span> &amp;&amp; height &lt;= <span class="variable constant_">MAX_HEIGHT</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      width,</span><br><span class="line">      height,</span><br><span class="line">      <span class="attr">zoom</span>: <span class="number">100</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> widthScale = <span class="variable constant_">MAX_WIDTH</span> / width;</span><br><span class="line">  <span class="keyword">const</span> heightScale = <span class="variable constant_">MAX_HEIGHT</span> / height;</span><br><span class="line">  <span class="keyword">const</span> scale = <span class="title class_">Math</span>.<span class="title function_">min</span>(widthScale, heightScale);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> newWidth = <span class="title class_">Math</span>.<span class="title function_">round</span>(width * scale);</span><br><span class="line">  <span class="keyword">const</span> newHeight = <span class="title class_">Math</span>.<span class="title function_">round</span>(height * scale);</span><br><span class="line">  <span class="keyword">const</span> zoom = <span class="title class_">Math</span>.<span class="title function_">round</span>(scale * <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    <span class="attr">width</span>: newWidth,</span><br><span class="line">    <span class="attr">height</span>: newHeight,</span><br><span class="line">    <span class="attr">zoom</span>: zoom</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 从文件内容中提取所有图片标签</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">extractImageTags</span>(<span class="params">content</span>) &#123;</span><br><span class="line">  <span class="comment">// 匹配 HTML img 标签: &lt;img src=&quot;path&quot; title=&quot;title&quot;&gt;</span></span><br><span class="line">  <span class="keyword">const</span> regex = <span class="regexp">/&lt;img\s+src=&quot;([^&quot;]+)&quot;(?:\s+title=&quot;([^&quot;]*)&quot;)?[^&gt;]*&gt;/g</span>;</span><br><span class="line">  <span class="keyword">const</span> matches = [];</span><br><span class="line">  <span class="keyword">let</span> match;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> ((match = regex.<span class="title function_">exec</span>(content)) !== <span class="literal">null</span>) &#123;</span><br><span class="line">    matches.<span class="title function_">push</span>(&#123;</span><br><span class="line">      <span class="attr">fullTag</span>: match[<span class="number">0</span>],</span><br><span class="line">      <span class="attr">localPath</span>: match[<span class="number">1</span>],</span><br><span class="line">      <span class="attr">title</span>: match[<span class="number">2</span>] || <span class="string">&quot;&quot;</span>,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> matches;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 上传图片到 Cloudflare Images</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">uploadToCloudflare</span>(<span class="params">filePath</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> fileName = path.<span class="title function_">basename</span>(filePath);</span><br><span class="line">  <span class="keyword">const</span> newFileName = <span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>-<span class="subst">$&#123;fileName&#125;</span>`</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> form = <span class="keyword">new</span> <span class="title class_">FormData</span>();</span><br><span class="line">  form.<span class="title function_">append</span>(<span class="string">&quot;file&quot;</span>, fs.<span class="title function_">createReadStream</span>(filePath), &#123; <span class="attr">filename</span>: newFileName &#125;);</span><br><span class="line">  form.<span class="title function_">append</span>(<span class="string">&quot;requireSignedURLs&quot;</span>, <span class="string">&quot;true&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> response = <span class="keyword">await</span> axios.<span class="title function_">post</span>(<span class="variable constant_">CF_IMAGES_API_URL</span>, form, &#123;</span><br><span class="line">    <span class="attr">headers</span>: &#123;</span><br><span class="line">      <span class="title class_">Authorization</span>: <span class="string">`Bearer <span class="subst">$&#123;CF_API_TOKEN&#125;</span>`</span>,</span><br><span class="line">      ...form.<span class="title function_">getHeaders</span>(),</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (!response.<span class="property">data</span>.<span class="property">success</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&quot;上传失败: &quot;</span> + <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(response.<span class="property">data</span>));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> response.<span class="property">data</span>.<span class="property">result</span>.<span class="property">id</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 主处理函数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">main</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`处理文章: <span class="subst">$&#123;abbrlink&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> postPath = <span class="title function_">findPostByAbbrlink</span>(abbrlink);</span><br><span class="line">  <span class="keyword">if</span> (!postPath) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>: 未找到该文章`</span>);</span><br><span class="line">    process.<span class="title function_">exit</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> content = fs.<span class="title function_">readFileSync</span>(postPath, <span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> imageTags = <span class="title function_">extractImageTags</span>(content);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (imageTags.<span class="property">length</span> === <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>: 没有找到图片`</span>);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>: 图片数量 <span class="subst">$&#123;imageTags.length&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> tag <span class="keyword">of</span> imageTags) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// 跳过 URL 图片</span></span><br><span class="line">      <span class="keyword">if</span> (tag.<span class="property">localPath</span>.<span class="title function_">startsWith</span>(<span class="string">&quot;http&quot;</span>)) &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>: 跳过 URL 图片 <span class="subst">$&#123;tag.localPath&#125;</span>`</span>);</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 解析本地路径</span></span><br><span class="line">      <span class="keyword">const</span> imagePath = path.<span class="title function_">isAbsolute</span>(tag.<span class="property">localPath</span>)</span><br><span class="line">        ? tag.<span class="property">localPath</span></span><br><span class="line">        : path.<span class="title function_">resolve</span>(__dirname, <span class="string">&quot;..&quot;</span>, tag.<span class="property">localPath</span>);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (!fs.<span class="title function_">existsSync</span>(imagePath)) &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>: 图片不存在 <span class="subst">$&#123;imagePath&#125;</span>`</span>);</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>: 正在处理 <span class="subst">$&#123;tag.localPath&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 自动缩放图片</span></span><br><span class="line">      <span class="keyword">const</span> &#123; width, height, zoom &#125; = <span class="keyword">await</span> <span class="title function_">calculateOptimalSize</span>(imagePath);</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>: 自动缩放 <span class="subst">$&#123;width&#125;</span>x<span class="subst">$&#123;height&#125;</span> (<span class="subst">$&#123;zoom&#125;</span>%)`</span>);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 上传图片</span></span><br><span class="line">      <span class="keyword">const</span> imageId = <span class="keyword">await</span> <span class="title function_">uploadToCloudflare</span>(imagePath);</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>: 上传成功 <span class="subst">$&#123;imageId&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 生成新标签 - HTML img 格式</span></span><br><span class="line">      <span class="keyword">const</span> newUrl = <span class="string">`<span class="subst">$&#123;IMAGE_BASE_URL&#125;</span>/<span class="subst">$&#123;imageId&#125;</span>/origin`</span>;</span><br><span class="line">      <span class="keyword">const</span> titleText = tag.<span class="property">title</span> || <span class="string">&quot;图片&quot;</span>;</span><br><span class="line">      <span class="keyword">const</span> newTag = <span class="string">`&lt;img src=&quot;<span class="subst">$&#123;newUrl&#125;</span>&quot; title=&quot;<span class="subst">$&#123;titleText&#125;</span>&quot; style=&quot;zoom:<span class="subst">$&#123;zoom&#125;</span>%;&quot; /&gt;`</span>;</span><br><span class="line"></span><br><span class="line">      content = content.<span class="title function_">replace</span>(tag.<span class="property">fullTag</span>, newTag);</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>: 处理完成 <span class="subst">$&#123;tag.localPath&#125;</span> -&gt; <span class="subst">$&#123;newUrl&#125;</span> (<span class="subst">$&#123;zoom&#125;</span>%)`</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">`<span class="subst">$&#123;abbrlink&#125;</span>: 处理失败: <span class="subst">$&#123;tag.localPath&#125;</span>`</span>, error.<span class="property">message</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  fs.<span class="title function_">writeFileSync</span>(postPath, content, <span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;处理完成&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">main</span>();</span><br></pre></td></tr></table></figure>
+
+<p>并将该脚本添加到 package.json</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="comment">// ...省略</span></span><br><span class="line">  <span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="comment">// ...省略</span></span><br><span class="line">    <span class="attr">&quot;upload&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node tools/upload-images.js&quot;</span></span><br><span class="line">    <span class="comment">// ...省略</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="comment">// ...省略</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后就可以通过 <code>npm run upload xxxxxxxx</code> 自动上传该文章中出现的图片并替换链接啦。</p>
+<h1 id="使用-R2"><a href="#使用-R2" class="headerlink" title="使用 R2"></a>使用 R2</h1><p>如果不想使用 Images 的付费功能，也可以使用 R2 的免费套餐搭建。其中 R2 的免费套餐包含 10G 存储空间、 A 类操作 100w&#x2F;月 和 B 类操作 1000w&#x2F;月。</p>
+<blockquote>
+<p>详情参考 <span class="exturl" data-url="aHR0cHM6Ly9kZXZlbG9wZXJzLmNsb3VkZmxhcmUuY29tL3IyL3ByaWNpbmcvIzp+OnRleHQ9Zm9yJTIwMiUyMEdCLi0sRnJlZSUyMHRpZXIsLVlvdSUyMGNhbiUyMHVzZQ==">Cloudflare Docs R2<i class="fa fa-external-link-alt"></i></span></p>
+</blockquote>
+<p>如果直接把域名绑定到 <code>R2 Bucket</code> 上开启公网访问，很容易一夜之间倾家荡产。所以关闭 <code>R2 Bucket</code> 公网访问，使用 Workers 免费计划的 10w&#x2F;天 的请求量天然的限制避免被刷流量。</p>
+<blockquote>
+<p>详情参考 <span class="exturl" data-url="aHR0cHM6Ly9kZXZlbG9wZXJzLmNsb3VkZmxhcmUuY29tL3dvcmtlcnMvcGxhdGZvcm0vcHJpY2luZy8jOn46dGV4dD1QYWdlcyUyMEZ1bmN0aW9ucyUyMHByaWNpbmcuLSxXb3JrZXJzLC1Vc2VycyUyMG9uJTIwdGhl">Cloudflare Docs Workers<i class="fa fa-external-link-alt"></i></span></p>
+</blockquote>
+<p>首先创建一个 <code>R2 Bucket</code>，名称自定义。然后新建一个 Workers 代码如下</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="keyword">async</span> <span class="title function_">fetch</span>(<span class="params">request, env</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (request.<span class="property">method</span> !== <span class="string">&quot;GET&quot;</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Method Not Allowed&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">405</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> url = <span class="keyword">new</span> <span class="title function_">URL</span>(request.<span class="property">url</span>);</span><br><span class="line">    <span class="keyword">const</span> path = <span class="built_in">decodeURIComponent</span>(url.<span class="property">pathname</span>.<span class="title function_">slice</span>(<span class="number">1</span>));</span><br><span class="line">    <span class="keyword">if</span> (!path) <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Not Found&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">404</span> &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> cacheKey = <span class="keyword">new</span> <span class="title class_">Request</span>(<span class="string">`<span class="subst">$&#123;url.origin&#125;</span><span class="subst">$&#123;url.pathname&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> cached = <span class="keyword">await</span> caches.<span class="property">default</span>.<span class="title function_">match</span>(cacheKey);</span><br><span class="line">      <span class="keyword">if</span> (cached) <span class="keyword">return</span> cached;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> file = <span class="keyword">await</span> env.<span class="property">IMAGES</span>.<span class="title function_">get</span>(path); <span class="comment">// IMAGES 为后续步骤中绑定的名称，可自行修改</span></span><br><span class="line">      <span class="keyword">if</span> (!file) <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Not Found&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">404</span> &#125;);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> response = <span class="keyword">new</span> <span class="title class_">Response</span>(file.<span class="property">body</span>, &#123;</span><br><span class="line">        <span class="attr">headers</span>: &#123;</span><br><span class="line">          <span class="string">&quot;Content-Type&quot;</span>: file.<span class="property">httpMetadata</span>?.<span class="property">contentType</span> || <span class="string">&quot;application/octet-stream&quot;</span>,</span><br><span class="line">          <span class="string">&quot;Cache-Control&quot;</span>: <span class="string">&quot;public, max-age=21600&quot;</span>, <span class="comment">// 缓存时间 6 小时，可自行修改</span></span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">await</span> caches.<span class="property">default</span>.<span class="title function_">put</span>(cacheKey, response.<span class="title function_">clone</span>());</span><br><span class="line">      <span class="keyword">return</span> response;</span><br><span class="line">    &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Server Error&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">500</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>然后在 Workers 绑定处添加绑定上面创建的 <code>R2 Bucket</code>，名称只需要与 Workers 代码中的名称一致即可。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zebedy
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://blog.zebedy.com/post/ec93b507.html" title="Cloudflare 使用 Workers 建立 Images 代理">https://blog.zebedy.com/post/ec93b507.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpoLWhhbnM="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/baaa1138.html" rel="prev" title="调整 macOS 顶部菜单栏图标间距">
+                  <i class="fa fa-chevron-left"></i> 调整 macOS 顶部菜单栏图标间距
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/16e3b020.html" rel="next" title="Garmin 国行码表使用 OSM 地图">
+                  Garmin 国行码表使用 OSM 地图 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2022 – 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zebedy</span>
+</div>
+<div class="vercount">
+    <span class="post-meta-item" id="vercount_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="vercount_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="vercount_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="vercount_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <span id="runtime_span"></span>
+  <script>
+    var now = new Date();
+    function show_runtime() {
+      var born = new Date("Sat Feb 05 2022 08:00:00 GMT+0800 (中国标准时间)");
+      now.setTime(now.getTime() + 250);
+      days = Math.floor((now - born) / 1000 / 60 / 60 / 24);
+      hours = Math.floor((now - born) / 1000 / 60 / 60 - (24 * days));
+      if (String(hours).length == 1) { hours = "0" + hours; }
+      minutes = Math.floor((now - born) / 1000 / 60 - (24 * 60 * days) - (60 * hours));
+      if (String(minutes).length == 1) { minutes = "0" + minutes; }
+      seconds = Math.round((now - born) / 1000 - (24 * 60 * 60 * days) - (60 * 60 * hours) - (60 * minutes));
+      if (String(seconds).length == 1) { seconds = "0" + seconds; }
+      document.getElementById("runtime_span").innerHTML = days + " 天 " + hours + " 小时 " + minutes + " 分 " + seconds + " 秒";
+    }
+    setInterval("show_runtime()", 250);
+  </script>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"neutral","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.8/dist/mermaid.min.js","integrity":"sha256-QmSAc2kIaUjleIJ46X7qPW2zrpCbXlMz3YIGgWpQ1Jo="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+  <script async src="https://events.vercount.one/js"></script>
+
+
+
+
+
+    <script type="text/javascript" src="/js/crash-cheat.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/js/oneko.js"></script>
+  
+</body>
+</html>

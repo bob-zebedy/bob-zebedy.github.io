@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.ico">
+  <link rel="mask-icon" href="/images/avatar.ico" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/red/pace-theme-flash.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.zebedy.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.9.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="在之前《搭建家庭私人 GitLab 服务器》说到我现在有这样的需求，而且根据上一篇，我们已经搭建好了这样的一个环境。那么有什么就赶紧用起来吧。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GitLab 自动部署 GitHub Pages 博客">
+<meta property="og:url" content="https://blog.zebedy.com/post/4a4b01f0.html">
+<meta property="og:site_name" content="Undefined">
+<meta property="og:description" content="在之前《搭建家庭私人 GitLab 服务器》说到我现在有这样的需求，而且根据上一篇，我们已经搭建好了这样的一个环境。那么有什么就赶紧用起来吧。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.zabrian.com/4dc2c2e2-dffb-44f5-2a7e-4140ab776f01/origin">
+<meta property="og:image" content="https://images.zabrian.com/fc6c425a-3304-44c8-a670-b425588c6101/origin">
+<meta property="og:image" content="https://images.zabrian.com/6f66496d-6e87-463b-1fe6-657a77a5d801/origin">
+<meta property="og:image" content="https://images.zabrian.com/5f546e74-b6d1-4751-a4d7-c80d71e37801/origin">
+<meta property="article:published_time" content="2022-02-14T06:26:03.000Z">
+<meta property="article:modified_time" content="2025-08-22T08:52:45.000Z">
+<meta property="article:author" content="Zebedy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.zabrian.com/4dc2c2e2-dffb-44f5-2a7e-4140ab776f01/origin">
+
+
+<link rel="canonical" href="https://blog.zebedy.com/post/4a4b01f0.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.zebedy.com/post/4a4b01f0.html","path":"post/4a4b01f0.html","title":"GitLab 自动部署 GitHub Pages 博客"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>GitLab 自动部署 GitHub Pages 博客 | Undefined</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EV574LFH56"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-EV574LFH56","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Undefined" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Undefined</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Life is but a span</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>订阅</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88"><span class="nav-text">为什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E5%90%A7"><span class="nav-text">开始吧</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Docker"><span class="nav-text">安装 Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85-Gitlab-Runner"><span class="nav-text">安装 Gitlab-Runner</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E5%86%8C-Runner"><span class="nav-text">注册 Runner</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-SSH-%E5%AF%86%E9%92%A5%E5%AF%B9"><span class="nav-text">创建 SSH 密钥对</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GitHub-%E6%B7%BB%E5%8A%A0-Deploy-keys"><span class="nav-text">GitHub 添加 Deploy keys</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GitLab-%E9%85%8D%E7%BD%AE-CI-CD"><span class="nav-text">GitLab 配置 CI&#x2F;CD</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE-gitlab-ci-yml-%E9%85%8D%E7%BD%AE"><span class="nav-text">项目 .gitlab-ci.yml 配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E6%9D%9F"><span class="nav-text">结束</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zebedy"
+      src="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin">
+  <p class="site-author-name" itemprop="name">Zebedy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+
+      <div class="twopeople">
+        <div class="container" style="height:200px;">
+          <canvas class="illo" width="800" height="800" style="max-width: 200px; max-height: 200px; touch-action: none; width: 640px; height: 640px;"></canvas>
+        </div>
+        <script src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/twopeople1.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/zdog.dist.js"></script>
+        <script id="rendered-js" src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/twopeople.js"></script>
+        <style>
+          .twopeople{
+            margin: 0;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
+          canvas {
+            display: block;
+            margin: 0 auto;
+            cursor: move;
+         }
+        </style>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.zebedy.com/post/4a4b01f0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin">
+      <meta itemprop="name" content="Zebedy">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Undefined">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GitLab 自动部署 GitHub Pages 博客
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-02-14 14:26:03" itemprop="dateCreated datePublished" datetime="2022-02-14T14:26:03+08:00">2022-02-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-08-22 16:52:45" itemprop="dateModified" datetime="2025-08-22T16:52:45+08:00">2025-08-22</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="vercount_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="vercount_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>在之前《<a href="/post/8d4f8799.html" title="搭建家庭私人 GitLab 服务器">搭建家庭私人 GitLab 服务器</a>》说到我现在有这样的需求，而且根据上一篇，我们已经搭建好了这样的一个环境。那么有什么就赶紧用起来吧。</p>
+<span id="more"></span>
+
+<p>那么这一篇主要是介绍一下如何用这个家庭私人 GitLab 实现自动部署托管在 GitHub Pages 上的博客。本文使用的是 <code>Hexo</code> 框架 + <code>Next</code> 主题，其他的静态博客框架大同小异。这的关注点不在搭建博客，这里假定你已经有了一个正在托管的 GitHub Pages 博客。这篇文章将此博客为例子讲解一下。</p>
+<h1 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h1><p>用过 <code>Hexo</code> 的都知道，它需要在你的本地电脑上搭建一个 <code>Node</code> 环境。安装框架、自定义修改配置、Markdown 写文章，然后生成、最后利用 Git 推送到 GitHub 仓库 然后才能在网上看到发布的文章。那么这样带来了一个问题：如果某一天你本地的写博客的环境丢失了（比如电脑坏了，硬盘坏了等等等等）那么如果你想再更新你的博客就需要再次搭建这样一个环境，除了需要将所有的配置再次配置一遍，关键是旧的 Markdown 文章已经几乎再找不回来了。</p>
+<p>几年前我也是因为这个原因导致放弃了之前写了很多文章的博客。那到这里就有人想了，如果我把位于本地的那个 ‘环境’ 也用 Git 管理起来呢？不错的想法，之后我也是这样做的，在 GitHub 上再新建一个仓库，用来保存本地写博客的环境，这样一来，即使换电脑了，只需要把这个仓库 clone 下来，安装一下相关的依赖，就可以继续了。</p>
+<p>看起来很美好，但很快就遇到另一个问题：这里相当于把你的博客所有源码都公开了出去，有什么弊端么？比如假如你使用了 <code>hexo-blog-encrypt</code> 插件对某些博客进行加密，密码使需要明文写在待加密博客的头部信息里的。好家伙，这样一来，不就成了防君子不防小人了？所以这就需要把源码托管在我们之前搭建那个家庭私人的 GitLab 上的。</p>
+<p>但是过了一段时间，我又双叒叕发现了一个问题：我经常忘记把本地的博客源码 push 到 GitLab 上。大部分的时候都是本地写完，修改的差不多之后就 <code>hexo deploy</code> 部署后就忘了 push 到 GitLab，导致用的时候该丢的文章还是丢了。恼羞成怒之下，萌生了利用 GitLab CI&#x2F;CD 自动部署。实现每次写完文章，只需要 push 本地源码到 GitLab，然后 GitLab 自动部署。这样一来就不怕每次写完文章手动部署之后忘记提交本地源码，二来也减少了需要手动的步骤。毕竟懒惰才是人类的第一生产力。</p>
+<h1 id="开始吧"><a href="#开始吧" class="headerlink" title="开始吧"></a>开始吧</h1><h2 id="安装-Docker"><a href="#安装-Docker" class="headerlink" title="安装 Docker"></a>安装 Docker</h2><p>使用 GitLab CI&#x2F;CD 功能不是必须 Docker，但是容器化的 Docker 能够隔离物理机，防止一言不合一个 <code>rm -rf /*</code> 让你的心血白费。</p>
+<p>以下命令需要 ssh 到 GitLab 服务所在的机器中进行</p>
+<ol>
+<li>卸载旧版本 Docker（如果没安装过，可以省略）</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt remove docker docker-engine docker.io containerd runc</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>安装必要依赖</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update &amp;&amp; <span class="built_in">sudo</span> apt install apt-transport-https ca-certificates curl gnupg lsb-release</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>添加 apt 源</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | <span class="built_in">sudo</span> gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> \</span><br><span class="line"> <span class="string">&quot;deb [arch=<span class="subst">$(dpkg --print-architecture)</span> signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \</span></span><br><span class="line"><span class="string"> <span class="subst">$(lsb_release -cs)</span> stable&quot;</span> | <span class="built_in">sudo</span> <span class="built_in">tee</span> /etc/apt/sources.list.d/docker.list &gt; /dev/null</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>安装 Docker</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update &amp;&amp; <span class="built_in">sudo</span> apt install docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>启动 Docker</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> docker</span><br><span class="line"><span class="built_in">sudo</span> systemctl start docker</span><br></pre></td></tr></table></figure>
+
+<p>如果以上命令没有出现错误，那么 docker 就已经安装到服务器上了。如果不放心，可以通过 <code>sudo docker -v</code> 命令，如果输出类似 <code>Docker version 20.10.12, build e91ed57</code> 就说明 docker 已经正确安装了。</p>
+<h2 id="安装-Gitlab-Runner"><a href="#安装-Gitlab-Runner" class="headerlink" title="安装 Gitlab-Runner"></a>安装 Gitlab-Runner</h2><p>以下的命令都需要 ssh 到 GitLab 服务所在的机器中进行</p>
+<ol>
+<li>添加 gitlab-runner 库</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -L <span class="string">&quot;https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh&quot;</span> | <span class="built_in">sudo</span> bash</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>安装 gitlab-runner</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install gitlab-runner</span><br></pre></td></tr></table></figure>
+
+<p>如果一切顺利，gitlab-runner 就安装好了，可以运行 <code>sudo gitlab-runner -v</code> 如果没有错误，则说明 gitlab-runner 安装成功。</p>
+<h2 id="注册-Runner"><a href="#注册-Runner" class="headerlink" title="注册 Runner"></a>注册 Runner</h2><p>首先使用 <code>root</code> 用户登录 gitlab -&gt; 点击左上方 <code>Menu</code> -&gt; 进入 <code>Admin</code> -&gt; 点击左侧面板 <code>Overview</code> 下的 <code>Runners</code><br><img src="https://images.zabrian.com/4dc2c2e2-dffb-44f5-2a7e-4140ab776f01/origin" title="GitLab-Admin-Runners" style="zoom:100%;" /></p>
+<p>然后点击右上方 Register an instance runner，复制 Registration token<br><img src="https://images.zabrian.com/fc6c425a-3304-44c8-a670-b425588c6101/origin" title="Register an instance runner" style="zoom:100%;" /></p>
+<p>再次通过 ssh 连接 GitLab 服务器注册一个共享 Runner</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-runner register</span><br><span class="line">Enter the GitLab instance URL (<span class="keyword">for</span> example, https://gitlab.com/):</span><br><span class="line">http://git.home/            <span class="comment"># 本地 GitLab 域名或者IP</span></span><br><span class="line">Enter the registration token:</span><br><span class="line">xxxxxxxxxxxxxxxx            <span class="comment"># 上面获取到的 token</span></span><br><span class="line">Enter a description <span class="keyword">for</span> the runner:</span><br><span class="line">[ubuntu]: node              <span class="comment"># runner 自定一个名字</span></span><br><span class="line">Enter tags <span class="keyword">for</span> the runner (comma-separated):</span><br><span class="line">node                        <span class="comment"># runner tag 的名字，通过 tag 指定运行 runner</span></span><br><span class="line">Registering runner... succeeded                     runner=xxxxxx</span><br><span class="line">Enter an executor: custom, ssh, docker-ssh+machine, kubernetes, docker, docker-ssh, parallels, shell, virtualbox, docker+machine:</span><br><span class="line">docker                      <span class="comment"># 这里选择 docker</span></span><br><span class="line">Enter the default Docker image (<span class="keyword">for</span> example, ruby:2.6):</span><br><span class="line">node:17                     <span class="comment"># docker 镜像以及版本</span></span><br><span class="line">Runner registered successfully. Feel free to start it, but <span class="keyword">if</span> it<span class="string">&#x27;s running already the config should be automatically reloaded!</span></span><br></pre></td></tr></table></figure>
+
+<p>当创建好 Runner 之后，再次回到 <code>Runners</code> 页面刷新就可以显示刚刚创建的 Runner 了。</p>
+<h2 id="创建-SSH-密钥对"><a href="#创建-SSH-密钥对" class="headerlink" title="创建 SSH 密钥对"></a>创建 SSH 密钥对</h2><p>在本地或者服务器上执行</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">ssh-keygen -f blog -t rsa -b 2048 -C <span class="string">&quot;xxxx@xxx.xxx&quot;</span>     <span class="comment"># 邮箱自行替换</span></span><br></pre></td></tr></table></figure>
+
+<p>生成一个无密码的 SSH 的密钥对</p>
+<p>公钥为 <code>blog.pub</code>，私钥为 <code>blog</code></p>
+<h2 id="GitHub-添加-Deploy-keys"><a href="#GitHub-添加-Deploy-keys" class="headerlink" title="GitHub 添加 Deploy keys"></a>GitHub 添加 Deploy keys</h2><p>登录 GitHub，进入部署的博客仓库，点击 <code>Settings</code> -&gt; <code>Deploy keys</code> -&gt; <code>Add deploy key</code></p>
+<p>将 <code>blog.pub</code> 公钥的内容全部复制到 <code>Key</code> 中，然后 <code>Title</code> 处自定义一个名字</p>
+<h2 id="GitLab-配置-CI-CD"><a href="#GitLab-配置-CI-CD" class="headerlink" title="GitLab 配置 CI&#x2F;CD"></a>GitLab 配置 CI&#x2F;CD</h2><p>进入 GitLab 博客项目，点击 <code>Settings</code> 下的 <code>CI/CD</code>，右侧展开 <code>Runners</code> 选项卡，右侧 <code>Shared runners</code> 打开 <code>Enable shared runners for this project</code> 选项<br><img src="https://images.zabrian.com/6f66496d-6e87-463b-1fe6-657a77a5d801/origin" title="Enable shared runners for this project" style="zoom:25%;" /></p>
+<p>然后再展开到下方 <code>Variables</code></p>
+<p>添加两个环境变量分别是</p>
+<ul>
+<li><code>SSH_KNOWN_HOSTS</code></li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>SSH_PRIVATE_KEY</code><br><a href="#%E5%88%9B%E5%BB%BA-SSH-%E5%AF%86%E9%92%A5%E5%AF%B9">创建 SSH 密钥对</a> 中的私钥 <code>blog</code> 内容<img src="https://images.zabrian.com/5f546e74-b6d1-4751-a4d7-c80d71e37801/origin" title="GitLab-CICD-Settings-Variables" style="zoom:47%;" /></li>
+</ul>
+<h2 id="项目-gitlab-ci-yml-配置"><a href="#项目-gitlab-ci-yml-配置" class="headerlink" title="项目 .gitlab-ci.yml 配置"></a>项目 <code>.gitlab-ci.yml</code> 配置</h2><p>经过以上配置，现在离成功有一步之遥。</p>
+<p>在 GitLab 博客源码项目根目录下创建一个 <code>.gitlab-ci.yml</code> 的配置文件</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">deploy</span></span><br><span class="line"></span><br><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">main</span> <span class="comment"># 指定只有主分支触发该 CI</span></span><br><span class="line">  <span class="attr">tags:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">node</span> <span class="comment"># 此处 tag 指定创建 GitLab Runner 时候填写 tag 名字</span></span><br><span class="line">  <span class="attr">before_script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ln</span> <span class="string">-sf</span> <span class="string">/usr/share/zoneinfo/Asia/Shanghai</span> <span class="string">/etc/localtime</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&quot;which ssh-agent || ( apt-get update -y &amp;&amp; apt-get install openssh-client -y )&quot;</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">eval</span> <span class="string">$(ssh-agent</span> <span class="string">-s)</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">mkdir</span> <span class="string">-p</span> <span class="string">~/.ssh</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">rm</span> <span class="string">-rf</span> <span class="string">~/.ssh/id_rsa</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">touch</span> <span class="string">~/.ssh/id_rsa</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">echo</span> <span class="string">&quot;$SSH_PRIVATE_KEY&quot;</span> <span class="string">&gt;</span> <span class="string">~/.ssh/id_rsa</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">rm</span> <span class="string">-rf</span> <span class="string">~/.ssh/known_hosts</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">touch</span> <span class="string">~/.ssh/known_hosts</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">echo</span> <span class="string">&quot;$SSH_KNOWN_HOSTS&quot;</span> <span class="string">&gt;</span> <span class="string">~/.ssh/known_hosts</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">chmod</span> <span class="number">700</span> <span class="string">~/.ssh</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">chmod</span> <span class="number">700</span> <span class="string">~/.ssh/*</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">git</span> <span class="string">config</span> <span class="string">--global</span> <span class="string">user.email</span> <span class="string">&quot;xxxx@xxx.xxx&quot;</span> <span class="comment"># GitHub 的邮箱</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">git</span> <span class="string">config</span> <span class="string">--global</span> <span class="string">user.name</span> <span class="string">&quot;xxxx&quot;</span> <span class="comment"># GitHub 的名字</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">git</span> <span class="string">config</span> <span class="string">--global</span> <span class="string">init.defaultBranch</span> <span class="string">main</span> <span class="comment"># GitHub 项目的主分支 main 或者 master</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">-g</span> <span class="string">hexo-cli</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-deployer-git</span> <span class="string">--save</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-renderer-swig</span> <span class="string">--save</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-generator-searchdb</span> <span class="string">--save</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-symbols-count-time</span> <span class="string">--save</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-generator-sitemap</span> <span class="string">--save</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-abbrlink</span> <span class="string">--save</span> <span class="comment"># 以上 npm 步骤根据自己添加的插件自定义</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">hexo</span> <span class="string">clean</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">hexo</span> <span class="string">generate</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">hexo</span> <span class="string">deploy</span></span><br></pre></td></tr></table></figure>
+
+<p>然后 <code>git add .gitlab-ci.yml</code> 最后推送到仓库之后，从侧边 <code>CI/CD</code> 下 <code>Pipelines</code> 就可以看到自动运行部署工作了</p>
+<h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>经过以上的步骤，现在就可以每次在本地编辑后，只需要推送到 GitLab 并稍等片刻，GitHub Pages 的页面就有最新的内容了。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zebedy
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://blog.zebedy.com/post/4a4b01f0.html" title="GitLab 自动部署 GitHub Pages 博客">https://blog.zebedy.com/post/4a4b01f0.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpoLWhhbnM="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/8d4f8799.html" rel="prev" title="搭建家庭私人 GitLab 服务器">
+                  <i class="fa fa-chevron-left"></i> 搭建家庭私人 GitLab 服务器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/465f36a1.html" rel="next" title="OpenWrt 配置记录">
+                  OpenWrt 配置记录 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2022 – 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zebedy</span>
+</div>
+<div class="vercount">
+    <span class="post-meta-item" id="vercount_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="vercount_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="vercount_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="vercount_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <span id="runtime_span"></span>
+  <script>
+    var now = new Date();
+    function show_runtime() {
+      var born = new Date("Sat Feb 05 2022 08:00:00 GMT+0800 (中国标准时间)");
+      now.setTime(now.getTime() + 250);
+      days = Math.floor((now - born) / 1000 / 60 / 60 / 24);
+      hours = Math.floor((now - born) / 1000 / 60 / 60 - (24 * days));
+      if (String(hours).length == 1) { hours = "0" + hours; }
+      minutes = Math.floor((now - born) / 1000 / 60 - (24 * 60 * days) - (60 * hours));
+      if (String(minutes).length == 1) { minutes = "0" + minutes; }
+      seconds = Math.round((now - born) / 1000 - (24 * 60 * 60 * days) - (60 * 60 * hours) - (60 * minutes));
+      if (String(seconds).length == 1) { seconds = "0" + seconds; }
+      document.getElementById("runtime_span").innerHTML = days + " 天 " + hours + " 小时 " + minutes + " 分 " + seconds + " 秒";
+    }
+    setInterval("show_runtime()", 250);
+  </script>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"neutral","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.8/dist/mermaid.min.js","integrity":"sha256-QmSAc2kIaUjleIJ46X7qPW2zrpCbXlMz3YIGgWpQ1Jo="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+  <script async src="https://events.vercount.one/js"></script>
+
+
+
+
+
+    <script type="text/javascript" src="/js/crash-cheat.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/js/oneko.js"></script>
+  
+</body>
+</html>
