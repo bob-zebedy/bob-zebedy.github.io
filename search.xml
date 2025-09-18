@@ -80,15 +80,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Garmin 国行码表使用 OSM 地图</title>
-    <url>/post/16e3b020.html</url>
-    <content><![CDATA[<p>国行的 Garmin 码表下载并安装 <code>OSM China</code> 地图作为骑行地图。<br>数据来源 <span class="exturl" data-url="aHR0cHM6Ly9hbHRlcm5hdGl2YXNsaWJyZXMub3JnL2VuL2Rvd25sb2Fkcy5waHAjQXNpYQ==">alternativaslibres<i class="fa fa-external-link-alt"></i></span> 并添加了必要的元数据。</p>
-<span id="more"></span>
-<h1 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h1><p>点击下方按钮，并将下载好的 <code>img</code> 文件复制到佳明码表 <code>Garmin/Maps/</code> 然后在码表地图中禁用自带的所有地图即可使用。</p>
-<a class="btn" href="https://9lnk.io/w1bh" title="点击下载 2025-09-18"><i class="fa fa-download"></i>点击下载 2025-09-18</a>
-]]></content>
-  </entry>
-  <entry>
     <title>GitLab 自动部署 GitHub Pages 博客</title>
     <url>/post/4a4b01f0.html</url>
     <content><![CDATA[<p>在之前《<a href="/post/8d4f8799.html" title="搭建家庭私人 GitLab 服务器">搭建家庭私人 GitLab 服务器</a>》说到我现在有这样的需求，而且根据上一篇，我们已经搭建好了这样的一个环境。那么有什么就赶紧用起来吧。</p>
@@ -169,6 +160,15 @@
 
 <p>然后 <code>git add .gitlab-ci.yml</code> 最后推送到仓库之后，从侧边 <code>CI/CD</code> 下 <code>Pipelines</code> 就可以看到自动运行部署工作了</p>
 <h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>经过以上的步骤，现在就可以每次在本地编辑后，只需要推送到 GitLab 并稍等片刻，GitHub Pages 的页面就有最新的内容了。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Garmin 国行码表使用 OSM 地图</title>
+    <url>/post/16e3b020.html</url>
+    <content><![CDATA[<p>国行的 Garmin 码表下载并安装 <code>OSM China</code> 地图作为骑行地图。<br>数据来源 <span class="exturl" data-url="aHR0cHM6Ly9hbHRlcm5hdGl2YXNsaWJyZXMub3JnL2VuL2Rvd25sb2Fkcy5waHAjQXNpYQ==">alternativaslibres<i class="fa fa-external-link-alt"></i></span> 并添加了必要的元数据。</p>
+<span id="more"></span>
+<h1 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h1><p>点击下方按钮，并将下载好的 <code>img</code> 文件复制到佳明码表 <code>Garmin/Maps/</code> 然后在码表地图中禁用自带的所有地图即可使用。</p>
+<a class="btn" href="https://9lnk.io/w1bh" title="点击下载 2025-09-18"><i class="fa fa-download"></i>点击下载 2025-09-18</a>
 ]]></content>
   </entry>
   <entry>
@@ -359,6 +359,30 @@
   <br></div></div></div>]]></content>
   </entry>
   <entry>
+    <title>macOS Chrome &#39;这些扩展程序不再受支持，因此已停用&#39; 解决办法</title>
+    <url>/post/e72f1311.html</url>
+    <content><![CDATA[<p>今天早上发现 macOS Chrome 版本更新到了 138.0.7204.101 打开浏览器的时候提示 “这些扩展程序不再受支持，因此已停用”，简单搜了一下发现有解决办法，但是都是针对于 Windows 下的解决方案。<br>而对于 macOS 有以下两种方法，任选其一即可。</p>
+<div class="note danger"><p>2025-09-11 更新: Chrome 已经更新到 140 版本，以下方法已经不适用。</p>
+</div>
+
+<span id="more"></span>
+
+<h2 id="通过-chrome-flags-推荐"><a href="#通过-chrome-flags-推荐" class="headerlink" title="通过 chrome:&#x2F;&#x2F;flags (推荐)"></a>通过 chrome:&#x2F;&#x2F;flags (推荐)</h2><ol>
+<li>升级到最新版本的 Chrome</li>
+<li>地址栏输入 <code>chrome://flags</code></li>
+<li>以下设置改为 <code>Enabled</code><br><code>temporary-unexpire-flags-m137</code></li>
+<li>重启浏览器并再次打开 <code>chrome://flags</code></li>
+<li>以下设置改为 <code>Disabled</code><br><code>extension-manifest-v2-deprecation-warning</code><br><code>extension-manifest-v2-deprecation-disabled</code><br><code>extension-manifest-v2-deprecation-unsupported</code></li>
+<li>以下设置改为 <code>Enabled</code><br><code>allow-legacy-mv2-extensions</code></li>
+<li>重启浏览器</li>
+</ol>
+<h2 id="通过企业政策管理"><a href="#通过企业政策管理" class="headerlink" title="通过企业政策管理"></a>通过企业政策管理</h2><p>根据 <span class="exturl" data-url="aHR0cHM6Ly9jaHJvbWVlbnRlcnByaXNlLmdvb2dsZS9pbnRsL3poX2NuL3BvbGljaWVzLz9wb2xpY3k9RXh0ZW5zaW9uTWFuaWZlc3RWMkF2YWlsYWJpbGl0eQ==">ExtensionManifestV2Availability<i class="fa fa-external-link-alt"></i></span> 的描述，可以通过通过企业控制管理进行设置。<br>此方法有一隔弊端是 Chrome 会显示一条 <code>您的浏览器由贵单位管理</code> 的提示，只是因为使用了企业管理的配置，所以会提示。实际并无任何企业对你的浏览器进行管理。<br>打开终端，输入以下内容</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> -p <span class="string">&quot;/Library/Managed Preferences&quot;</span> &amp;&amp; <span class="built_in">sudo</span> <span class="built_in">tee</span> <span class="string">&quot;/Library/Managed Preferences/com.google.Chrome.plist&quot;</span> &gt;/dev/null &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="string">&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot;</span></span><br><span class="line"><span class="string">  &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;\&gt;</span></span><br><span class="line"><span class="string">&lt;plist version=&quot;1.0&quot;&gt;</span></span><br><span class="line"><span class="string">  &lt;dict&gt;</span></span><br><span class="line"><span class="string">    &lt;key&gt;ExtensionManifestV2Availability&lt;/key&gt;</span></span><br><span class="line"><span class="string">    &lt;integer&gt;2&lt;/integer&gt;</span></span><br><span class="line"><span class="string">  &lt;/dict&gt;</span></span><br><span class="line"><span class="string">&lt;/plist&gt;</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure>
+
+<p>完全关闭 Chrome 后再打开，在地址栏输入 <code>chrome://policy/</code> 点击左上角的重新加载政策，然后旧版的扩展就可以继续使用啦。</p>
+]]></content>
+  </entry>
+  <entry>
     <title>macOS GPG 使用指南</title>
     <url>/post/cb9ee24d.html</url>
     <content><![CDATA[<p>这篇指南面向的是对 <code>GPG</code> 有了一定了解的的朋友，如果你还不知道 <code>GPG</code> 是什么，那么可能需要先补充一下这部分的基础知识，再来食用比较合适。</p>
@@ -525,30 +549,6 @@
 
 <p>同时 <code>push</code> 到 <code>GitHub</code> 上后也可以看到提交有一个 <code>verified</code> 的标记。</p>
 <p>至此，创建用于代码签名的子密钥结束。</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>macOS Chrome &#39;这些扩展程序不再受支持，因此已停用&#39; 解决办法</title>
-    <url>/post/e72f1311.html</url>
-    <content><![CDATA[<p>今天早上发现 macOS Chrome 版本更新到了 138.0.7204.101 打开浏览器的时候提示 “这些扩展程序不再受支持，因此已停用”，简单搜了一下发现有解决办法，但是都是针对于 Windows 下的解决方案。<br>而对于 macOS 有以下两种方法，任选其一即可。</p>
-<div class="note danger"><p>2025-09-11 更新: Chrome 已经更新到 140 版本，以下方法已经不适用。</p>
-</div>
-
-<span id="more"></span>
-
-<h2 id="通过-chrome-flags-推荐"><a href="#通过-chrome-flags-推荐" class="headerlink" title="通过 chrome:&#x2F;&#x2F;flags (推荐)"></a>通过 chrome:&#x2F;&#x2F;flags (推荐)</h2><ol>
-<li>升级到最新版本的 Chrome</li>
-<li>地址栏输入 <code>chrome://flags</code></li>
-<li>以下设置改为 <code>Enabled</code><br><code>temporary-unexpire-flags-m137</code></li>
-<li>重启浏览器并再次打开 <code>chrome://flags</code></li>
-<li>以下设置改为 <code>Disabled</code><br><code>extension-manifest-v2-deprecation-warning</code><br><code>extension-manifest-v2-deprecation-disabled</code><br><code>extension-manifest-v2-deprecation-unsupported</code></li>
-<li>以下设置改为 <code>Enabled</code><br><code>allow-legacy-mv2-extensions</code></li>
-<li>重启浏览器</li>
-</ol>
-<h2 id="通过企业政策管理"><a href="#通过企业政策管理" class="headerlink" title="通过企业政策管理"></a>通过企业政策管理</h2><p>根据 <span class="exturl" data-url="aHR0cHM6Ly9jaHJvbWVlbnRlcnByaXNlLmdvb2dsZS9pbnRsL3poX2NuL3BvbGljaWVzLz9wb2xpY3k9RXh0ZW5zaW9uTWFuaWZlc3RWMkF2YWlsYWJpbGl0eQ==">ExtensionManifestV2Availability<i class="fa fa-external-link-alt"></i></span> 的描述，可以通过通过企业控制管理进行设置。<br>此方法有一隔弊端是 Chrome 会显示一条 <code>您的浏览器由贵单位管理</code> 的提示，只是因为使用了企业管理的配置，所以会提示。实际并无任何企业对你的浏览器进行管理。<br>打开终端，输入以下内容</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> -p <span class="string">&quot;/Library/Managed Preferences&quot;</span> &amp;&amp; <span class="built_in">sudo</span> <span class="built_in">tee</span> <span class="string">&quot;/Library/Managed Preferences/com.google.Chrome.plist&quot;</span> &gt;/dev/null &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="string">&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot;</span></span><br><span class="line"><span class="string">  &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;\&gt;</span></span><br><span class="line"><span class="string">&lt;plist version=&quot;1.0&quot;&gt;</span></span><br><span class="line"><span class="string">  &lt;dict&gt;</span></span><br><span class="line"><span class="string">    &lt;key&gt;ExtensionManifestV2Availability&lt;/key&gt;</span></span><br><span class="line"><span class="string">    &lt;integer&gt;2&lt;/integer&gt;</span></span><br><span class="line"><span class="string">  &lt;/dict&gt;</span></span><br><span class="line"><span class="string">&lt;/plist&gt;</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure>
-
-<p>完全关闭 Chrome 后再打开，在地址栏输入 <code>chrome://policy/</code> 点击左上角的重新加载政策，然后旧版的扩展就可以继续使用啦。</p>
 ]]></content>
   </entry>
   <entry>
