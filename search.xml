@@ -13,6 +13,38 @@
 ]]></content>
   </entry>
   <entry>
+    <title>Cloudflare 设置引用站点策略</title>
+    <url>/post/e6a2e300.html</url>
+    <content><![CDATA[<p>前几日，把我的博客部署在 <code>Cloudflare Pages</code> 上面了。同时绑定了一个托管在 <code>Cloudflare</code> 上面的域名，到这里一切顺利。<br>但是当我兴致勃勃的打开博客的时候发现了一个问题，为什么图片全 403 了？</p>
+<span id="more"></span>
+
+<p>一开始想到了可能是我的 <code>OSS</code> 防盗链。跑去看了一下，我已经添加了对应的 <code>Referer</code> 域名。一开始还以为是添加 <code>Referer</code> 生效需要时间，于是乎过了几个小时再打开问题依旧。<br>最诡异的是，打开 <code>Cloudflare Pages</code> 默认的 <code>pages.dev</code> 域名的时候，图片就是正常的。排查了一下，然后就发现了端倪。<br>问题来自通过绑定的自定义域名访问的时候，图片请求的 Header 中没有 <code>Referer</code> 字段。众所周知，所谓的防盗链其实就是检查 <code>Referer</code> 字段是不是在白名单中。那么问题来这了，为什么 <code>pages.dev</code> 域名中请求图片有 <code>Referer</code> 但是自定义域名没有？<br>再次稍加观察发现了一个现象</p>
+<img src="https://images.zabrian.com/538e6269-12f2-4f3a-0bf1-bf030ba01501/origin" title="自定义域名" style="zoom:18%;" />
+
+<img src="https://images.zabrian.com/a95cabc7-4b98-47be-7bdb-bc59cbb46101/origin" title="pages.dev 域名" style="zoom:21%;" />
+
+<p>原因就在这里</p>
+<ul>
+<li>自定义域名的引用站点策略为 <code>same-origin</code></li>
+<li>pages.dev 域名的引用站点策略为 <code>strict-origin-when-cross-origin</code></li>
+</ul>
+<p>就是因为浏览器的 <strong>同源策略(Same-Origin Policy)</strong> 因此自定义域名的请求图片的时候未带上 <code>Referer</code><br>既然问题知道了，就可以解决了：只需要修改一下自定义域名的请求头就行了。  </p>
+<ol>
+<li>打开 Cloudflare 控制台，选择对应的域名</li>
+<li>侧边栏选择 <strong>规则</strong> → <strong>创建规则</strong> → <strong>响应头转换规则</strong></li>
+<li>选择 <strong>向响应添加静态标头</strong> 模板</li>
+<li>选择 <strong>自定义筛选表达式</strong></li>
+<li>编辑表达式 <code>(http.request.full_uri wildcard &quot;https://这里填写你自己的域名/*&quot;)</code></li>
+<li>规则 <strong>添加静态响应头</strong><ul>
+<li><code>cross-origin-resource-policy = cross-origin</code></li>
+<li><code>referrer-policy = strict-origin-when-cross-origin</code></li>
+</ul>
+</li>
+</ol>
+<p>这样就可以了，此时再访问自定义域名，发现图片就正常携带了 <code>Referer</code></p>
+]]></content>
+  </entry>
+  <entry>
     <title>Cloudflare 使用 Workers 建立 Images 代理</title>
     <url>/post/ec93b507.html</url>
     <content><![CDATA[<p>最早这个博客是托管在 GitHub pages 上的，绑定的域名是在阿里云注册的，几个月前偶然一次机会，在 Cloudflare 上注册了一个自己喜欢的域名。于是就也通过 Cloudflare pages 托管了相同的 GitHub pages 仓库，因此目前使用 <span class="exturl" data-url="aHR0cHM6Ly9ibG9nLnphYnJpYW4uY29tLw==">Cloudflare pages<i class="fa fa-external-link-alt"></i></span> 或者 <a href="https://blog.zebedy.com/">GitHub pages</a> 均可访问，内容都来自同一个 GitHub repo</p>
@@ -54,38 +86,6 @@
 <span id="more"></span>
 <h1 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h1><p>点击下方按钮，并将下载好的 <code>img</code> 文件复制到佳明码表 <code>Garmin/Maps/</code> 然后在码表地图中禁用自带的所有地图即可使用。</p>
 <a class="btn" href="https://9lnk.io/LnUW" title="点击下载 2025-09-18"><i class="fa fa-download"></i>点击下载 2025-09-18</a>
-]]></content>
-  </entry>
-  <entry>
-    <title>Cloudflare 设置引用站点策略</title>
-    <url>/post/e6a2e300.html</url>
-    <content><![CDATA[<p>前几日，把我的博客部署在 <code>Cloudflare Pages</code> 上面了。同时绑定了一个托管在 <code>Cloudflare</code> 上面的域名，到这里一切顺利。<br>但是当我兴致勃勃的打开博客的时候发现了一个问题，为什么图片全 403 了？</p>
-<span id="more"></span>
-
-<p>一开始想到了可能是我的 <code>OSS</code> 防盗链。跑去看了一下，我已经添加了对应的 <code>Referer</code> 域名。一开始还以为是添加 <code>Referer</code> 生效需要时间，于是乎过了几个小时再打开问题依旧。<br>最诡异的是，打开 <code>Cloudflare Pages</code> 默认的 <code>pages.dev</code> 域名的时候，图片就是正常的。排查了一下，然后就发现了端倪。<br>问题来自通过绑定的自定义域名访问的时候，图片请求的 Header 中没有 <code>Referer</code> 字段。众所周知，所谓的防盗链其实就是检查 <code>Referer</code> 字段是不是在白名单中。那么问题来这了，为什么 <code>pages.dev</code> 域名中请求图片有 <code>Referer</code> 但是自定义域名没有？<br>再次稍加观察发现了一个现象</p>
-<img src="https://images.zabrian.com/538e6269-12f2-4f3a-0bf1-bf030ba01501/origin" title="自定义域名" style="zoom:18%;" />
-
-<img src="https://images.zabrian.com/a95cabc7-4b98-47be-7bdb-bc59cbb46101/origin" title="pages.dev 域名" style="zoom:21%;" />
-
-<p>原因就在这里</p>
-<ul>
-<li>自定义域名的引用站点策略为 <code>same-origin</code></li>
-<li>pages.dev 域名的引用站点策略为 <code>strict-origin-when-cross-origin</code></li>
-</ul>
-<p>就是因为浏览器的 <strong>同源策略(Same-Origin Policy)</strong> 因此自定义域名的请求图片的时候未带上 <code>Referer</code><br>既然问题知道了，就可以解决了：只需要修改一下自定义域名的请求头就行了。  </p>
-<ol>
-<li>打开 Cloudflare 控制台，选择对应的域名</li>
-<li>侧边栏选择 <strong>规则</strong> → <strong>创建规则</strong> → <strong>响应头转换规则</strong></li>
-<li>选择 <strong>向响应添加静态标头</strong> 模板</li>
-<li>选择 <strong>自定义筛选表达式</strong></li>
-<li>编辑表达式 <code>(http.request.full_uri wildcard &quot;https://这里填写你自己的域名/*&quot;)</code></li>
-<li>规则 <strong>添加静态响应头</strong><ul>
-<li><code>cross-origin-resource-policy = cross-origin</code></li>
-<li><code>referrer-policy = strict-origin-when-cross-origin</code></li>
-</ul>
-</li>
-</ol>
-<p>这样就可以了，此时再访问自定义域名，发现图片就正常携带了 <code>Referer</code></p>
 ]]></content>
   </entry>
   <entry>
@@ -359,30 +359,6 @@
   <br></div></div></div>]]></content>
   </entry>
   <entry>
-    <title>macOS Chrome &#39;这些扩展程序不再受支持，因此已停用&#39; 解决办法</title>
-    <url>/post/e72f1311.html</url>
-    <content><![CDATA[<p>今天早上发现 macOS Chrome 版本更新到了 138.0.7204.101 打开浏览器的时候提示 “这些扩展程序不再受支持，因此已停用”，简单搜了一下发现有解决办法，但是都是针对于 Windows 下的解决方案。<br>而对于 macOS 有以下两种方法，任选其一即可。</p>
-<div class="note danger"><p>2025-09-11 更新: Chrome 已经更新到 140 版本，以下方法已经不适用。</p>
-</div>
-
-<span id="more"></span>
-
-<h2 id="通过-chrome-flags-推荐"><a href="#通过-chrome-flags-推荐" class="headerlink" title="通过 chrome:&#x2F;&#x2F;flags (推荐)"></a>通过 chrome:&#x2F;&#x2F;flags (推荐)</h2><ol>
-<li>升级到最新版本的 Chrome</li>
-<li>地址栏输入 <code>chrome://flags</code></li>
-<li>以下设置改为 <code>Enabled</code><br><code>temporary-unexpire-flags-m137</code></li>
-<li>重启浏览器并再次打开 <code>chrome://flags</code></li>
-<li>以下设置改为 <code>Disabled</code><br><code>extension-manifest-v2-deprecation-warning</code><br><code>extension-manifest-v2-deprecation-disabled</code><br><code>extension-manifest-v2-deprecation-unsupported</code></li>
-<li>以下设置改为 <code>Enabled</code><br><code>allow-legacy-mv2-extensions</code></li>
-<li>重启浏览器</li>
-</ol>
-<h2 id="通过企业政策管理"><a href="#通过企业政策管理" class="headerlink" title="通过企业政策管理"></a>通过企业政策管理</h2><p>根据 <span class="exturl" data-url="aHR0cHM6Ly9jaHJvbWVlbnRlcnByaXNlLmdvb2dsZS9pbnRsL3poX2NuL3BvbGljaWVzLz9wb2xpY3k9RXh0ZW5zaW9uTWFuaWZlc3RWMkF2YWlsYWJpbGl0eQ==">ExtensionManifestV2Availability<i class="fa fa-external-link-alt"></i></span> 的描述，可以通过通过企业控制管理进行设置。<br>此方法有一隔弊端是 Chrome 会显示一条 <code>您的浏览器由贵单位管理</code> 的提示，只是因为使用了企业管理的配置，所以会提示。实际并无任何企业对你的浏览器进行管理。<br>打开终端，输入以下内容</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> -p <span class="string">&quot;/Library/Managed Preferences&quot;</span> &amp;&amp; <span class="built_in">sudo</span> <span class="built_in">tee</span> <span class="string">&quot;/Library/Managed Preferences/com.google.Chrome.plist&quot;</span> &gt;/dev/null &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="string">&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot;</span></span><br><span class="line"><span class="string">  &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;\&gt;</span></span><br><span class="line"><span class="string">&lt;plist version=&quot;1.0&quot;&gt;</span></span><br><span class="line"><span class="string">  &lt;dict&gt;</span></span><br><span class="line"><span class="string">    &lt;key&gt;ExtensionManifestV2Availability&lt;/key&gt;</span></span><br><span class="line"><span class="string">    &lt;integer&gt;2&lt;/integer&gt;</span></span><br><span class="line"><span class="string">  &lt;/dict&gt;</span></span><br><span class="line"><span class="string">&lt;/plist&gt;</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure>
-
-<p>完全关闭 Chrome 后再打开，在地址栏输入 <code>chrome://policy/</code> 点击左上角的重新加载政策，然后旧版的扩展就可以继续使用啦。</p>
-]]></content>
-  </entry>
-  <entry>
     <title>macOS GPG 使用指南</title>
     <url>/post/cb9ee24d.html</url>
     <content><![CDATA[<p>这篇指南面向的是对 <code>GPG</code> 有了一定了解的的朋友，如果你还不知道 <code>GPG</code> 是什么，那么可能需要先补充一下这部分的基础知识，再来食用比较合适。</p>
@@ -552,6 +528,30 @@
 ]]></content>
   </entry>
   <entry>
+    <title>macOS Chrome &#39;这些扩展程序不再受支持，因此已停用&#39; 解决办法</title>
+    <url>/post/e72f1311.html</url>
+    <content><![CDATA[<p>今天早上发现 macOS Chrome 版本更新到了 138.0.7204.101 打开浏览器的时候提示 “这些扩展程序不再受支持，因此已停用”，简单搜了一下发现有解决办法，但是都是针对于 Windows 下的解决方案。<br>而对于 macOS 有以下两种方法，任选其一即可。</p>
+<div class="note danger"><p>2025-09-11 更新: Chrome 已经更新到 140 版本，以下方法已经不适用。</p>
+</div>
+
+<span id="more"></span>
+
+<h2 id="通过-chrome-flags-推荐"><a href="#通过-chrome-flags-推荐" class="headerlink" title="通过 chrome:&#x2F;&#x2F;flags (推荐)"></a>通过 chrome:&#x2F;&#x2F;flags (推荐)</h2><ol>
+<li>升级到最新版本的 Chrome</li>
+<li>地址栏输入 <code>chrome://flags</code></li>
+<li>以下设置改为 <code>Enabled</code><br><code>temporary-unexpire-flags-m137</code></li>
+<li>重启浏览器并再次打开 <code>chrome://flags</code></li>
+<li>以下设置改为 <code>Disabled</code><br><code>extension-manifest-v2-deprecation-warning</code><br><code>extension-manifest-v2-deprecation-disabled</code><br><code>extension-manifest-v2-deprecation-unsupported</code></li>
+<li>以下设置改为 <code>Enabled</code><br><code>allow-legacy-mv2-extensions</code></li>
+<li>重启浏览器</li>
+</ol>
+<h2 id="通过企业政策管理"><a href="#通过企业政策管理" class="headerlink" title="通过企业政策管理"></a>通过企业政策管理</h2><p>根据 <span class="exturl" data-url="aHR0cHM6Ly9jaHJvbWVlbnRlcnByaXNlLmdvb2dsZS9pbnRsL3poX2NuL3BvbGljaWVzLz9wb2xpY3k9RXh0ZW5zaW9uTWFuaWZlc3RWMkF2YWlsYWJpbGl0eQ==">ExtensionManifestV2Availability<i class="fa fa-external-link-alt"></i></span> 的描述，可以通过通过企业控制管理进行设置。<br>此方法有一隔弊端是 Chrome 会显示一条 <code>您的浏览器由贵单位管理</code> 的提示，只是因为使用了企业管理的配置，所以会提示。实际并无任何企业对你的浏览器进行管理。<br>打开终端，输入以下内容</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> -p <span class="string">&quot;/Library/Managed Preferences&quot;</span> &amp;&amp; <span class="built_in">sudo</span> <span class="built_in">tee</span> <span class="string">&quot;/Library/Managed Preferences/com.google.Chrome.plist&quot;</span> &gt;/dev/null &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="string">&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot;</span></span><br><span class="line"><span class="string">  &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;\&gt;</span></span><br><span class="line"><span class="string">&lt;plist version=&quot;1.0&quot;&gt;</span></span><br><span class="line"><span class="string">  &lt;dict&gt;</span></span><br><span class="line"><span class="string">    &lt;key&gt;ExtensionManifestV2Availability&lt;/key&gt;</span></span><br><span class="line"><span class="string">    &lt;integer&gt;2&lt;/integer&gt;</span></span><br><span class="line"><span class="string">  &lt;/dict&gt;</span></span><br><span class="line"><span class="string">&lt;/plist&gt;</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure>
+
+<p>完全关闭 Chrome 后再打开，在地址栏输入 <code>chrome://policy/</code> 点击左上角的重新加载政策，然后旧版的扩展就可以继续使用啦。</p>
+]]></content>
+  </entry>
+  <entry>
     <title>北京联通异地宽带办理指南</title>
     <url>/post/de583f28.html</url>
     <content><![CDATA[<p>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。</p>
@@ -611,33 +611,6 @@
 <img src="https://images.zabrian.com/ac825486-02e6-43f8-1e06-419808a0da01/origin" title="SpeedTest 测速" style="zoom:100%;" />
 
 <img src="https://images.zabrian.com/8cb09a0c-3136-4487-8e35-a242c3ecf601/origin" title="USTC 测速" style="zoom:85%;" />
-]]></content>
-  </entry>
-  <entry>
-    <title>更改 macOS 强调色</title>
-    <url>/post/c59c6467.html</url>
-    <content><![CDATA[<p>Apple 在 <span class="exturl" data-url="aHR0cHM6Ly93d3cuYXBwbGUuY29tL2ltYWMtMjQ=">iMac 24”<i class="fa fa-external-link-alt"></i></span> Mac 中首次使用了新的强调色，这些强调色是这些 Mac 独有的。但是现在只要是 macOS 11.3.1 以上的系统，即使不是 iMac 24” 机器，也可以使用这些特有的强调色。</p>
-<span id="more"></span>
-
-<p>首先需要开启基于硬件的强调色 <code>NSColorSimulateHardwareAccent</code> 功能</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulateHardwareAccent -bool YES</span><br></pre></td></tr></table></figure>
-
-<p>然后通过 <code>NSColorSimulatedHardwareEnclosureNumber</code> 选择其中任意一种颜色。其中可选的颜色选项为 3 到 8 (包含 3 和 8)</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulatedHardwareEnclosureNumber -int 3</span><br></pre></td></tr></table></figure>
-
-<p>然后重新启动电脑或者退出登录重新登录即可生效。<br>然后在 <strong>系统设置</strong> -&gt; <strong>外观选项卡</strong> -&gt; <strong>强调色</strong> 和 <strong>高亮标记颜色</strong> 选项中会出现一个 <strong>这台 Mac</strong> 的颜色选项，其中颜色即为上面设置的颜色。</p>
-<p>以下是 <code>NSColorSimulatedHardwareEnclosureNumber</code> 不同值的实际效果</p>
-<img src="https://images.zabrian.com/c5f66aed-fff8-43e1-940d-8388311a0a01/origin" title="颜色 3" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/38169874-ea75-4086-24b1-ccd6416e9701/origin" title="颜色 4" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/1683833a-7ee4-416a-5659-2a31fbe46001/origin" title="颜色 5" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/fe160cc7-b5cb-435d-374b-6cb2e744d901/origin" title="颜色 6" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/5a1dfe77-2619-435a-290f-d058a032b601/origin" title="颜色 7" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/6dcb7e11-165d-4547-1bd4-ff7e02a8c001/origin" title="颜色 8" style="zoom:57%;" />
 ]]></content>
   </entry>
   <entry>
@@ -714,40 +687,30 @@
 ]]></content>
   </entry>
   <entry>
-    <title>有点意思的 Python 系列二 内置类型增加额外方法</title>
-    <url>/post/5f8a6fc4.html</url>
-    <content><![CDATA[<p>我们知道，如果想给一个自定义类型增加对应的方法，可以直接修改这个类就可以了，但是如果我们这个时候想给内置的类型增加一些自定义方法呢？</p>
+    <title>更改 macOS 强调色</title>
+    <url>/post/c59c6467.html</url>
+    <content><![CDATA[<p>Apple 在 <span class="exturl" data-url="aHR0cHM6Ly93d3cuYXBwbGUuY29tL2ltYWMtMjQ=">iMac 24”<i class="fa fa-external-link-alt"></i></span> Mac 中首次使用了新的强调色，这些强调色是这些 Mac 独有的。但是现在只要是 macOS 11.3.1 以上的系统，即使不是 iMac 24” 机器，也可以使用这些特有的强调色。</p>
 <span id="more"></span>
 
-<p>比如对于可变类型对象，我们想增加一个 <code>deepcopy</code> 的方法实现深拷贝，类似<code>dd = &#123;&#39;a&#39;: [1, 2, 3]&#125;.deepcopy()</code> 达到 <code>dd = copy.deepcopy(&#123;&#39;a&#39;: [1, 2, 3]&#125;)</code> 的效果，显而易见的是直接在一个 dict 对象上 <code>.deepcopy()</code> 是更优雅的。但是事与愿违，我们没有办法通过常规手段给 dict 增加 <code>deepcopy()</code> 方法。</p>
-<p>难道就真的没有办法吗？下面这段代码可以优雅的实现。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> ctypes</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PyType</span>(ctypes.Structure):</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PyObject</span>(ctypes.Structure):</span><br><span class="line">    Py_ssize_t = (</span><br><span class="line">        ctypes.c_int64 <span class="keyword">if</span> ctypes.sizeof(ctypes.c_void_p) == <span class="number">8</span> <span class="keyword">else</span> ctypes.c_int32</span><br><span class="line">    )</span><br><span class="line">    _fields_ = [</span><br><span class="line">        (<span class="string">&quot;ob_refcnt&quot;</span>, Py_ssize_t),</span><br><span class="line">        (<span class="string">&quot;ob_type&quot;</span>, ctypes.POINTER(PyType)),</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PyTypeObject</span>(<span class="title class_ inherited__">PyObject</span>):</span><br><span class="line">    _fields_ = [</span><br><span class="line">        (<span class="string">&quot;dict&quot;</span>, ctypes.POINTER(PyObject))</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">inject</span>(<span class="params">class_, method, force=<span class="literal">False</span></span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_</span>(<span class="params">function</span>):</span><br><span class="line">        name_, dict_ = class_.__name__, class_.__dict__</span><br><span class="line">        proxy_dict = PyTypeObject.from_address(<span class="built_in">id</span>(dict_))</span><br><span class="line">        namespace = &#123;&#125;</span><br><span class="line">        ctypes.pythonapi.PyDict_SetItem(</span><br><span class="line">            ctypes.py_object(namespace),</span><br><span class="line">            ctypes.py_object(name_),</span><br><span class="line">            proxy_dict.<span class="built_in">dict</span></span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> force <span class="keyword">and</span> namespace.get(name_, &#123;&#125;).get(method, <span class="literal">None</span>):</span><br><span class="line">            <span class="keyword">raise</span> RuntimeError(<span class="string">f&quot;已存在方法 <span class="subst">&#123;class_.__name__&#125;</span>.<span class="subst">&#123;method&#125;</span>()&quot;</span>)</span><br><span class="line">        namespace[name_][method] = function</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> _</span><br></pre></td></tr></table></figure>
+<p>首先需要开启基于硬件的强调色 <code>NSColorSimulateHardwareAccent</code> 功能</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulateHardwareAccent -bool YES</span><br></pre></td></tr></table></figure>
 
-<p>而使用使用方法也很简单，比如上面的给 <code>dict</code> 添加一个 <code>deepcopy()</code> 实现字典的深拷贝</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"></span><br><span class="line"><span class="meta">@inject(<span class="params"><span class="built_in">dict</span>, <span class="string">&#x27;deepcopy&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">deepcopy</span>(<span class="params">d</span>):</span><br><span class="line">    <span class="keyword">return</span> copy.deepcopy(d)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证一下</span></span><br><span class="line">origin_dict = &#123;<span class="string">&quot;goods&quot;</span>: [<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;orange&quot;</span>]&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;初始字典: <span class="subst">&#123;origin_dict&#125;</span>&quot;</span>) <span class="comment"># &#123;&#x27;goods&#x27;: [&#x27;apple&#x27;, &#x27;orange&#x27;]&#125;</span></span><br><span class="line"></span><br><span class="line">copy_dict = origin_dict.copy() <span class="comment"># 自带的 copy() 浅拷贝</span></span><br><span class="line">deepcopy_dict = origin_dict.deepcopy() <span class="comment"># 添加的 deepcopy() 深拷贝</span></span><br><span class="line"></span><br><span class="line">origin_dict[<span class="string">&quot;goods&quot;</span>].append(<span class="string">&quot;banana&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;初始字典变更: <span class="subst">&#123;origin_dict&#125;</span>&quot;</span>) <span class="comment"># &#123;&#x27;goods&#x27;: [&#x27;apple&#x27;, &#x27;orange&#x27;, &#x27;banana&#x27;]&#125;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;.copy() 结果: <span class="subst">&#123;copy_dict&#125;</span>&quot;</span>) <span class="comment"># &#123;&#x27;goods&#x27;: [&#x27;apple&#x27;, &#x27;orange&#x27;, &#x27;banana&#x27;]&#125;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;.deepcopy() 结果: <span class="subst">&#123;deepcopy_dict&#125;</span>&quot;</span>) <span class="comment"># &#123;&#x27;goods&#x27;: [&#x27;apple&#x27;, &#x27;orange&#x27;]&#125;</span></span><br></pre></td></tr></table></figure>
+<p>然后通过 <code>NSColorSimulatedHardwareEnclosureNumber</code> 选择其中任意一种颜色。其中可选的颜色选项为 3 到 8 (包含 3 和 8)</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulatedHardwareEnclosureNumber -int 3</span><br></pre></td></tr></table></figure>
 
-<p>再或者给 <code>list</code> 添加一个 <code>average()</code> 方法计算平均数</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">@inject(<span class="params"><span class="built_in">list</span>, <span class="string">&#x27;average&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">average</span>(<span class="params">l</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">sum</span>(l) / <span class="built_in">len</span>(l)</span><br><span class="line"></span><br><span class="line">score = [<span class="number">95.0</span>, <span class="number">89.5</span>, <span class="number">77.0</span>, <span class="number">91.0</span>]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(score.average())  <span class="comment"># 88.125</span></span><br></pre></td></tr></table></figure>
+<p>然后重新启动电脑或者退出登录重新登录即可生效。<br>然后在 <strong>系统设置</strong> -&gt; <strong>外观选项卡</strong> -&gt; <strong>强调色</strong> 和 <strong>高亮标记颜色</strong> 选项中会出现一个 <strong>这台 Mac</strong> 的颜色选项，其中颜色即为上面设置的颜色。</p>
+<p>以下是 <code>NSColorSimulatedHardwareEnclosureNumber</code> 不同值的实际效果</p>
+<img src="https://images.zabrian.com/c5f66aed-fff8-43e1-940d-8388311a0a01/origin" title="颜色 3" style="zoom:57%;" />
 
-<p>再或者给字符串添加一个 <code>json()</code> 方法，可以直接通过 <code>str.json()</code> 将该字符串格式化为 <code>json</code> 对象（当然前提是这个字符串是可以被反序列化为 <code>json</code> 对象）</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> json <span class="keyword">import</span> loads</span><br><span class="line"></span><br><span class="line"><span class="meta">@inject(<span class="params"><span class="built_in">str</span>, <span class="string">&#x27;json&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">json</span>(<span class="params">s</span>):</span><br><span class="line">    <span class="keyword">return</span> loads(s)</span><br><span class="line"></span><br><span class="line">info = <span class="string">&#x27;&#123;&quot;first_name&quot;: &quot;Michael&quot;, &quot;last_name&quot;: &quot;Rodgers&quot;, &quot;department&quot;: &quot;Marketing&quot;&#125;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(info.json()) <span class="comment"># &#123;&#x27;first_name&#x27;: &#x27;Michael&#x27;, &#x27;last_name&#x27;: &#x27;Rodgers&#x27;, &#x27;department&#x27;: &#x27;Marketing&#x27;&#125;</span></span><br></pre></td></tr></table></figure>
+<img src="https://images.zabrian.com/38169874-ea75-4086-24b1-ccd6416e9701/origin" title="颜色 4" style="zoom:57%;" />
 
-<p>同样的，比如给 <code>int</code> 类型添加 <code>add(number)</code> 方法</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">@inject(<span class="params"><span class="built_in">int</span>, <span class="string">&#x27;add&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">i, number</span>):</span><br><span class="line">    <span class="keyword">return</span> i + number</span><br><span class="line"></span><br><span class="line">munber = <span class="number">5</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(number.add(<span class="number">3</span>)) <span class="comment"># 8</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 还可以进行链式调用</span></span><br><span class="line"><span class="built_in">print</span>(munber.add(<span class="number">3</span>).add(<span class="number">7</span>).add(-<span class="number">1</span>)) <span class="comment"># 14</span></span><br></pre></td></tr></table></figure>
+<img src="https://images.zabrian.com/1683833a-7ee4-416a-5659-2a31fbe46001/origin" title="颜色 5" style="zoom:57%;" />
 
-<p>当然除了内置类型，也可以修补自定义类型</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Number</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n</span>):</span><br><span class="line">        <span class="variable language_">self</span>.number = n</span><br><span class="line"></span><br><span class="line"><span class="meta">@inject(<span class="params">Number, <span class="string">&#x27;sub&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">sub</span>(<span class="params">n, num</span>):</span><br><span class="line">    <span class="keyword">return</span> Number(n.number - num)</span><br><span class="line"></span><br><span class="line">number = Number(<span class="number">10</span>)</span><br><span class="line"><span class="built_in">print</span>(number.sub(<span class="number">3</span>).sub(<span class="number">5</span>).number)  <span class="comment"># 2</span></span><br></pre></td></tr></table></figure>
+<img src="https://images.zabrian.com/fe160cc7-b5cb-435d-374b-6cb2e744d901/origin" title="颜色 6" style="zoom:57%;" />
 
-<!-- more -->
-]]></content>
-  </entry>
-  <entry>
-    <title>调整 macOS 顶部菜单栏图标间距</title>
-    <url>/post/baaa1138.html</url>
-    <content><![CDATA[<p>无需任何第三方软件，通过 macOS 命令行就可以调整顶部菜单栏图标间距</p>
-<span id="more"></span>
+<img src="https://images.zabrian.com/5a1dfe77-2619-435a-290f-d058a032b601/origin" title="颜色 7" style="zoom:57%;" />
 
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 查询当前间距</span></span><br><span class="line">defaults -currentHost <span class="built_in">read</span> -globalDomain NSStatusItemSpacing</span><br><span class="line"><span class="comment"># 查询当前内间距</span></span><br><span class="line">defaults -currentHost <span class="built_in">read</span> -globalDomain NSStatusItemSelectionPadding</span><br><span class="line"><span class="comment"># 指定间距</span></span><br><span class="line">defaults -currentHost write -globalDomain NSStatusItemSpacing -int 10</span><br><span class="line"><span class="comment"># 指定内间距</span></span><br><span class="line">defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 6</span><br><span class="line"><span class="comment"># 恢复默认间距</span></span><br><span class="line">defaults -currentHost delete -globalDomain NSStatusItemSpacing</span><br><span class="line"><span class="comment"># 恢复默认内间距</span></span><br><span class="line">defaults -currentHost delete -globalDomain NSStatusItemSelectionPadding</span><br></pre></td></tr></table></figure>
+<img src="https://images.zabrian.com/6dcb7e11-165d-4547-1bd4-ff7e02a8c001/origin" title="颜色 8" style="zoom:57%;" />
 ]]></content>
   </entry>
   <entry>
@@ -808,6 +771,43 @@
 <li>直接修改 cPython 的源码实现好处是实现了原生实现。但是缺点也很明显。就是这样写的代码，只能运行在这个修改后的 Python 环境，否则就会报错。<br>但是换个思路想，这样也会带来一个好处就是间接的保护了代码。这个具体的内容后面可以在展开聊聊。</li>
 <li>这里编译的 Python 其实只是一个调试环境，因为没有启用 PGO 所以编译很快，但是不能用于生产环境。<br>如果想把这个版本的 Python 用在生产环境，可以在 <code>./configure</code> 的时候增加 <code>--enable-optimizations</code> 参数。具体内容可参考 <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3B5dGhvbi9jcHl0aG9uI3Byb2ZpbGUtZ3VpZGVkLW9wdGltaXphdGlvbg==">profile-guided-optimization<i class="fa fa-external-link-alt"></i></span></li>
 </ol>
+]]></content>
+  </entry>
+  <entry>
+    <title>有点意思的 Python 系列二 内置类型增加额外方法</title>
+    <url>/post/5f8a6fc4.html</url>
+    <content><![CDATA[<p>我们知道，如果想给一个自定义类型增加对应的方法，可以直接修改这个类就可以了，但是如果我们这个时候想给内置的类型增加一些自定义方法呢？</p>
+<span id="more"></span>
+
+<p>比如对于可变类型对象，我们想增加一个 <code>deepcopy</code> 的方法实现深拷贝，类似<code>dd = &#123;&#39;a&#39;: [1, 2, 3]&#125;.deepcopy()</code> 达到 <code>dd = copy.deepcopy(&#123;&#39;a&#39;: [1, 2, 3]&#125;)</code> 的效果，显而易见的是直接在一个 dict 对象上 <code>.deepcopy()</code> 是更优雅的。但是事与愿违，我们没有办法通过常规手段给 dict 增加 <code>deepcopy()</code> 方法。</p>
+<p>难道就真的没有办法吗？下面这段代码可以优雅的实现。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> ctypes</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PyType</span>(ctypes.Structure):</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PyObject</span>(ctypes.Structure):</span><br><span class="line">    Py_ssize_t = (</span><br><span class="line">        ctypes.c_int64 <span class="keyword">if</span> ctypes.sizeof(ctypes.c_void_p) == <span class="number">8</span> <span class="keyword">else</span> ctypes.c_int32</span><br><span class="line">    )</span><br><span class="line">    _fields_ = [</span><br><span class="line">        (<span class="string">&quot;ob_refcnt&quot;</span>, Py_ssize_t),</span><br><span class="line">        (<span class="string">&quot;ob_type&quot;</span>, ctypes.POINTER(PyType)),</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PyTypeObject</span>(<span class="title class_ inherited__">PyObject</span>):</span><br><span class="line">    _fields_ = [</span><br><span class="line">        (<span class="string">&quot;dict&quot;</span>, ctypes.POINTER(PyObject))</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">inject</span>(<span class="params">class_, method, force=<span class="literal">False</span></span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_</span>(<span class="params">function</span>):</span><br><span class="line">        name_, dict_ = class_.__name__, class_.__dict__</span><br><span class="line">        proxy_dict = PyTypeObject.from_address(<span class="built_in">id</span>(dict_))</span><br><span class="line">        namespace = &#123;&#125;</span><br><span class="line">        ctypes.pythonapi.PyDict_SetItem(</span><br><span class="line">            ctypes.py_object(namespace),</span><br><span class="line">            ctypes.py_object(name_),</span><br><span class="line">            proxy_dict.<span class="built_in">dict</span></span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> force <span class="keyword">and</span> namespace.get(name_, &#123;&#125;).get(method, <span class="literal">None</span>):</span><br><span class="line">            <span class="keyword">raise</span> RuntimeError(<span class="string">f&quot;已存在方法 <span class="subst">&#123;class_.__name__&#125;</span>.<span class="subst">&#123;method&#125;</span>()&quot;</span>)</span><br><span class="line">        namespace[name_][method] = function</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> _</span><br></pre></td></tr></table></figure>
+
+<p>而使用使用方法也很简单，比如上面的给 <code>dict</code> 添加一个 <code>deepcopy()</code> 实现字典的深拷贝</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"></span><br><span class="line"><span class="meta">@inject(<span class="params"><span class="built_in">dict</span>, <span class="string">&#x27;deepcopy&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">deepcopy</span>(<span class="params">d</span>):</span><br><span class="line">    <span class="keyword">return</span> copy.deepcopy(d)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证一下</span></span><br><span class="line">origin_dict = &#123;<span class="string">&quot;goods&quot;</span>: [<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;orange&quot;</span>]&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;初始字典: <span class="subst">&#123;origin_dict&#125;</span>&quot;</span>) <span class="comment"># &#123;&#x27;goods&#x27;: [&#x27;apple&#x27;, &#x27;orange&#x27;]&#125;</span></span><br><span class="line"></span><br><span class="line">copy_dict = origin_dict.copy() <span class="comment"># 自带的 copy() 浅拷贝</span></span><br><span class="line">deepcopy_dict = origin_dict.deepcopy() <span class="comment"># 添加的 deepcopy() 深拷贝</span></span><br><span class="line"></span><br><span class="line">origin_dict[<span class="string">&quot;goods&quot;</span>].append(<span class="string">&quot;banana&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;初始字典变更: <span class="subst">&#123;origin_dict&#125;</span>&quot;</span>) <span class="comment"># &#123;&#x27;goods&#x27;: [&#x27;apple&#x27;, &#x27;orange&#x27;, &#x27;banana&#x27;]&#125;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;.copy() 结果: <span class="subst">&#123;copy_dict&#125;</span>&quot;</span>) <span class="comment"># &#123;&#x27;goods&#x27;: [&#x27;apple&#x27;, &#x27;orange&#x27;, &#x27;banana&#x27;]&#125;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;.deepcopy() 结果: <span class="subst">&#123;deepcopy_dict&#125;</span>&quot;</span>) <span class="comment"># &#123;&#x27;goods&#x27;: [&#x27;apple&#x27;, &#x27;orange&#x27;]&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>再或者给 <code>list</code> 添加一个 <code>average()</code> 方法计算平均数</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">@inject(<span class="params"><span class="built_in">list</span>, <span class="string">&#x27;average&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">average</span>(<span class="params">l</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">sum</span>(l) / <span class="built_in">len</span>(l)</span><br><span class="line"></span><br><span class="line">score = [<span class="number">95.0</span>, <span class="number">89.5</span>, <span class="number">77.0</span>, <span class="number">91.0</span>]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(score.average())  <span class="comment"># 88.125</span></span><br></pre></td></tr></table></figure>
+
+<p>再或者给字符串添加一个 <code>json()</code> 方法，可以直接通过 <code>str.json()</code> 将该字符串格式化为 <code>json</code> 对象（当然前提是这个字符串是可以被反序列化为 <code>json</code> 对象）</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> json <span class="keyword">import</span> loads</span><br><span class="line"></span><br><span class="line"><span class="meta">@inject(<span class="params"><span class="built_in">str</span>, <span class="string">&#x27;json&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">json</span>(<span class="params">s</span>):</span><br><span class="line">    <span class="keyword">return</span> loads(s)</span><br><span class="line"></span><br><span class="line">info = <span class="string">&#x27;&#123;&quot;first_name&quot;: &quot;Michael&quot;, &quot;last_name&quot;: &quot;Rodgers&quot;, &quot;department&quot;: &quot;Marketing&quot;&#125;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(info.json()) <span class="comment"># &#123;&#x27;first_name&#x27;: &#x27;Michael&#x27;, &#x27;last_name&#x27;: &#x27;Rodgers&#x27;, &#x27;department&#x27;: &#x27;Marketing&#x27;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>同样的，比如给 <code>int</code> 类型添加 <code>add(number)</code> 方法</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">@inject(<span class="params"><span class="built_in">int</span>, <span class="string">&#x27;add&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">i, number</span>):</span><br><span class="line">    <span class="keyword">return</span> i + number</span><br><span class="line"></span><br><span class="line">munber = <span class="number">5</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(number.add(<span class="number">3</span>)) <span class="comment"># 8</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 还可以进行链式调用</span></span><br><span class="line"><span class="built_in">print</span>(munber.add(<span class="number">3</span>).add(<span class="number">7</span>).add(-<span class="number">1</span>)) <span class="comment"># 14</span></span><br></pre></td></tr></table></figure>
+
+<p>当然除了内置类型，也可以修补自定义类型</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Number</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n</span>):</span><br><span class="line">        <span class="variable language_">self</span>.number = n</span><br><span class="line"></span><br><span class="line"><span class="meta">@inject(<span class="params">Number, <span class="string">&#x27;sub&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">sub</span>(<span class="params">n, num</span>):</span><br><span class="line">    <span class="keyword">return</span> Number(n.number - num)</span><br><span class="line"></span><br><span class="line">number = Number(<span class="number">10</span>)</span><br><span class="line"><span class="built_in">print</span>(number.sub(<span class="number">3</span>).sub(<span class="number">5</span>).number)  <span class="comment"># 2</span></span><br></pre></td></tr></table></figure>
+
+<!-- more -->
+]]></content>
+  </entry>
+  <entry>
+    <title>调整 macOS 顶部菜单栏图标间距</title>
+    <url>/post/baaa1138.html</url>
+    <content><![CDATA[<p>无需任何第三方软件，通过 macOS 命令行就可以调整顶部菜单栏图标间距</p>
+<span id="more"></span>
+
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 查询当前间距</span></span><br><span class="line">defaults -currentHost <span class="built_in">read</span> -globalDomain NSStatusItemSpacing</span><br><span class="line"><span class="comment"># 查询当前内间距</span></span><br><span class="line">defaults -currentHost <span class="built_in">read</span> -globalDomain NSStatusItemSelectionPadding</span><br><span class="line"><span class="comment"># 指定间距</span></span><br><span class="line">defaults -currentHost write -globalDomain NSStatusItemSpacing -int 10</span><br><span class="line"><span class="comment"># 指定内间距</span></span><br><span class="line">defaults -currentHost write -globalDomain NSStatusItemSelectionPadding -int 6</span><br><span class="line"><span class="comment"># 恢复默认间距</span></span><br><span class="line">defaults -currentHost delete -globalDomain NSStatusItemSpacing</span><br><span class="line"><span class="comment"># 恢复默认内间距</span></span><br><span class="line">defaults -currentHost delete -globalDomain NSStatusItemSelectionPadding</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
 </search>
