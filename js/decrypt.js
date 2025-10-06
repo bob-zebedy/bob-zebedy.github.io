@@ -73,7 +73,7 @@ class FIDO2Decryptor {
 
       const { html, timestamp } = JSON.parse(cached);
       const now = Date.now();
-      const expiry = 15 * 60 * 1000;
+      const expiry = 10 * 60 * 1000;
 
       if (now - timestamp < expiry) {
         this.render(html);
