@@ -110,15 +110,6 @@
   </url>
   
   <url>
-    <loc>https://blog.zebedy.com/post/ec93b507.html</loc>
-    
-    <lastmod>2025-08-22</lastmod>
-    
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.zebedy.com/post/e6a2e300.html</loc>
     
     <lastmod>2025-08-22</lastmod>
@@ -129,6 +120,15 @@
   
   <url>
     <loc>https://blog.zebedy.com/post/4a4b01f0.html</loc>
+    
+    <lastmod>2025-08-22</lastmod>
+    
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.zebedy.com/post/ec93b507.html</loc>
     
     <lastmod>2025-08-22</lastmod>
     
