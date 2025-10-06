@@ -1,9 +1,6 @@
 function getRPID() {
   const h = location.hostname;
   return h === "127.0.0.1" ? "localhost" : h;
-  // if (h === "localhost" || h === "127.0.0.1") return h;
-  // const p = h.split(".");
-  // return p.length > 2 ? p.slice(-2).join(".") : h;
 }
 
 class FIDO2Decryptor {

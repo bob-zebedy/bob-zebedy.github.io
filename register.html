@@ -128,7 +128,7 @@
         async register() {
           if (!window.PublicKeyCredential) {
             this.show(
-              '<div class="note danger"><p>您的浏览器不支持 FIDO2/WebAuthn</p></div>'
+              '<div class="note danger"><p>此浏览器不支持 FIDO2/WebAuthn</p></div>'
             );
             return;
           }
