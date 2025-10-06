@@ -6,7 +6,7 @@
   <link href="https://blog.zebedy.com/atom.xml" rel="self"/>
   
   <link href="https://blog.zebedy.com/"/>
-  <updated>2025-09-18T05:04:33.000Z</updated>
+  <updated>2025-10-06T14:46:04.000Z</updated>
   <id>https://blog.zebedy.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>测试加密文章</title>
+    <link href="https://blog.zebedy.com/post/19c1a188.html"/>
+    <id>https://blog.zebedy.com/post/19c1a188.html</id>
+    <published>2025-10-06T14:46:04.000Z</published>
+    <updated>2025-10-06T14:46:04.000Z</updated>
+    
+    <content type="html"><![CDATA[<div class="encrypted-post-container"      data-ciphertext="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"     data-iv="gS36DsAL9GqIAv8g"     data-auth-tag="CPPIRQsMzCt2ma8tnNc+WQ=="     data-key-hint="DksVBImhShNfPwBJQeCLV3UNusvTZi1A7h70AMxmyX0=">  <div class="encrypted-post-notice">    <h3>此文章已加密</h3>    <button class="fido2-verify-btn" id="fido2-verify-btn">      <i class="fa fa-key"></i> 使用安全密钥验证    </button>    <div class="verification-status" id="verification-status"></div>  </div>  <div class="decrypted-content" id="decrypted-content" style="display:none"></div></div>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;div class=&quot;encrypted-post-container&quot; 
+     data-ciphertext=&quot;PhPIqhU9dpykS2EkA/JHuQX8gvhLEAatclhPmd4CI/R/nHwVd6DWk9HLJ8zAqwQACmFV1t6Z11iEmm8</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>NexT 主题高级标签插件</title>
@@ -344,27 +365,6 @@
     
     
     <summary type="html">&lt;p&gt;大概今年（2022）一月中旬的时候入手了一个 &lt;span class=&quot;exturl&quot; data-url=&quot;aHR0cHM6Ly9yODZzLm5ldC8=&quot;&gt;R86S&lt;i class=&quot;fa fa-external-link-alt&quot;&gt;&lt;/i&gt;&lt;/span&gt; 的小主机。因为错过了众筹的车，所以是直接下的单。最后入手了 16G 的黑色千兆版本。不上万兆一个原因是家里没有这个需求，还有一个就是万兆版的没有 NVME 硬盘位，这一点对我还是刚需。&lt;/p&gt;</summary>
-    
-    
-    
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="https://blog.zebedy.com/post/4a17b156.html"/>
-    <id>https://blog.zebedy.com/post/4a17b156.html</id>
-    <published>2022-02-05T05:51:50.000Z</published>
-    <updated>2025-08-22T08:52:45.000Z</updated>
-    
-    <content type="html"><![CDATA[<center>Hello World</center>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;center&gt;Hello World&lt;/center&gt;
-</summary>
-      
     
     
     
