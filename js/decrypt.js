@@ -1,8 +1,9 @@
 function getRPID() {
   const h = location.hostname;
-  if (h === "localhost" || h === "127.0.0.1") return h;
-  const p = h.split(".");
-  return p.length > 2 ? p.slice(-2).join(".") : h;
+  return h === "127.0.0.1" ? "localhost" : h;
+  // if (h === "localhost" || h === "127.0.0.1") return h;
+  // const p = h.split(".");
+  // return p.length > 2 ? p.slice(-2).join(".") : h;
 }
 
 class FIDO2Decryptor {
@@ -144,6 +145,18 @@ class FIDO2Decryptor {
       notice.style.display = "none";
       content.innerHTML = html;
       content.style.display = "block";
+
+      try {
+        if (
+          typeof NexT !== "undefined" &&
+          NexT.boot &&
+          typeof NexT.boot.refresh === "function"
+        ) {
+          NexT.boot.refresh();
+        }
+      } catch (e) {
+        console.warn(`Hexo NexT 主题功能初始化失败: ${e}`);
+      }
     }
   }
 

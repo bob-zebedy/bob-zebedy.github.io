@@ -117,9 +117,7 @@
     <script>
       function getRPID() {
         const h = location.hostname;
-        if (h === "localhost" || h === "127.0.0.1") return h;
-        const p = h.split(".");
-        return p.length > 2 ? p.slice(-2).join(".") : h;
+        return h === "127.0.0.1" ? "localhost" : h;
       }
 
       class FIDO2Registrar {
