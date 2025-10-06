@@ -55,13 +55,7 @@ class FIDO2Decryptor {
       this.showStatus("验证成功", "success");
       setTimeout(() => this.decrypt(), 500);
     } catch (e) {
-      if (e.name === "NotAllowedError") {
-        this.showError("验证被拒绝或超时");
-      } else if (e.name === "InvalidStateError" || e.name === "NotFoundError") {
-        this.showError("未找到已注册的安全密钥");
-      } else {
-        this.showError(`验证失败: ${e.message}`);
-      }
+      this.showError(`验证失败: ${e.message}`);
     }
   }
 

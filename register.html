@@ -107,7 +107,7 @@
               <div class="success-message" id="success">
                 <i class="fa fa-check-circle"></i>
                 <h3>注册成功</h3>
-                <p>您的安全密钥已配置完成</p>
+                <p>安全密钥已配置完成</p>
               </div>
             </div>
           </div>
@@ -159,14 +159,13 @@
               },
             });
 
-            if (!cred) throw new Error("注册失败");
+            if (!cred) throw new Error("未知错误");
             document.getElementById("success").style.display = "block";
             btn.style.display = "none";
           } catch (e) {
             let msg = "注册失败: ";
-            if (e.name === "NotAllowedError") msg += "操作被取消或超时";
-            else if (e.name === "InvalidStateError")
-              msg += "此安全密钥已被注册";
+            if (e.name === "NotAllowedError") msg += "操作取消或超时";
+            else if (e.name === "InvalidStateError") msg += "安全密钥重复注册";
             else msg += e.message;
             this.show(
               `<div class="note danger"><p><i class="fa fa-times-circle"></i> ${msg}</p></div>`
