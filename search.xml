@@ -13,6 +13,38 @@
 ]]></content>
   </entry>
   <entry>
+    <title>Cloudflare 设置引用站点策略</title>
+    <url>/post/e6a2e300.html</url>
+    <content><![CDATA[<p>前几日，把我的博客部署在 <code>Cloudflare Pages</code> 上面了。同时绑定了一个托管在 <code>Cloudflare</code> 上面的域名，到这里一切顺利。<br>但是当我兴致勃勃的打开博客的时候发现了一个问题，为什么图片全 403 了？</p>
+<span id="more"></span>
+
+<p>一开始想到了可能是我的 <code>OSS</code> 防盗链。跑去看了一下，我已经添加了对应的 <code>Referer</code> 域名。一开始还以为是添加 <code>Referer</code> 生效需要时间，于是乎过了几个小时再打开问题依旧。<br>最诡异的是，打开 <code>Cloudflare Pages</code> 默认的 <code>pages.dev</code> 域名的时候，图片就是正常的。排查了一下，然后就发现了端倪。<br>问题来自通过绑定的自定义域名访问的时候，图片请求的 Header 中没有 <code>Referer</code> 字段。众所周知，所谓的防盗链其实就是检查 <code>Referer</code> 字段是不是在白名单中。那么问题来这了，为什么 <code>pages.dev</code> 域名中请求图片有 <code>Referer</code> 但是自定义域名没有？<br>再次稍加观察发现了一个现象</p>
+<img src="https://images.zabrian.com/538e6269-12f2-4f3a-0bf1-bf030ba01501/origin" title="自定义域名" style="zoom:18%;" />
+
+<img src="https://images.zabrian.com/a95cabc7-4b98-47be-7bdb-bc59cbb46101/origin" title="pages.dev 域名" style="zoom:21%;" />
+
+<p>原因就在这里</p>
+<ul>
+<li>自定义域名的引用站点策略为 <code>same-origin</code></li>
+<li>pages.dev 域名的引用站点策略为 <code>strict-origin-when-cross-origin</code></li>
+</ul>
+<p>就是因为浏览器的 <strong>同源策略(Same-Origin Policy)</strong> 因此自定义域名的请求图片的时候未带上 <code>Referer</code><br>既然问题知道了，就可以解决了：只需要修改一下自定义域名的请求头就行了。  </p>
+<ol>
+<li>打开 Cloudflare 控制台，选择对应的域名</li>
+<li>侧边栏选择 <strong>规则</strong> → <strong>创建规则</strong> → <strong>响应头转换规则</strong></li>
+<li>选择 <strong>向响应添加静态标头</strong> 模板</li>
+<li>选择 <strong>自定义筛选表达式</strong></li>
+<li>编辑表达式 <code>(http.request.full_uri wildcard &quot;https://这里填写你自己的域名/*&quot;)</code></li>
+<li>规则 <strong>添加静态响应头</strong><ul>
+<li><code>cross-origin-resource-policy = cross-origin</code></li>
+<li><code>referrer-policy = strict-origin-when-cross-origin</code></li>
+</ul>
+</li>
+</ol>
+<p>这样就可以了，此时再访问自定义域名，发现图片就正常携带了 <code>Referer</code></p>
+]]></content>
+  </entry>
+  <entry>
     <title>Cloudflare 使用 Workers 建立 Images 代理</title>
     <url>/post/ec93b507.html</url>
     <content><![CDATA[<p>最早这个博客是托管在 GitHub pages 上的，绑定的域名是在阿里云注册的，几个月前偶然一次机会，在 Cloudflare 上注册了一个自己喜欢的域名。于是就也通过 Cloudflare pages 托管了相同的 GitHub pages 仓库，因此目前使用 <span class="exturl" data-url="aHR0cHM6Ly9ibG9nLnphYnJpYW4uY29tLw==">Cloudflare pages<i class="fa fa-external-link-alt"></i></span> 或者 <a href="https://blog.zebedy.com/">GitHub pages</a> 均可访问，内容都来自同一个 GitHub repo</p>
@@ -54,38 +86,6 @@
 <span id="more"></span>
 <h1 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h1><p>点击下方按钮，并将下载好的 <code>img</code> 文件复制到佳明码表 <code>Garmin/Maps/</code> 然后在码表地图中禁用自带的所有地图即可使用。</p>
 <a class="btn" href="https://9lnk.io/gJHF" title="点击下载 2025-10-04"><i class="fa fa-download"></i>点击下载 2025-10-04</a>
-]]></content>
-  </entry>
-  <entry>
-    <title>Cloudflare 设置引用站点策略</title>
-    <url>/post/e6a2e300.html</url>
-    <content><![CDATA[<p>前几日，把我的博客部署在 <code>Cloudflare Pages</code> 上面了。同时绑定了一个托管在 <code>Cloudflare</code> 上面的域名，到这里一切顺利。<br>但是当我兴致勃勃的打开博客的时候发现了一个问题，为什么图片全 403 了？</p>
-<span id="more"></span>
-
-<p>一开始想到了可能是我的 <code>OSS</code> 防盗链。跑去看了一下，我已经添加了对应的 <code>Referer</code> 域名。一开始还以为是添加 <code>Referer</code> 生效需要时间，于是乎过了几个小时再打开问题依旧。<br>最诡异的是，打开 <code>Cloudflare Pages</code> 默认的 <code>pages.dev</code> 域名的时候，图片就是正常的。排查了一下，然后就发现了端倪。<br>问题来自通过绑定的自定义域名访问的时候，图片请求的 Header 中没有 <code>Referer</code> 字段。众所周知，所谓的防盗链其实就是检查 <code>Referer</code> 字段是不是在白名单中。那么问题来这了，为什么 <code>pages.dev</code> 域名中请求图片有 <code>Referer</code> 但是自定义域名没有？<br>再次稍加观察发现了一个现象</p>
-<img src="https://images.zabrian.com/538e6269-12f2-4f3a-0bf1-bf030ba01501/origin" title="自定义域名" style="zoom:18%;" />
-
-<img src="https://images.zabrian.com/a95cabc7-4b98-47be-7bdb-bc59cbb46101/origin" title="pages.dev 域名" style="zoom:21%;" />
-
-<p>原因就在这里</p>
-<ul>
-<li>自定义域名的引用站点策略为 <code>same-origin</code></li>
-<li>pages.dev 域名的引用站点策略为 <code>strict-origin-when-cross-origin</code></li>
-</ul>
-<p>就是因为浏览器的 <strong>同源策略(Same-Origin Policy)</strong> 因此自定义域名的请求图片的时候未带上 <code>Referer</code><br>既然问题知道了，就可以解决了：只需要修改一下自定义域名的请求头就行了。  </p>
-<ol>
-<li>打开 Cloudflare 控制台，选择对应的域名</li>
-<li>侧边栏选择 <strong>规则</strong> → <strong>创建规则</strong> → <strong>响应头转换规则</strong></li>
-<li>选择 <strong>向响应添加静态标头</strong> 模板</li>
-<li>选择 <strong>自定义筛选表达式</strong></li>
-<li>编辑表达式 <code>(http.request.full_uri wildcard &quot;https://这里填写你自己的域名/*&quot;)</code></li>
-<li>规则 <strong>添加静态响应头</strong><ul>
-<li><code>cross-origin-resource-policy = cross-origin</code></li>
-<li><code>referrer-policy = strict-origin-when-cross-origin</code></li>
-</ul>
-</li>
-</ol>
-<p>这样就可以了，此时再访问自定义域名，发现图片就正常携带了 <code>Referer</code></p>
 ]]></content>
   </entry>
   <entry>
@@ -297,6 +297,23 @@
 ]]></content>
   </entry>
   <entry>
+    <title>iPhone 17 壁纸</title>
+    <url>/post/958b861f.html</url>
+    <content><![CDATA[<p>2025-09-10 苹果发布了全新的 iPhone 17 系列，除了带来了全新的 iPhone Air 系列，同时还新增了每款机型对应的系统壁纸。</p>
+<span id="more"></span>
+
+<div class="tabs" id="iphone-17-系列壁纸"><ul class="nav-tabs"><li class="tab active"><a href="#iphone-17-系列壁纸-1"><i class="fa fa-mobile"></i>iPhone 17 系列</a></li><li class="tab"><a href="#iphone-17-系列壁纸-2"><i class="fa fa-mobile"></i>iPhone 17 Air 系列</a></li><li class="tab"><a href="#iphone-17-系列壁纸-3"><i class="fa fa-mobile"></i>iPhone 17 Pro 系列</a></li></ul><div class="tab-content"><div class="tab-pane active" id="iphone-17-系列壁纸-1"><img src="https://images.zabrian.com/d81266c0-d74e-49ce-64fe-0794ab6d1001/origin" title="iPhone 17 系列" style="zoom:8%;" />
+  <br>
+  <center><a class="btn" href="https://9lnk.io/eSDn" title="点击下载原图"><i class="fa fa-download"></i>点击下载原图</a><center>
+  <br></div><div class="tab-pane" id="iphone-17-系列壁纸-2"><img src="https://images.zabrian.com/65a42a74-6d52-41c6-f26e-a484100d9801/origin" title="iPhone 17 Air 系列" style="zoom:8%;" />
+  <br>
+  <center><a class="btn" href="https://9lnk.io/dC4Q" title="点击下载原图"><i class="fa fa-download"></i>点击下载原图</a><center>
+  <br></div><div class="tab-pane" id="iphone-17-系列壁纸-3"><img src="https://images.zabrian.com/6755691c-557d-4069-7881-fb08a524cd01/origin" title="iPhone 17 Pro 系列" style="zoom:8%;" />
+  <br>
+  <center><a class="btn" href="https://9lnk.io/XEkx" title="点击下载原图"><i class="fa fa-download"></i>点击下载原图</a></center>
+  <br></div></div></div>]]></content>
+  </entry>
+  <entry>
     <title>OpenWrt 配置记录</title>
     <url>/post/465f36a1.html</url>
     <content><![CDATA[<p>这里会增量记录 OpenWrt 相关的一些技巧或者配置方法。</p>
@@ -336,29 +353,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/post/4a17b156.html</url>
-    <content><![CDATA[<center>Hello World</center>
-]]></content>
-  </entry>
-  <entry>
-    <title>iPhone 17 壁纸</title>
-    <url>/post/958b861f.html</url>
-    <content><![CDATA[<p>2025-09-10 苹果发布了全新的 iPhone 17 系列，除了带来了全新的 iPhone Air 系列，同时还新增了每款机型对应的系统壁纸。</p>
-<span id="more"></span>
-
-<div class="tabs" id="iphone-17-系列壁纸"><ul class="nav-tabs"><li class="tab active"><a href="#iphone-17-系列壁纸-1"><i class="fa fa-mobile"></i>iPhone 17 系列</a></li><li class="tab"><a href="#iphone-17-系列壁纸-2"><i class="fa fa-mobile"></i>iPhone 17 Air 系列</a></li><li class="tab"><a href="#iphone-17-系列壁纸-3"><i class="fa fa-mobile"></i>iPhone 17 Pro 系列</a></li></ul><div class="tab-content"><div class="tab-pane active" id="iphone-17-系列壁纸-1"><img src="https://images.zabrian.com/d81266c0-d74e-49ce-64fe-0794ab6d1001/origin" title="iPhone 17 系列" style="zoom:8%;" />
-  <br>
-  <center><a class="btn" href="https://9lnk.io/eSDn" title="点击下载原图"><i class="fa fa-download"></i>点击下载原图</a><center>
-  <br></div><div class="tab-pane" id="iphone-17-系列壁纸-2"><img src="https://images.zabrian.com/65a42a74-6d52-41c6-f26e-a484100d9801/origin" title="iPhone 17 Air 系列" style="zoom:8%;" />
-  <br>
-  <center><a class="btn" href="https://9lnk.io/dC4Q" title="点击下载原图"><i class="fa fa-download"></i>点击下载原图</a><center>
-  <br></div><div class="tab-pane" id="iphone-17-系列壁纸-3"><img src="https://images.zabrian.com/6755691c-557d-4069-7881-fb08a524cd01/origin" title="iPhone 17 Pro 系列" style="zoom:8%;" />
-  <br>
-  <center><a class="btn" href="https://9lnk.io/XEkx" title="点击下载原图"><i class="fa fa-download"></i>点击下载原图</a></center>
-  <br></div></div></div>]]></content>
-  </entry>
-  <entry>
     <title>macOS Chrome &#39;这些扩展程序不再受支持，因此已停用&#39; 解决办法</title>
     <url>/post/e72f1311.html</url>
     <content><![CDATA[<p>今天早上发现 macOS Chrome 版本更新到了 138.0.7204.101 打开浏览器的时候提示 “这些扩展程序不再受支持，因此已停用”，简单搜了一下发现有解决办法，但是都是针对于 Windows 下的解决方案。<br>而对于 macOS 有以下两种方法，任选其一即可。</p>
@@ -380,6 +374,160 @@
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> -p <span class="string">&quot;/Library/Managed Preferences&quot;</span> &amp;&amp; <span class="built_in">sudo</span> <span class="built_in">tee</span> <span class="string">&quot;/Library/Managed Preferences/com.google.Chrome.plist&quot;</span> &gt;/dev/null &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="string">&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot;</span></span><br><span class="line"><span class="string">  &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;\&gt;</span></span><br><span class="line"><span class="string">&lt;plist version=&quot;1.0&quot;&gt;</span></span><br><span class="line"><span class="string">  &lt;dict&gt;</span></span><br><span class="line"><span class="string">    &lt;key&gt;ExtensionManifestV2Availability&lt;/key&gt;</span></span><br><span class="line"><span class="string">    &lt;integer&gt;2&lt;/integer&gt;</span></span><br><span class="line"><span class="string">  &lt;/dict&gt;</span></span><br><span class="line"><span class="string">&lt;/plist&gt;</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure>
 
 <p>完全关闭 Chrome 后再打开，在地址栏输入 <code>chrome://policy/</code> 点击左上角的重新加载政策，然后旧版的扩展就可以继续使用啦。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>北京联通异地宽带办理指南</title>
+    <url>/post/de583f28.html</url>
+    <content><![CDATA[<p>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。</p>
+<ul>
+<li>1000 Mbps 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30 元</li>
+<li>500 Mbps 无合约 166 元&#x2F;月</li>
+</ul>
+<p>因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。</p>
+<span id="more"></span>
+
+<p>北京地区的异地宽带分两种</p>
+<ul>
+<li>300 Mbps 60 元&#x2F;月</li>
+<li>500 Mbps 80 元&#x2F;月</li>
+</ul>
+<img src="https://images.zabrian.com/8ec6254c-3291-42f6-69b0-2c8d53f22901/origin" title="异地宽带套餐" style="zoom:62%;" />
+
+<h1 id="办卡"><a href="#办卡" class="headerlink" title="办卡"></a>办卡</h1><p>既然是异地宽带，首先是需要一个异地手机卡。在某宝找了一个办卡，选了一个 19 块钱的套餐，反正就是能办多便宜就多便宜。19 差不多就是能在开卡的最便宜了。异地选的天津，主要就是离北京近，方便。</p>
+<p>然后记得询问一下卡是不是能正常改套餐办宽带啥的，别办物联网卡就行，要办的一定是正常的手机卡。然后配送地址写一个天津的地址，千万不能写异地，因为天津联通不能异地配送。必须要天津本地的地址。为了方便，我就直接写到了天津站。</p>
+<p>然后就是提交身份证啥的审核，当天审核通过下午显示就分配了小哥上门送卡。然后就是打电话给小哥改一下时间。毕竟当天下午已经 3 点了，还在上班咋，可能到天津取卡。</p>
+<p>然后我就约到了周六下午 3 点了。然后就是买了周六 14:09 ~ 14:42 从北京到天津的去程，15:22 ~ 15:52 从天津到北京南的返程。一共花了 100 过点。</p>
+<p>当天上车之后给小哥打了个电话，说了下是专程来办卡的，返程时间比较紧，希望能尽快到。小哥表示没问题。然后我快到站的时候小哥来电话了说他已经到了（d&#x3D;(´▽ ｀)&#x3D;b）</p>
+<p>然后就和小哥在车站里面碰上面了。拍照办卡一气呵成，全程花了不到 5 分钟。交了 500 块钱话费结束。然后返程回家。</p>
+<h1 id="改套餐"><a href="#改套餐" class="headerlink" title="改套餐"></a>改套餐</h1><p>开卡的时候选的是 19 块钱的套餐，第二天第一件事就是改到 8 元保号套餐。所以上面办卡的时候需要确认卡片套餐能否修改（有的有合约，不能修改或者得过几个月才能修改）可以直接打电话给联通，转到人工改。但是我嫌打电话麻烦，下载了联通 app，用新办的手机卡登录，右上角在线客服修改套餐到 8 元保号套餐就行。客服会告诉你会有专属经理 48h 内联系，但是我的当天下午就来电联系了，确认修改后次月就生效了。</p>
+<img src="https://images.zabrian.com/83d18cc4-1a34-43d3-043c-b63386745e01/origin" title="联系客服修改套餐" style="zoom:62%;" />
+
+<h1 id="办宽带"><a href="#办宽带" class="headerlink" title="办宽带"></a>办宽带</h1><p>这里办宽带一定要从联通 app 上办理，去营业厅是办不了这个价格的异地宽带。</p>
+<p>app 里面的位置在这里</p>
+<img src="https://images.zabrian.com/8d192054-73d8-4156-87f5-c8f5eed0fd01/origin" title="异地同享专区" style="zoom:62%;" />
+
+<p>然后选择全国一家亲异地宽带</p>
+<img src="https://images.zabrian.com/32f222f5-5e1f-4b39-5329-848898dd2f01/origin" title="全国一家亲异地宽带" style="zoom:62%;" />
+
+<p>然后进去之后选择宽带办理的城市，我这里就是北京，然后就会有能办理的类型，包括 300 Mbps 和 500 Mbps 选好之后填写下面的具体的内容，提交预约即可。</p>
+<p>然后过了几个小时就有联通的电话了，确定办理的宽带后，表示北京有一个 300 块钱的安装费。次月从话费里面扣除。确定无误后客服给我发了一个短信，里面有个链接。需要上传身份证正反面和拍摄一张免冠自拍照。然后就等着分配小哥吧。</p>
+<h1 id="上门安装"><a href="#上门安装" class="headerlink" title="上门安装"></a>上门安装</h1><p>到了预约的那天，小哥上门。确认了信息之后就开始装光猫啥的。在这个途中，因为现在北京天气已经很热了，小哥又是中午上门的。递上瓶水，拿个板凳坐会儿。要是抽烟可以再递个烟啥的。之后就开始表达自己想要公网 IP 的诉求（毕竟求人办事儿，所以前面就客气点）小哥问了个原因，我说家里有监控需要。然后小哥还拍了个监控的照片，并且还说：“现在公网 IP 不好拿，需要有明确的需求才能申请，你这个要用监控。但其实现在监控这个理由不怎么能过了。你要是有明确诉求可以给你申请。”（反正就是一边表达不好搞，但是一边还都给申请了）然后就顺便连桥接一起给办了，顺便加了一下小哥私人的微信（虽然现在一般都是要加企微，但是小哥还是给了他私人的微信）最后装好后他那走了个测速，安装 500 M 实际测速能到 650。还不错。最后记了一下宽带的密码，搞定。从上门到最后小哥走一共花了不到 10 min，外加一瓶水的钱。</p>
+<h1 id="办理上行提速"><a href="#办理上行提速" class="headerlink" title="办理上行提速"></a>办理上行提速</h1><p>500 Mbps 的宽带下行对应上行才给 30 Mbps 是真的拉跨，但是可以办理加速包: <span class="exturl" data-url="aHR0cHM6Ly93b2t1YW4uMTE0bWVuaHUuY29tLw==">沃宽<i class="fa fa-external-link-alt"></i></span></p>
+<p>用办理宽带的异地手机号登录</p>
+<img src="https://images.zabrian.com/29685c89-0b86-439b-be44-1ea181ba1601/origin" title="沃宽登陆界面" style="zoom:39%;" />
+
+<p>然后在左侧【我的宽带】中添加当前宽带</p>
+<img src="https://images.zabrian.com/214b8dce-750d-4fea-cb68-b81701392d01/origin" title="沃宽添加宽带" style="zoom:40%;" />
+
+<p>添加成功后再左侧 【我要购买】中应该可以看到一个【宽带上行提速包 100 M】这里一次最多可以购买 6 个（连续半年，到期后可以继续购买）</p>
+<img src="https://images.zabrian.com/13a412ea-2b2b-4be8-4013-821b35e6d201/origin" title="购买上行提速包" style="zoom:40%;" />
+
+<p>购买成功后，在左侧【首页】点击【点我提速】就可以了，无需重启光猫即可享受 100 Mbps 的上行速率了。</p>
+<img src="https://images.zabrian.com/1b239e28-26bc-43cd-e168-d7970cc88701/origin" title="上行提速" style="zoom:39%;" />
+
+<h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>最后算一下成本</p>
+<ul>
+<li>一次性成本：来回 100 元路费 + 装机费 300 元（唯一的坑点） &#x3D; 400 元</li>
+<li>周期性成本：每月异地号码套餐 8 元 + 宽带费用 80 元 + 上行加速包 30 元 &#x3D; 118 元</li>
+</ul>
+<p>总体还是比 500 Mbps 的融合套便宜很多的。</p>
+<p>最后附上 speedtest 和 ustc 的测速结果吧</p>
+<img src="https://images.zabrian.com/ac825486-02e6-43f8-1e06-419808a0da01/origin" title="SpeedTest 测速" style="zoom:100%;" />
+
+<img src="https://images.zabrian.com/8cb09a0c-3136-4487-8e35-a242c3ecf601/origin" title="USTC 测速" style="zoom:85%;" />
+]]></content>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/post/4a17b156.html</url>
+    <content><![CDATA[<center>Hello World</center>
+]]></content>
+  </entry>
+  <entry>
+    <title>搭建家庭私人 GitLab 服务器</title>
+    <url>/post/8d4f8799.html</url>
+    <content><![CDATA[<p>大概今年（2022）一月中旬的时候入手了一个 <span class="exturl" data-url="aHR0cHM6Ly9yODZzLm5ldC8=">R86S<i class="fa fa-external-link-alt"></i></span> 的小主机。因为错过了众筹的车，所以是直接下的单。最后入手了 16G 的黑色千兆版本。不上万兆一个原因是家里没有这个需求，还有一个就是万兆版的没有 NVME 硬盘位，这一点对我还是刚需。</p>
+<span id="more"></span>
+
+<p>最后用了差不多一周的时间，终于在年前，这个心心念的小主机到手了。<br>有关这个小主机我就不多做介绍了，今天主要是介绍一下我怎么用它在我的家庭环境搭建一个私人的 GitLab。这篇文章从我为什么要搭建家庭私人 GitLab 以及如何搭建。都会都做一个比较详细的介绍。</p>
+<h1 id="初衷"><a href="#初衷" class="headerlink" title="初衷"></a>初衷</h1><p>家里是有一个 J4125 的软路由，去年很早就买了。一直在我家作为主路由负责拨号和科学上网的功能，用的 OpenWrt 也是我自己配置和 GitHub Action 编译的，也满足了我家的基本需求。而且也因为是物理机直装，再加上害怕 J4125 玩起来怕性能不够，再影响了正常的网络。所以也就不想再折腾他了，就让他安安心心做我家的路由器就好了。</p>
+<p>但与此同时呢，作为一个爱折腾的程序员，身边的很多不管是硬件还是软件的小玩意儿都是有特别的需求的。</p>
+<p>就比如去年（2021）年买的一个 <span class="exturl" data-url="aHR0cHM6Ly9kcm9wLmNvbS9idXkvc3RhY2stb3ZlcmZsb3ctdGhlLWtleS1tYWNyb3BhZA==">STACK OVERFLOW THE KEY MACROPAD<i class="fa fa-external-link-alt"></i></span> 键盘，配上从淘宝买的键帽，因为使用 QMK 的键盘方案，所以可以定制固件。现在已经成为了我的专用密码输入器。但是问题来了，因为我现在还尝试看他还有没别的好玩的东西，所以我需要对这个键盘固件的代码不断进行修改、编译、刷入，然后再尝试修改、编译、刷入。这样的操作重复起来会让人很繁琐，但是因为固件中存在一些敏感代码（比如我的各种密码）所以不方便托管到 GitHub。所以之前我就在想要是能有一个私人的 Git 多好。除了代码的托管，如果还可以加入 CI&#x2F;CD 这种持续集成的能力，就可以解放很多无谓的重复的劳动。而能同时满足这个需求的让我想到的第一个解决方案就是 GitLab 了。</p>
+<p>除了上面说的那个键盘固件，还有比如说我的 Rime（鼠须管）的配置文件，因为词库中有很多的自定义词，以及还有人名通讯地址之类的敏感词，所以也是不方便把这个配置直接托管在 GitHub 上的。</p>
+<p>还有现在看到的这个博客，用 Hexo 生成的 GitHub Pages 静态页面，博客本身的代码我不想放到 GitHub 上，所以这时候的我也需要一个私人的 GitLab。除了能实现代码的托管，还能顺便利用 GitLab CI 实现一键发布，每次只要提交了代码，稍等片刻 GitHub Pages 就自动部署好了。</p>
+<h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>上面说了那么多。现在有了 R86S 这样一个性能跟得上的小主机，在东西到货的第二天，就开始了他的折腾之路。</p>
+<h2 id="安装硬件"><a href="#安装硬件" class="headerlink" title="安装硬件"></a>安装硬件</h2><p>因为这个 R86S 只带了一个电源，内置的一个 EMMC 容量只有 128G 且性能堪忧。所以第一步是安装一个自己的 NVME 固态。记得之前有一块买多了的吃灰三星 980 Pro 500G，都没有开封。之前还差点给挂到海鲜市场出掉，现在终于派上用场了。<br>安装好硬盘然后找一个网线，连接好路由器的 LAN 口和 R86S 的随便一个网口。连接好键盘鼠标，就可以插上电源自动上电开机了。</p>
+<h2 id="安装系统"><a href="#安装系统" class="headerlink" title="安装系统"></a>安装系统</h2><p>既然是是要做小型服务器，哪有用桌面操作系统的。所以这里就选择了 <span class="exturl" data-url="aHR0cHM6Ly91YnVudHUuY29tL2Rvd25sb2FkL3NlcnZlcg==">Ubuntu Server 20.04.3 LTS<i class="fa fa-external-link-alt"></i></span>。下载完镜像后，写入到 U 盘。然后就可以通过 U 盘 启动就可以进安装环节了。<br>安装系统有几个点需要注意一下</p>
+<ol>
+<li><p>分配 IP 地址的方式</p>
+<p>在进行网络配置的时候，既可以通过 DHCP 动态分配 IP，也可以手动指定。如果是 DHCP 分配，则后续需要到路由器中绑定一下 Mac 地址和 IP，毕竟我们在内网访问也是需要有一个内网的固定 IP。通过手动指定 IP 地址，要注意不要和现有分配的的地址冲突。手动指定 IP 就不需要后续到路由器绑定 Mac 地址和 IP 了。</p>
+</li>
+<li><p>选择安装硬盘</p>
+<p>因为主板上带一个 EMMC，所以在选择硬盘的时候记得选自己安装的 NVME SSD 上，而且调整根目录大小调整为剩余 SSD 所由空间。否则根目录默认只划分了 100G，后面进入系统后还需要手动扩容。</p>
+</li>
+<li><p>安装后修改网络配置</p>
+<p>安装完系统后重新启动有可能会出现日志 <code>A start job is running for wait for network to be configured.</code> 导致需要很长时间才能进入系统。这时候需要等进到系统后修改网络配置文件</p>
+<p><code>/etc/netplan/00-installer-config.yaml</code>（文件名 <code>00-installer-config.yaml</code> 不固定，但是文件名类似的一个 <code>yaml</code> 文件)</p>
+<p>在每一个设备下面添加 <code>optional: true</code></p>
+<p>最后的配置应该类似</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">network:</span></span><br><span class="line">  <span class="attr">ethernets:</span></span><br><span class="line">    <span class="attr">enp1s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp2s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp3s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>然后应用更改</p>
+<figure class="highlight coq"><table><tr><td class="code"><pre><span class="line">netplan <span class="built_in">apply</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="创建-GitLab-备份位置"><a href="#创建-GitLab-备份位置" class="headerlink" title="创建 GitLab 备份位置"></a>创建 GitLab 备份位置</h2><p>上面说到了，这个 R86S 自带一个 128G 的 EMMC 存储，虽然性能比较差，但是东西不能浪费了。所以这里我拿来作为一个独立的 GitLab 数据备份存储，即使是主硬盘挂了，还有一份独立的备份存在，而且短时间内 128G 还是够用的。</p>
+<h3 id="创建新的硬盘分区"><a href="#创建新的硬盘分区" class="headerlink" title="创建新的硬盘分区"></a>创建新的硬盘分区</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> cfdisk /dev/mmcblk0        <span class="comment"># mmcblk0 是 EMMC 设备</span></span><br><span class="line"><span class="built_in">sudo</span> mkfs.ext4 /dev/mmcblk0     <span class="comment"># 格式化为 ext4</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="挂载到-mmc"><a href="#挂载到-mmc" class="headerlink" title="挂载到 &#x2F;mmc"></a>挂载到 &#x2F;mmc</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/fstab</span><br><span class="line"><span class="comment"># 添加一行</span></span><br><span class="line">/dev/mmcblk0 /mmc ext4 defaults 0 0</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装-GitLab"><a href="#安装-GitLab" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h2><h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install -y curl openssh-server ca-certificates tzdata perl</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加-GitLab-源"><a href="#添加-GitLab-源" class="headerlink" title="添加 GitLab 源"></a>添加 GitLab 源</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | <span class="built_in">sudo</span> bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-GitLab-1"><a href="#安装-GitLab-1" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install gitlab-ce</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取-root-用户密码"><a href="#获取-root-用户密码" class="headerlink" title="获取 root 用户密码"></a>获取 root 用户密码</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /etc/gitlab/initial_root_password</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意，这个文件后面会被自动删除。因此请及时保管好该密码或者及时进行修改。</strong></p>
+<h3 id="配置-GitLab"><a href="#配置-GitLab" class="headerlink" title="配置 GitLab"></a>配置 GitLab</h3><p>如果上面几步都比较顺利，不出意外，现在应该已经在这个系统中安装好了 GitLab。接下来先进行一些简要地配置。</p>
+<p>GitLab 的配置文件是 <code>/etc/gitlab/gitlab.rb</code></p>
+<p>我家 OpenWrt 主路由在 DHCP 中设置的 <code>本地服务器</code> 和 <code>本地域名</code> 分别为 <code>/home/</code> 和 <code>home</code>，同时我也希望能通过域名访问这个 GitLab 服务器。所以我还添加了一条 <code>自定义挟持域名</code>，其中域名为 <code>git</code>，IP 地址为 R86S 分配的固定 IP（比如我家的是 <code>192.168.50.50</code>）。这样我就可以通过域名 <code>http://git.home</code> 来访问这个 GitLab 服务器了。</p>
+<p>根据以上前提，这里需要修改的几个地方</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">external_url</span> <span class="string">&#x27;http://git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;gitlab_ssh_host&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;time_zone&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;Asia/Shanghai&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;backup_path&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;/mmc&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>backup_path</code> 即为 <a href="#%E5%88%9B%E5%BB%BA-GitLab-%E5%A4%87%E4%BB%BD%E4%BD%8D%E7%BD%AE">EMMC 设备的挂载点</a></p>
+<p>修改完 <code>gitlab.rb</code> 后需要重新配置 GitLab 才能生效</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
+
+<p>稍等片刻，在浏览器中打开 <span class="exturl" data-url="aHR0cDovL2dpdC5ob21lLw==">http://git.home<i class="fa fa-external-link-alt"></i></span> 就可以看到搭建好的 GitLab 了。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>更改 macOS 强调色</title>
+    <url>/post/c59c6467.html</url>
+    <content><![CDATA[<p>Apple 在 <span class="exturl" data-url="aHR0cHM6Ly93d3cuYXBwbGUuY29tL2ltYWMtMjQ=">iMac 24”<i class="fa fa-external-link-alt"></i></span> Mac 中首次使用了新的强调色，这些强调色是这些 Mac 独有的。但是现在只要是 macOS 11.3.1 以上的系统，即使不是 iMac 24” 机器，也可以使用这些特有的强调色。</p>
+<span id="more"></span>
+
+<p>首先需要开启基于硬件的强调色 <code>NSColorSimulateHardwareAccent</code> 功能</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulateHardwareAccent -bool YES</span><br></pre></td></tr></table></figure>
+
+<p>然后通过 <code>NSColorSimulatedHardwareEnclosureNumber</code> 选择其中任意一种颜色。其中可选的颜色选项为 3 到 8 (包含 3 和 8)</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulatedHardwareEnclosureNumber -int 3</span><br></pre></td></tr></table></figure>
+
+<p>然后重新启动电脑或者退出登录重新登录即可生效。<br>然后在 <strong>系统设置</strong> -&gt; <strong>外观选项卡</strong> -&gt; <strong>强调色</strong> 和 <strong>高亮标记颜色</strong> 选项中会出现一个 <strong>这台 Mac</strong> 的颜色选项，其中颜色即为上面设置的颜色。</p>
+<p>以下是 <code>NSColorSimulatedHardwareEnclosureNumber</code> 不同值的实际效果</p>
+<img src="https://images.zabrian.com/c5f66aed-fff8-43e1-940d-8388311a0a01/origin" title="颜色 3" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/38169874-ea75-4086-24b1-ccd6416e9701/origin" title="颜色 4" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/1683833a-7ee4-416a-5659-2a31fbe46001/origin" title="颜色 5" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/fe160cc7-b5cb-435d-374b-6cb2e744d901/origin" title="颜色 6" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/5a1dfe77-2619-435a-290f-d058a032b601/origin" title="颜色 7" style="zoom:57%;" />
+
+<img src="https://images.zabrian.com/6dcb7e11-165d-4547-1bd4-ff7e02a8c001/origin" title="颜色 8" style="zoom:57%;" />
 ]]></content>
   </entry>
   <entry>
@@ -552,92 +700,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>搭建家庭私人 GitLab 服务器</title>
-    <url>/post/8d4f8799.html</url>
-    <content><![CDATA[<p>大概今年（2022）一月中旬的时候入手了一个 <span class="exturl" data-url="aHR0cHM6Ly9yODZzLm5ldC8=">R86S<i class="fa fa-external-link-alt"></i></span> 的小主机。因为错过了众筹的车，所以是直接下的单。最后入手了 16G 的黑色千兆版本。不上万兆一个原因是家里没有这个需求，还有一个就是万兆版的没有 NVME 硬盘位，这一点对我还是刚需。</p>
-<span id="more"></span>
-
-<p>最后用了差不多一周的时间，终于在年前，这个心心念的小主机到手了。<br>有关这个小主机我就不多做介绍了，今天主要是介绍一下我怎么用它在我的家庭环境搭建一个私人的 GitLab。这篇文章从我为什么要搭建家庭私人 GitLab 以及如何搭建。都会都做一个比较详细的介绍。</p>
-<h1 id="初衷"><a href="#初衷" class="headerlink" title="初衷"></a>初衷</h1><p>家里是有一个 J4125 的软路由，去年很早就买了。一直在我家作为主路由负责拨号和科学上网的功能，用的 OpenWrt 也是我自己配置和 GitHub Action 编译的，也满足了我家的基本需求。而且也因为是物理机直装，再加上害怕 J4125 玩起来怕性能不够，再影响了正常的网络。所以也就不想再折腾他了，就让他安安心心做我家的路由器就好了。</p>
-<p>但与此同时呢，作为一个爱折腾的程序员，身边的很多不管是硬件还是软件的小玩意儿都是有特别的需求的。</p>
-<p>就比如去年（2021）年买的一个 <span class="exturl" data-url="aHR0cHM6Ly9kcm9wLmNvbS9idXkvc3RhY2stb3ZlcmZsb3ctdGhlLWtleS1tYWNyb3BhZA==">STACK OVERFLOW THE KEY MACROPAD<i class="fa fa-external-link-alt"></i></span> 键盘，配上从淘宝买的键帽，因为使用 QMK 的键盘方案，所以可以定制固件。现在已经成为了我的专用密码输入器。但是问题来了，因为我现在还尝试看他还有没别的好玩的东西，所以我需要对这个键盘固件的代码不断进行修改、编译、刷入，然后再尝试修改、编译、刷入。这样的操作重复起来会让人很繁琐，但是因为固件中存在一些敏感代码（比如我的各种密码）所以不方便托管到 GitHub。所以之前我就在想要是能有一个私人的 Git 多好。除了代码的托管，如果还可以加入 CI&#x2F;CD 这种持续集成的能力，就可以解放很多无谓的重复的劳动。而能同时满足这个需求的让我想到的第一个解决方案就是 GitLab 了。</p>
-<p>除了上面说的那个键盘固件，还有比如说我的 Rime（鼠须管）的配置文件，因为词库中有很多的自定义词，以及还有人名通讯地址之类的敏感词，所以也是不方便把这个配置直接托管在 GitHub 上的。</p>
-<p>还有现在看到的这个博客，用 Hexo 生成的 GitHub Pages 静态页面，博客本身的代码我不想放到 GitHub 上，所以这时候的我也需要一个私人的 GitLab。除了能实现代码的托管，还能顺便利用 GitLab CI 实现一键发布，每次只要提交了代码，稍等片刻 GitHub Pages 就自动部署好了。</p>
-<h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>上面说了那么多。现在有了 R86S 这样一个性能跟得上的小主机，在东西到货的第二天，就开始了他的折腾之路。</p>
-<h2 id="安装硬件"><a href="#安装硬件" class="headerlink" title="安装硬件"></a>安装硬件</h2><p>因为这个 R86S 只带了一个电源，内置的一个 EMMC 容量只有 128G 且性能堪忧。所以第一步是安装一个自己的 NVME 固态。记得之前有一块买多了的吃灰三星 980 Pro 500G，都没有开封。之前还差点给挂到海鲜市场出掉，现在终于派上用场了。<br>安装好硬盘然后找一个网线，连接好路由器的 LAN 口和 R86S 的随便一个网口。连接好键盘鼠标，就可以插上电源自动上电开机了。</p>
-<h2 id="安装系统"><a href="#安装系统" class="headerlink" title="安装系统"></a>安装系统</h2><p>既然是是要做小型服务器，哪有用桌面操作系统的。所以这里就选择了 <span class="exturl" data-url="aHR0cHM6Ly91YnVudHUuY29tL2Rvd25sb2FkL3NlcnZlcg==">Ubuntu Server 20.04.3 LTS<i class="fa fa-external-link-alt"></i></span>。下载完镜像后，写入到 U 盘。然后就可以通过 U 盘 启动就可以进安装环节了。<br>安装系统有几个点需要注意一下</p>
-<ol>
-<li><p>分配 IP 地址的方式</p>
-<p>在进行网络配置的时候，既可以通过 DHCP 动态分配 IP，也可以手动指定。如果是 DHCP 分配，则后续需要到路由器中绑定一下 Mac 地址和 IP，毕竟我们在内网访问也是需要有一个内网的固定 IP。通过手动指定 IP 地址，要注意不要和现有分配的的地址冲突。手动指定 IP 就不需要后续到路由器绑定 Mac 地址和 IP 了。</p>
-</li>
-<li><p>选择安装硬盘</p>
-<p>因为主板上带一个 EMMC，所以在选择硬盘的时候记得选自己安装的 NVME SSD 上，而且调整根目录大小调整为剩余 SSD 所由空间。否则根目录默认只划分了 100G，后面进入系统后还需要手动扩容。</p>
-</li>
-<li><p>安装后修改网络配置</p>
-<p>安装完系统后重新启动有可能会出现日志 <code>A start job is running for wait for network to be configured.</code> 导致需要很长时间才能进入系统。这时候需要等进到系统后修改网络配置文件</p>
-<p><code>/etc/netplan/00-installer-config.yaml</code>（文件名 <code>00-installer-config.yaml</code> 不固定，但是文件名类似的一个 <code>yaml</code> 文件)</p>
-<p>在每一个设备下面添加 <code>optional: true</code></p>
-<p>最后的配置应该类似</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">network:</span></span><br><span class="line">  <span class="attr">ethernets:</span></span><br><span class="line">    <span class="attr">enp1s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp2s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp3s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
-
-<p>然后应用更改</p>
-<figure class="highlight coq"><table><tr><td class="code"><pre><span class="line">netplan <span class="built_in">apply</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="创建-GitLab-备份位置"><a href="#创建-GitLab-备份位置" class="headerlink" title="创建 GitLab 备份位置"></a>创建 GitLab 备份位置</h2><p>上面说到了，这个 R86S 自带一个 128G 的 EMMC 存储，虽然性能比较差，但是东西不能浪费了。所以这里我拿来作为一个独立的 GitLab 数据备份存储，即使是主硬盘挂了，还有一份独立的备份存在，而且短时间内 128G 还是够用的。</p>
-<h3 id="创建新的硬盘分区"><a href="#创建新的硬盘分区" class="headerlink" title="创建新的硬盘分区"></a>创建新的硬盘分区</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> cfdisk /dev/mmcblk0        <span class="comment"># mmcblk0 是 EMMC 设备</span></span><br><span class="line"><span class="built_in">sudo</span> mkfs.ext4 /dev/mmcblk0     <span class="comment"># 格式化为 ext4</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="挂载到-mmc"><a href="#挂载到-mmc" class="headerlink" title="挂载到 &#x2F;mmc"></a>挂载到 &#x2F;mmc</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/fstab</span><br><span class="line"><span class="comment"># 添加一行</span></span><br><span class="line">/dev/mmcblk0 /mmc ext4 defaults 0 0</span><br></pre></td></tr></table></figure>
-
-<h2 id="安装-GitLab"><a href="#安装-GitLab" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h2><h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install -y curl openssh-server ca-certificates tzdata perl</span><br></pre></td></tr></table></figure>
-
-<h3 id="添加-GitLab-源"><a href="#添加-GitLab-源" class="headerlink" title="添加 GitLab 源"></a>添加 GitLab 源</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | <span class="built_in">sudo</span> bash</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装-GitLab-1"><a href="#安装-GitLab-1" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install gitlab-ce</span><br></pre></td></tr></table></figure>
-
-<h3 id="获取-root-用户密码"><a href="#获取-root-用户密码" class="headerlink" title="获取 root 用户密码"></a>获取 root 用户密码</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /etc/gitlab/initial_root_password</span><br></pre></td></tr></table></figure>
-
-<p><strong>注意，这个文件后面会被自动删除。因此请及时保管好该密码或者及时进行修改。</strong></p>
-<h3 id="配置-GitLab"><a href="#配置-GitLab" class="headerlink" title="配置 GitLab"></a>配置 GitLab</h3><p>如果上面几步都比较顺利，不出意外，现在应该已经在这个系统中安装好了 GitLab。接下来先进行一些简要地配置。</p>
-<p>GitLab 的配置文件是 <code>/etc/gitlab/gitlab.rb</code></p>
-<p>我家 OpenWrt 主路由在 DHCP 中设置的 <code>本地服务器</code> 和 <code>本地域名</code> 分别为 <code>/home/</code> 和 <code>home</code>，同时我也希望能通过域名访问这个 GitLab 服务器。所以我还添加了一条 <code>自定义挟持域名</code>，其中域名为 <code>git</code>，IP 地址为 R86S 分配的固定 IP（比如我家的是 <code>192.168.50.50</code>）。这样我就可以通过域名 <code>http://git.home</code> 来访问这个 GitLab 服务器了。</p>
-<p>根据以上前提，这里需要修改的几个地方</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">external_url</span> <span class="string">&#x27;http://git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;gitlab_ssh_host&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;time_zone&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;Asia/Shanghai&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;backup_path&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;/mmc&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p><code>backup_path</code> 即为 <a href="#%E5%88%9B%E5%BB%BA-GitLab-%E5%A4%87%E4%BB%BD%E4%BD%8D%E7%BD%AE">EMMC 设备的挂载点</a></p>
-<p>修改完 <code>gitlab.rb</code> 后需要重新配置 GitLab 才能生效</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
-
-<p>稍等片刻，在浏览器中打开 <span class="exturl" data-url="aHR0cDovL2dpdC5ob21lLw==">http://git.home<i class="fa fa-external-link-alt"></i></span> 就可以看到搭建好的 GitLab 了。</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>更改 macOS 强调色</title>
-    <url>/post/c59c6467.html</url>
-    <content><![CDATA[<p>Apple 在 <span class="exturl" data-url="aHR0cHM6Ly93d3cuYXBwbGUuY29tL2ltYWMtMjQ=">iMac 24”<i class="fa fa-external-link-alt"></i></span> Mac 中首次使用了新的强调色，这些强调色是这些 Mac 独有的。但是现在只要是 macOS 11.3.1 以上的系统，即使不是 iMac 24” 机器，也可以使用这些特有的强调色。</p>
-<span id="more"></span>
-
-<p>首先需要开启基于硬件的强调色 <code>NSColorSimulateHardwareAccent</code> 功能</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulateHardwareAccent -bool YES</span><br></pre></td></tr></table></figure>
-
-<p>然后通过 <code>NSColorSimulatedHardwareEnclosureNumber</code> 选择其中任意一种颜色。其中可选的颜色选项为 3 到 8 (包含 3 和 8)</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">defaults write -g NSColorSimulatedHardwareEnclosureNumber -int 3</span><br></pre></td></tr></table></figure>
-
-<p>然后重新启动电脑或者退出登录重新登录即可生效。<br>然后在 <strong>系统设置</strong> -&gt; <strong>外观选项卡</strong> -&gt; <strong>强调色</strong> 和 <strong>高亮标记颜色</strong> 选项中会出现一个 <strong>这台 Mac</strong> 的颜色选项，其中颜色即为上面设置的颜色。</p>
-<p>以下是 <code>NSColorSimulatedHardwareEnclosureNumber</code> 不同值的实际效果</p>
-<img src="https://images.zabrian.com/c5f66aed-fff8-43e1-940d-8388311a0a01/origin" title="颜色 3" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/38169874-ea75-4086-24b1-ccd6416e9701/origin" title="颜色 4" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/1683833a-7ee4-416a-5659-2a31fbe46001/origin" title="颜色 5" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/fe160cc7-b5cb-435d-374b-6cb2e744d901/origin" title="颜色 6" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/5a1dfe77-2619-435a-290f-d058a032b601/origin" title="颜色 7" style="zoom:57%;" />
-
-<img src="https://images.zabrian.com/6dcb7e11-165d-4547-1bd4-ff7e02a8c001/origin" title="颜色 8" style="zoom:57%;" />
-]]></content>
-  </entry>
-  <entry>
     <title>有点意思的 Python 系列一 数学函数和导数计算</title>
     <url>/post/e0c91e46.html</url>
     <content><![CDATA[<p>该系列旨在收集整理一些很有意思的 Python 代码，这些代码有些是通过简洁的代码实现了很牛逼的功能，有些则是通过花里胡哨的技巧代码眼花缭乱。</p>
@@ -752,9 +814,9 @@
     <title>测试加密文章</title>
     <url>/post/19c1a188.html</url>
     <content><![CDATA[<div class="encrypted-post-container" 
-     data-ciphertext="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"
-     data-iv="LMjyQyDFqJKVfmkn"
-     data-auth-tag="kxDcH9ta1BX2Xue7vaOLFQ=="
+     data-ciphertext="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"
+     data-iv="hcJFdW7/nBEw/Ayf"
+     data-auth-tag="/XoSEBhZKp55s8op/UH1KA=="
      data-key-hint="DksVBImhShNfPwBJQeCLV3UNusvTZi1A7h70AMxmyX0=">
   <div class="encrypted-post-notice">
     <button class="fido2-verify-btn" id="fido2-verify-btn">
@@ -764,67 +826,5 @@
   </div>
   <div class="decrypted-content" id="decrypted-content" style="display:none"></div>
 </div>]]></content>
-  </entry>
-  <entry>
-    <title>北京联通异地宽带办理指南</title>
-    <url>/post/de583f28.html</url>
-    <content><![CDATA[<p>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。</p>
-<ul>
-<li>1000 Mbps 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30 元</li>
-<li>500 Mbps 无合约 166 元&#x2F;月</li>
-</ul>
-<p>因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。</p>
-<span id="more"></span>
-
-<p>北京地区的异地宽带分两种</p>
-<ul>
-<li>300 Mbps 60 元&#x2F;月</li>
-<li>500 Mbps 80 元&#x2F;月</li>
-</ul>
-<img src="https://images.zabrian.com/8ec6254c-3291-42f6-69b0-2c8d53f22901/origin" title="异地宽带套餐" style="zoom:62%;" />
-
-<h1 id="办卡"><a href="#办卡" class="headerlink" title="办卡"></a>办卡</h1><p>既然是异地宽带，首先是需要一个异地手机卡。在某宝找了一个办卡，选了一个 19 块钱的套餐，反正就是能办多便宜就多便宜。19 差不多就是能在开卡的最便宜了。异地选的天津，主要就是离北京近，方便。</p>
-<p>然后记得询问一下卡是不是能正常改套餐办宽带啥的，别办物联网卡就行，要办的一定是正常的手机卡。然后配送地址写一个天津的地址，千万不能写异地，因为天津联通不能异地配送。必须要天津本地的地址。为了方便，我就直接写到了天津站。</p>
-<p>然后就是提交身份证啥的审核，当天审核通过下午显示就分配了小哥上门送卡。然后就是打电话给小哥改一下时间。毕竟当天下午已经 3 点了，还在上班咋，可能到天津取卡。</p>
-<p>然后我就约到了周六下午 3 点了。然后就是买了周六 14:09 ~ 14:42 从北京到天津的去程，15:22 ~ 15:52 从天津到北京南的返程。一共花了 100 过点。</p>
-<p>当天上车之后给小哥打了个电话，说了下是专程来办卡的，返程时间比较紧，希望能尽快到。小哥表示没问题。然后我快到站的时候小哥来电话了说他已经到了（d&#x3D;(´▽ ｀)&#x3D;b）</p>
-<p>然后就和小哥在车站里面碰上面了。拍照办卡一气呵成，全程花了不到 5 分钟。交了 500 块钱话费结束。然后返程回家。</p>
-<h1 id="改套餐"><a href="#改套餐" class="headerlink" title="改套餐"></a>改套餐</h1><p>开卡的时候选的是 19 块钱的套餐，第二天第一件事就是改到 8 元保号套餐。所以上面办卡的时候需要确认卡片套餐能否修改（有的有合约，不能修改或者得过几个月才能修改）可以直接打电话给联通，转到人工改。但是我嫌打电话麻烦，下载了联通 app，用新办的手机卡登录，右上角在线客服修改套餐到 8 元保号套餐就行。客服会告诉你会有专属经理 48h 内联系，但是我的当天下午就来电联系了，确认修改后次月就生效了。</p>
-<img src="https://images.zabrian.com/83d18cc4-1a34-43d3-043c-b63386745e01/origin" title="联系客服修改套餐" style="zoom:62%;" />
-
-<h1 id="办宽带"><a href="#办宽带" class="headerlink" title="办宽带"></a>办宽带</h1><p>这里办宽带一定要从联通 app 上办理，去营业厅是办不了这个价格的异地宽带。</p>
-<p>app 里面的位置在这里</p>
-<img src="https://images.zabrian.com/8d192054-73d8-4156-87f5-c8f5eed0fd01/origin" title="异地同享专区" style="zoom:62%;" />
-
-<p>然后选择全国一家亲异地宽带</p>
-<img src="https://images.zabrian.com/32f222f5-5e1f-4b39-5329-848898dd2f01/origin" title="全国一家亲异地宽带" style="zoom:62%;" />
-
-<p>然后进去之后选择宽带办理的城市，我这里就是北京，然后就会有能办理的类型，包括 300 Mbps 和 500 Mbps 选好之后填写下面的具体的内容，提交预约即可。</p>
-<p>然后过了几个小时就有联通的电话了，确定办理的宽带后，表示北京有一个 300 块钱的安装费。次月从话费里面扣除。确定无误后客服给我发了一个短信，里面有个链接。需要上传身份证正反面和拍摄一张免冠自拍照。然后就等着分配小哥吧。</p>
-<h1 id="上门安装"><a href="#上门安装" class="headerlink" title="上门安装"></a>上门安装</h1><p>到了预约的那天，小哥上门。确认了信息之后就开始装光猫啥的。在这个途中，因为现在北京天气已经很热了，小哥又是中午上门的。递上瓶水，拿个板凳坐会儿。要是抽烟可以再递个烟啥的。之后就开始表达自己想要公网 IP 的诉求（毕竟求人办事儿，所以前面就客气点）小哥问了个原因，我说家里有监控需要。然后小哥还拍了个监控的照片，并且还说：“现在公网 IP 不好拿，需要有明确的需求才能申请，你这个要用监控。但其实现在监控这个理由不怎么能过了。你要是有明确诉求可以给你申请。”（反正就是一边表达不好搞，但是一边还都给申请了）然后就顺便连桥接一起给办了，顺便加了一下小哥私人的微信（虽然现在一般都是要加企微，但是小哥还是给了他私人的微信）最后装好后他那走了个测速，安装 500 M 实际测速能到 650。还不错。最后记了一下宽带的密码，搞定。从上门到最后小哥走一共花了不到 10 min，外加一瓶水的钱。</p>
-<h1 id="办理上行提速"><a href="#办理上行提速" class="headerlink" title="办理上行提速"></a>办理上行提速</h1><p>500 Mbps 的宽带下行对应上行才给 30 Mbps 是真的拉跨，但是可以办理加速包: <span class="exturl" data-url="aHR0cHM6Ly93b2t1YW4uMTE0bWVuaHUuY29tLw==">沃宽<i class="fa fa-external-link-alt"></i></span></p>
-<p>用办理宽带的异地手机号登录</p>
-<img src="https://images.zabrian.com/29685c89-0b86-439b-be44-1ea181ba1601/origin" title="沃宽登陆界面" style="zoom:39%;" />
-
-<p>然后在左侧【我的宽带】中添加当前宽带</p>
-<img src="https://images.zabrian.com/214b8dce-750d-4fea-cb68-b81701392d01/origin" title="沃宽添加宽带" style="zoom:40%;" />
-
-<p>添加成功后再左侧 【我要购买】中应该可以看到一个【宽带上行提速包 100 M】这里一次最多可以购买 6 个（连续半年，到期后可以继续购买）</p>
-<img src="https://images.zabrian.com/13a412ea-2b2b-4be8-4013-821b35e6d201/origin" title="购买上行提速包" style="zoom:40%;" />
-
-<p>购买成功后，在左侧【首页】点击【点我提速】就可以了，无需重启光猫即可享受 100 Mbps 的上行速率了。</p>
-<img src="https://images.zabrian.com/1b239e28-26bc-43cd-e168-d7970cc88701/origin" title="上行提速" style="zoom:39%;" />
-
-<h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>最后算一下成本</p>
-<ul>
-<li>一次性成本：来回 100 元路费 + 装机费 300 元（唯一的坑点） &#x3D; 400 元</li>
-<li>周期性成本：每月异地号码套餐 8 元 + 宽带费用 80 元 + 上行加速包 30 元 &#x3D; 118 元</li>
-</ul>
-<p>总体还是比 500 Mbps 的融合套便宜很多的。</p>
-<p>最后附上 speedtest 和 ustc 的测速结果吧</p>
-<img src="https://images.zabrian.com/ac825486-02e6-43f8-1e06-419808a0da01/origin" title="SpeedTest 测速" style="zoom:100%;" />
-
-<img src="https://images.zabrian.com/8cb09a0c-3136-4487-8e35-a242c3ecf601/origin" title="USTC 测速" style="zoom:85%;" />
-]]></content>
   </entry>
 </search>
