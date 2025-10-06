@@ -164,8 +164,8 @@
             btn.style.display = "none";
           } catch (e) {
             let msg = "注册失败: ";
-            if (e.name === "NotAllowedError") msg += "操作取消或超时";
-            else if (e.name === "InvalidStateError") msg += "安全密钥重复注册";
+            if (e.name === "NotAllowedError") msg += "操作取消";
+            else if (e.name === "InvalidStateError") msg += "重复注册";
             else msg += e.message;
             this.show(
               `<div class="note danger"><p><i class="fa fa-times-circle"></i> ${msg}</p></div>`
