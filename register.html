@@ -59,13 +59,14 @@
         transition: all 0.3s;
       }
 
-      .register-btn:hover {
+      .register-btn:hover:not(:disabled) {
         background: #047857;
       }
 
       .register-btn:disabled {
-        opacity: 0.6;
+        opacity: 0.5;
         cursor: not-allowed;
+        background: #9ca3af;
       }
 
       .register-btn i {
@@ -163,8 +164,8 @@
       </p>
 
       <div class="salt-container">
-        <label for="prf-salt-input">PRF Salt</label>
-        <input type="text" id="prf-salt-input" />
+        <label for="prf-salt-input">PRF Salt <span style="color: #ef4444;">*</span></label>
+        <input type="text" id="prf-salt-input" placeholder="请输入 PRF Salt" required />
       </div>
 
       <button class="register-btn" id="register-btn">
@@ -182,19 +183,27 @@
 
       class FIDO2Registrar {
         constructor() {
-          const btn = document.getElementById("register-btn");
-          btn.onclick = () => this.register();
+          this.btn = document.getElementById("register-btn");
+          this.saltInput = document.getElementById("prf-salt-input");
+          
+          this.btn.onclick = () => this.register();
+          this.saltInput.addEventListener("input", () => this.validateInput());
+          this.validateInput();
+        }
+
+        validateInput() {
+          const isValid = this.saltInput.value.trim().length > 0;
+          this.btn.disabled = !isValid;
         }
 
         async register() {
-          const btn = document.getElementById("register-btn");
-          btn.disabled = true;
+          this.btn.disabled = true;
 
           if (!window.PublicKeyCredential) {
             this.show(
               '<div class="note danger"><p>浏览器不支持 FIDO2/WebAuthn</p></div>'
             );
-            btn.disabled = false;
+            this.btn.disabled = false;
             return;
           }
 
@@ -236,13 +245,13 @@
             const prfEnabled = cred.getClientExtensionResults().prf?.enabled;
             if (!prfEnabled) {
               this.show('<div class="note danger"><p>PRF 扩展不可用</p></div>');
-              btn.disabled = false;
+              this.btn.disabled = false;
               return;
             }
 
             await this.generateEncryptionKey();
 
-            btn.style.display = "none";
+            this.btn.style.display = "none";
           } catch (e) {
             let msg = "注册失败: ";
             if (e.name === "NotAllowedError") msg += "操作取消";
@@ -251,14 +260,13 @@
 
             this.show(`<div class="note danger"><p>${msg}</p></div>`);
           } finally {
-            btn.disabled = false;
+            this.btn.disabled = false;
           }
         }
 
         async generateEncryptionKey() {
           try {
-            const prfSaltInput = document.getElementById("prf-salt-input");
-            const prfSaltString = prfSaltInput.value.trim();
+            const prfSaltString = this.saltInput.value.trim();
 
             this.show(
               '<div class="note info"><p>正在生成加密密钥...</p></div>'
