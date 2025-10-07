@@ -13,6 +13,38 @@
 ]]></content>
   </entry>
   <entry>
+    <title>Cloudflare 设置引用站点策略</title>
+    <url>/post/e6a2e300.html</url>
+    <content><![CDATA[<p>前几日，把我的博客部署在 <code>Cloudflare Pages</code> 上面了。同时绑定了一个托管在 <code>Cloudflare</code> 上面的域名，到这里一切顺利。<br>但是当我兴致勃勃的打开博客的时候发现了一个问题，为什么图片全 403 了？</p>
+<span id="more"></span>
+
+<p>一开始想到了可能是我的 <code>OSS</code> 防盗链。跑去看了一下，我已经添加了对应的 <code>Referer</code> 域名。一开始还以为是添加 <code>Referer</code> 生效需要时间，于是乎过了几个小时再打开问题依旧。<br>最诡异的是，打开 <code>Cloudflare Pages</code> 默认的 <code>pages.dev</code> 域名的时候，图片就是正常的。排查了一下，然后就发现了端倪。<br>问题来自通过绑定的自定义域名访问的时候，图片请求的 Header 中没有 <code>Referer</code> 字段。众所周知，所谓的防盗链其实就是检查 <code>Referer</code> 字段是不是在白名单中。那么问题来这了，为什么 <code>pages.dev</code> 域名中请求图片有 <code>Referer</code> 但是自定义域名没有？<br>再次稍加观察发现了一个现象</p>
+<img src="https://images.zabrian.com/538e6269-12f2-4f3a-0bf1-bf030ba01501/origin" title="自定义域名" style="zoom:18%;" />
+
+<img src="https://images.zabrian.com/a95cabc7-4b98-47be-7bdb-bc59cbb46101/origin" title="pages.dev 域名" style="zoom:21%;" />
+
+<p>原因就在这里</p>
+<ul>
+<li>自定义域名的引用站点策略为 <code>same-origin</code></li>
+<li>pages.dev 域名的引用站点策略为 <code>strict-origin-when-cross-origin</code></li>
+</ul>
+<p>就是因为浏览器的 <strong>同源策略(Same-Origin Policy)</strong> 因此自定义域名的请求图片的时候未带上 <code>Referer</code><br>既然问题知道了，就可以解决了：只需要修改一下自定义域名的请求头就行了。  </p>
+<ol>
+<li>打开 Cloudflare 控制台，选择对应的域名</li>
+<li>侧边栏选择 <strong>规则</strong> → <strong>创建规则</strong> → <strong>响应头转换规则</strong></li>
+<li>选择 <strong>向响应添加静态标头</strong> 模板</li>
+<li>选择 <strong>自定义筛选表达式</strong></li>
+<li>编辑表达式 <code>(http.request.full_uri wildcard &quot;https://这里填写你自己的域名/*&quot;)</code></li>
+<li>规则 <strong>添加静态响应头</strong><ul>
+<li><code>cross-origin-resource-policy = cross-origin</code></li>
+<li><code>referrer-policy = strict-origin-when-cross-origin</code></li>
+</ul>
+</li>
+</ol>
+<p>这样就可以了，此时再访问自定义域名，发现图片就正常携带了 <code>Referer</code></p>
+]]></content>
+  </entry>
+  <entry>
     <title>Cloudflare 使用 Workers 建立 Images 代理</title>
     <url>/post/ec93b507.html</url>
     <content><![CDATA[<p>最早这个博客是托管在 GitHub pages 上的，绑定的域名是在阿里云注册的，几个月前偶然一次机会，在 Cloudflare 上注册了一个自己喜欢的域名。于是就也通过 Cloudflare pages 托管了相同的 GitHub pages 仓库，因此目前使用 <span class="exturl" data-url="aHR0cHM6Ly9ibG9nLnphYnJpYW4uY29tLw==">Cloudflare pages<i class="fa fa-external-link-alt"></i></span> 或者 <a href="https://blog.zebedy.com/">GitHub pages</a> 均可访问，内容都来自同一个 GitHub repo</p>
@@ -45,47 +77,6 @@
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="keyword">async</span> <span class="title function_">fetch</span>(<span class="params">request, env</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (request.<span class="property">method</span> !== <span class="string">&quot;GET&quot;</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Method Not Allowed&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">405</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> url = <span class="keyword">new</span> <span class="title function_">URL</span>(request.<span class="property">url</span>);</span><br><span class="line">    <span class="keyword">const</span> path = <span class="built_in">decodeURIComponent</span>(url.<span class="property">pathname</span>.<span class="title function_">slice</span>(<span class="number">1</span>));</span><br><span class="line">    <span class="keyword">if</span> (!path) <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Not Found&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">404</span> &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> cacheKey = <span class="keyword">new</span> <span class="title class_">Request</span>(<span class="string">`<span class="subst">$&#123;url.origin&#125;</span><span class="subst">$&#123;url.pathname&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> cached = <span class="keyword">await</span> caches.<span class="property">default</span>.<span class="title function_">match</span>(cacheKey);</span><br><span class="line">      <span class="keyword">if</span> (cached) <span class="keyword">return</span> cached;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> file = <span class="keyword">await</span> env.<span class="property">IMAGES</span>.<span class="title function_">get</span>(path); <span class="comment">// IMAGES 为后续步骤中绑定的名称，可自行修改</span></span><br><span class="line">      <span class="keyword">if</span> (!file) <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Not Found&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">404</span> &#125;);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> response = <span class="keyword">new</span> <span class="title class_">Response</span>(file.<span class="property">body</span>, &#123;</span><br><span class="line">        <span class="attr">headers</span>: &#123;</span><br><span class="line">          <span class="string">&quot;Content-Type&quot;</span>: file.<span class="property">httpMetadata</span>?.<span class="property">contentType</span> || <span class="string">&quot;application/octet-stream&quot;</span>,</span><br><span class="line">          <span class="string">&quot;Cache-Control&quot;</span>: <span class="string">&quot;public, max-age=21600&quot;</span>, <span class="comment">// 缓存时间 6 小时，可自行修改</span></span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">await</span> caches.<span class="property">default</span>.<span class="title function_">put</span>(cacheKey, response.<span class="title function_">clone</span>());</span><br><span class="line">      <span class="keyword">return</span> response;</span><br><span class="line">    &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;Server Error&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">500</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>然后在 Workers 绑定处添加绑定上面创建的 <code>R2 Bucket</code>，名称只需要与 Workers 代码中的名称一致即可。</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>Garmin 国行码表使用 OSM 地图</title>
-    <url>/post/16e3b020.html</url>
-    <content><![CDATA[<p>国行的 Garmin 码表下载并安装 <code>OSM China</code> 地图作为骑行地图。<br>数据来源 <span class="exturl" data-url="aHR0cHM6Ly9hbHRlcm5hdGl2YXNsaWJyZXMub3JnL2VuL2Rvd25sb2Fkcy5waHAjQXNpYQ==">alternativaslibres<i class="fa fa-external-link-alt"></i></span> 并添加了必要的元数据。</p>
-<span id="more"></span>
-<h1 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h1><p>点击下方按钮，并将下载好的 <code>img</code> 文件复制到佳明码表 <code>Garmin/Maps/</code> 然后在码表地图中禁用自带的所有地图即可使用。</p>
-<a class="btn" href="https://9lnk.io/gJHF" title="点击下载 2025-10-04"><i class="fa fa-download"></i>点击下载 2025-10-04</a>
-]]></content>
-  </entry>
-  <entry>
-    <title>Cloudflare 设置引用站点策略</title>
-    <url>/post/e6a2e300.html</url>
-    <content><![CDATA[<p>前几日，把我的博客部署在 <code>Cloudflare Pages</code> 上面了。同时绑定了一个托管在 <code>Cloudflare</code> 上面的域名，到这里一切顺利。<br>但是当我兴致勃勃的打开博客的时候发现了一个问题，为什么图片全 403 了？</p>
-<span id="more"></span>
-
-<p>一开始想到了可能是我的 <code>OSS</code> 防盗链。跑去看了一下，我已经添加了对应的 <code>Referer</code> 域名。一开始还以为是添加 <code>Referer</code> 生效需要时间，于是乎过了几个小时再打开问题依旧。<br>最诡异的是，打开 <code>Cloudflare Pages</code> 默认的 <code>pages.dev</code> 域名的时候，图片就是正常的。排查了一下，然后就发现了端倪。<br>问题来自通过绑定的自定义域名访问的时候，图片请求的 Header 中没有 <code>Referer</code> 字段。众所周知，所谓的防盗链其实就是检查 <code>Referer</code> 字段是不是在白名单中。那么问题来这了，为什么 <code>pages.dev</code> 域名中请求图片有 <code>Referer</code> 但是自定义域名没有？<br>再次稍加观察发现了一个现象</p>
-<img src="https://images.zabrian.com/538e6269-12f2-4f3a-0bf1-bf030ba01501/origin" title="自定义域名" style="zoom:18%;" />
-
-<img src="https://images.zabrian.com/a95cabc7-4b98-47be-7bdb-bc59cbb46101/origin" title="pages.dev 域名" style="zoom:21%;" />
-
-<p>原因就在这里</p>
-<ul>
-<li>自定义域名的引用站点策略为 <code>same-origin</code></li>
-<li>pages.dev 域名的引用站点策略为 <code>strict-origin-when-cross-origin</code></li>
-</ul>
-<p>就是因为浏览器的 <strong>同源策略(Same-Origin Policy)</strong> 因此自定义域名的请求图片的时候未带上 <code>Referer</code><br>既然问题知道了，就可以解决了：只需要修改一下自定义域名的请求头就行了。  </p>
-<ol>
-<li>打开 Cloudflare 控制台，选择对应的域名</li>
-<li>侧边栏选择 <strong>规则</strong> → <strong>创建规则</strong> → <strong>响应头转换规则</strong></li>
-<li>选择 <strong>向响应添加静态标头</strong> 模板</li>
-<li>选择 <strong>自定义筛选表达式</strong></li>
-<li>编辑表达式 <code>(http.request.full_uri wildcard &quot;https://这里填写你自己的域名/*&quot;)</code></li>
-<li>规则 <strong>添加静态响应头</strong><ul>
-<li><code>cross-origin-resource-policy = cross-origin</code></li>
-<li><code>referrer-policy = strict-origin-when-cross-origin</code></li>
-</ul>
-</li>
-</ol>
-<p>这样就可以了，此时再访问自定义域名，发现图片就正常携带了 <code>Referer</code></p>
 ]]></content>
   </entry>
   <entry>
@@ -172,6 +163,15 @@
 ]]></content>
   </entry>
   <entry>
+    <title>Garmin 国行码表使用 OSM 地图</title>
+    <url>/post/16e3b020.html</url>
+    <content><![CDATA[<p>国行的 Garmin 码表下载并安装 <code>OSM China</code> 地图作为骑行地图。<br>数据来源 <span class="exturl" data-url="aHR0cHM6Ly9hbHRlcm5hdGl2YXNsaWJyZXMub3JnL2VuL2Rvd25sb2Fkcy5waHAjQXNpYQ==">alternativaslibres<i class="fa fa-external-link-alt"></i></span> 并添加了必要的元数据。</p>
+<span id="more"></span>
+<h1 id="下载链接"><a href="#下载链接" class="headerlink" title="下载链接"></a>下载链接</h1><p>点击下方按钮，并将下载好的 <code>img</code> 文件复制到佳明码表 <code>Garmin/Maps/</code> 然后在码表地图中禁用自带的所有地图即可使用。</p>
+<a class="btn" href="https://9lnk.io/gJHF" title="点击下载 2025-10-04"><i class="fa fa-download"></i>点击下载 2025-10-04</a>
+]]></content>
+  </entry>
+  <entry>
     <title>Hexo 静态博客使用 Cloudflare Turnstile</title>
     <url>/post/50a431e6.html</url>
     <content><![CDATA[<p>在 <a href="/post/ec93b507.html" title="Cloudflare 使用 Workers 建立 Images 代理">Cloudflare 使用 Workers 建立 Images 代理</a> 一文中。使用 Workers 搭建了一个 Images 代理，通过设置 <code>Referer</code> 和 URL 签名有效期实现简易的防盗链以及防刷流量。但是这些措施只能做到防君子不防小人，其实很轻易的就可以通过代码自动实现刷图片流量。为了避免这种情况，想着能不能使用 <code>Cloudflare Turnstile</code> 阻挡非人类请求的流量。但是研究了一下发现 <code>Cloudflare Turnstile</code> 需要 <strong><span class="exturl" data-url="aHR0cHM6Ly9kZXZlbG9wZXJzLmNsb3VkZmxhcmUuY29tL3R1cm5zdGlsZS9nZXQtc3RhcnRlZC9zZXJ2ZXItc2lkZS12YWxpZGF0aW9uLw==">服务端代码验证<i class="fa fa-external-link-alt"></i></span></strong> 但是很显然，<code>Hexo</code> 这种纯静态博客没有后端服务，所以思索了一下决定还是使用 Workers 实现一个支持静态网页的 <code>Cloudflare Turnstile</code> 方案。</p>
@@ -188,100 +188,6 @@
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 配置常量</span></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">CONFIG</span> = &#123;</span><br><span class="line">  <span class="attr">BLOG_SOURCE</span>: <span class="string">&quot;https://source.example.com&quot;</span>, <span class="comment">// 静态页面源站 URL，自行修改</span></span><br><span class="line">  <span class="attr">TURNSTILE_URL</span>: <span class="string">&quot;https://challenges.cloudflare.com/turnstile/v0/siteverify&quot;</span>, <span class="comment">// Turnstile 验证地址</span></span><br><span class="line">  <span class="attr">TURNSTILE_SITEKEY</span>: <span class="string">&quot;&quot;</span>, <span class="comment">// Turnstile 站点密钥，根据实际修改</span></span><br><span class="line">  <span class="attr">TURNSTILE_SECRET</span>: <span class="string">&quot;&quot;</span>, <span class="comment">// Turnstile 密钥，根据实际修改</span></span><br><span class="line">  <span class="attr">JWT_SECRET</span>: <span class="string">&quot;&quot;</span>, <span class="comment">// JWT 密钥，可通过命令生成 openssl rand -base64 48</span></span><br><span class="line">  <span class="attr">COOKIE_NAME</span>: <span class="string">&quot;&quot;</span>, <span class="comment">// 注入的 JWT Token cookie 名字，可自定义</span></span><br><span class="line">  <span class="attr">COOKIE_EXPIRE</span>: <span class="number">3600</span>, <span class="comment">// Turnstile 有效期 1 小时，可自定义</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 生成 JWT token</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">generateToken</span>(<span class="params">payload</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> header = &#123; <span class="attr">alg</span>: <span class="string">&quot;HS256&quot;</span>, <span class="attr">typ</span>: <span class="string">&quot;JWT&quot;</span> &#125;;</span><br><span class="line">  <span class="keyword">const</span> encodedHeader = <span class="title function_">btoa</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(header)).<span class="title function_">replace</span>(<span class="regexp">/=/g</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">  <span class="keyword">const</span> encodedPayload = <span class="title function_">btoa</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(payload)).<span class="title function_">replace</span>(<span class="regexp">/=/g</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> data = <span class="string">`<span class="subst">$&#123;encodedHeader&#125;</span>.<span class="subst">$&#123;encodedPayload&#125;</span>`</span>;</span><br><span class="line">  <span class="keyword">const</span> encoder = <span class="keyword">new</span> <span class="title class_">TextEncoder</span>();</span><br><span class="line">  <span class="keyword">const</span> key = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">importKey</span>(</span><br><span class="line">    <span class="string">&quot;raw&quot;</span>,</span><br><span class="line">    encoder.<span class="title function_">encode</span>(<span class="variable constant_">CONFIG</span>.<span class="property">JWT_SECRET</span>),</span><br><span class="line">    &#123; <span class="attr">name</span>: <span class="string">&quot;HMAC&quot;</span>, <span class="attr">hash</span>: <span class="string">&quot;SHA-256&quot;</span> &#125;,</span><br><span class="line">    <span class="literal">false</span>,</span><br><span class="line">    [<span class="string">&quot;sign&quot;</span>]</span><br><span class="line">  );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> signature = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">sign</span>(<span class="string">&quot;HMAC&quot;</span>, key, encoder.<span class="title function_">encode</span>(data));</span><br><span class="line">  <span class="keyword">const</span> encodedSignature = <span class="title function_">btoa</span>(</span><br><span class="line">    <span class="title class_">String</span>.<span class="title function_">fromCharCode</span>(...<span class="keyword">new</span> <span class="title class_">Uint8Array</span>(signature))</span><br><span class="line">  ).<span class="title function_">replace</span>(<span class="regexp">/=/g</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="string">`<span class="subst">$&#123;data&#125;</span>.<span class="subst">$&#123;encodedSignature&#125;</span>`</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 验证 JWT token</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">verifyToken</span>(<span class="params">token</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`JWT Token 获取: <span class="subst">$&#123;token&#125;</span>`</span>);</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> parts = token.<span class="title function_">split</span>(<span class="string">&quot;.&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (parts.<span class="property">length</span> !== <span class="number">3</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> [header, payload, signature] = parts;</span><br><span class="line">    <span class="keyword">const</span> data = <span class="string">`<span class="subst">$&#123;header&#125;</span>.<span class="subst">$&#123;payload&#125;</span>`</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> encoder = <span class="keyword">new</span> <span class="title class_">TextEncoder</span>();</span><br><span class="line">    <span class="keyword">const</span> key = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">importKey</span>(</span><br><span class="line">      <span class="string">&quot;raw&quot;</span>,</span><br><span class="line">      encoder.<span class="title function_">encode</span>(<span class="variable constant_">CONFIG</span>.<span class="property">JWT_SECRET</span>),</span><br><span class="line">      &#123; <span class="attr">name</span>: <span class="string">&quot;HMAC&quot;</span>, <span class="attr">hash</span>: <span class="string">&quot;SHA-256&quot;</span> &#125;,</span><br><span class="line">      <span class="literal">false</span>,</span><br><span class="line">      [<span class="string">&quot;verify&quot;</span>]</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> expectedSignature = <span class="title class_">Uint8Array</span>.<span class="title function_">from</span>(</span><br><span class="line">      <span class="title function_">atob</span>(signature + <span class="string">&quot;===&quot;</span>.<span class="title function_">substring</span>(<span class="number">0</span>, (<span class="number">4</span> - (signature.<span class="property">length</span> % <span class="number">4</span>)) % <span class="number">4</span>)),</span><br><span class="line">      <span class="function">(<span class="params">c</span>) =&gt;</span> c.<span class="title function_">charCodeAt</span>(<span class="number">0</span>)</span><br><span class="line">    );</span><br><span class="line">    <span class="keyword">const</span> isValid = <span class="keyword">await</span> crypto.<span class="property">subtle</span>.<span class="title function_">verify</span>(</span><br><span class="line">      <span class="string">&quot;HMAC&quot;</span>,</span><br><span class="line">      key,</span><br><span class="line">      expectedSignature,</span><br><span class="line">      encoder.<span class="title function_">encode</span>(data)</span><br><span class="line">    );</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`JWT Token 有效: <span class="subst">$&#123;isValid&#125;</span>`</span>);</span><br><span class="line">    <span class="keyword">if</span> (!isValid) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> decodedPayload = <span class="title class_">JSON</span>.<span class="title function_">parse</span>(</span><br><span class="line">      <span class="title function_">atob</span>(payload + <span class="string">&quot;===&quot;</span>.<span class="title function_">substring</span>(<span class="number">0</span>, (<span class="number">4</span> - (payload.<span class="property">length</span> % <span class="number">4</span>)) % <span class="number">4</span>))</span><br><span class="line">    );</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`JWT Token 解码: <span class="subst">$&#123;<span class="built_in">JSON</span>.stringify(decodedPayload)&#125;</span>`</span>);</span><br><span class="line">    <span class="keyword">const</span> isExpired = decodedPayload.<span class="property">exp</span> &gt; <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Date</span>.<span class="title function_">now</span>() / <span class="number">1000</span>);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`JWT Token 过期: <span class="subst">$&#123;!isExpired&#125;</span>`</span>);</span><br><span class="line">    <span class="keyword">return</span> isExpired;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`JWT Token 失败: <span class="subst">$&#123;e&#125;</span>`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Turnstile HTML 页面</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getTurnstileHTML</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="string">&lt;html lang=&quot;zh-CN&quot;&gt;</span></span><br><span class="line"><span class="string">&lt;head&gt;</span></span><br><span class="line"><span class="string">  &lt;meta charset=&quot;utf-8&quot;&gt;</span></span><br><span class="line"><span class="string">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;</span></span><br><span class="line"><span class="string">  &lt;title&gt;安全验证 - Zabrian&#x27;s Blog&lt;/title&gt;</span></span><br><span class="line"><span class="string">  &lt;script src=&quot;https://challenges.cloudflare.com/turnstile/v0/api.js&quot; async defer&gt;&lt;/script&gt;</span></span><br><span class="line"><span class="string">  &lt;style&gt;</span></span><br><span class="line"><span class="string">    body &#123; font-family: -apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; padding: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; &#125;</span></span><br><span class="line"><span class="string">    .container &#123; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 40px; width: 400px; min-height: 300px; text-align: center; box-sizing: border-box; &#125;</span></span><br><span class="line"><span class="string">    .logo &#123; font-size: 24px; font-weight: bold; color: #333; margin-bottom: 24px; &#125;</span></span><br><span class="line"><span class="string">    .title &#123; color: #333; margin-bottom: 16px; font-size: 18px; font-weight: 500; &#125;</span></span><br><span class="line"><span class="string">    .description &#123; color: #666; margin-bottom: 24px; font-size: 14px; line-height: 1.5; &#125;</span></span><br><span class="line"><span class="string">    .turnstile-container &#123; display: flex; justify-content: center; align-items: center; margin: 20px 0; min-height: 65px; width: 100%; &#125;</span></span><br><span class="line"><span class="string">    .cf-turnstile &#123; margin: 0 auto; &#125;</span></span><br><span class="line"><span class="string">  &lt;/style&gt;</span></span><br><span class="line"><span class="string">&lt;/head&gt;</span></span><br><span class="line"><span class="string">&lt;body&gt;</span></span><br><span class="line"><span class="string">  &lt;div class=&quot;container&quot;&gt;</span></span><br><span class="line"><span class="string">    &lt;div class=&quot;logo&quot;&gt;Zabrian&#x27;s Blog&lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;h2 class=&quot;title&quot;&gt;安全验证&lt;/h2&gt;</span></span><br><span class="line"><span class="string">    &lt;p class=&quot;description&quot;&gt;请完成以下验证后继续访问&lt;/p&gt;</span></span><br><span class="line"><span class="string">    &lt;form method=&quot;POST&quot;&gt;</span></span><br><span class="line"><span class="string">      &lt;div class=&quot;turnstile-container&quot;&gt;</span></span><br><span class="line"><span class="string">        &lt;div class=&quot;cf-turnstile&quot; data-sitekey=&quot;<span class="subst">$&#123;CONFIG.TURNSTILE_SITEKEY&#125;</span>&quot; data-callback=&quot;onSuccess&quot;&gt;&lt;/div&gt;</span></span><br><span class="line"><span class="string">      &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;/form&gt;</span></span><br><span class="line"><span class="string">  &lt;/div&gt;</span></span><br><span class="line"><span class="string">  &lt;script&gt;function onSuccess()&#123;document.querySelector(&#x27;form&#x27;).submit();&#125;&lt;/script&gt;</span></span><br><span class="line"><span class="string">&lt;/body&gt;</span></span><br><span class="line"><span class="string">&lt;/html&gt;`</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 验证 Turnstile Response</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">verifyTurnstile</span>(<span class="params">response, remoteip</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Turnstile 质询: <span class="subst">$&#123;remoteip&#125;</span>`</span>);</span><br><span class="line">  <span class="keyword">let</span> formData = <span class="keyword">new</span> <span class="title class_">FormData</span>();</span><br><span class="line">  formData.<span class="title function_">append</span>(<span class="string">&quot;secret&quot;</span>, <span class="variable constant_">CONFIG</span>.<span class="property">TURNSTILE_SECRET</span>);</span><br><span class="line">  formData.<span class="title function_">append</span>(<span class="string">&quot;response&quot;</span>, response);</span><br><span class="line">  formData.<span class="title function_">append</span>(<span class="string">&quot;remoteip&quot;</span>, remoteip);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> verifyResponse = <span class="keyword">await</span> <span class="title function_">fetch</span>(<span class="variable constant_">CONFIG</span>.<span class="property">TURNSTILE_URL</span>, &#123;</span><br><span class="line">    <span class="attr">method</span>: <span class="string">&quot;POST&quot;</span>,</span><br><span class="line">    <span class="attr">body</span>: formData,</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">const</span> result = <span class="keyword">await</span> verifyResponse.<span class="title function_">json</span>();</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Turnstile 结果: <span class="subst">$&#123;<span class="built_in">JSON</span>.stringify(result)&#125;</span>`</span>);</span><br><span class="line">  <span class="keyword">return</span> result.<span class="property">success</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 检查是否已通过 JWT 验证</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">isVerifiedToken</span>(<span class="params">request</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> cookie = request.<span class="property">headers</span>.<span class="title function_">get</span>(<span class="string">&quot;Cookie&quot;</span>) || <span class="string">&quot;&quot;</span>;</span><br><span class="line">  <span class="keyword">const</span> match = cookie.<span class="title function_">match</span>(<span class="keyword">new</span> <span class="title class_">RegExp</span>(<span class="variable constant_">CONFIG</span>.<span class="property">COOKIE_NAME</span> + <span class="string">&quot;=([^;]+)&quot;</span>));</span><br><span class="line">  <span class="keyword">if</span> (!match) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> token = match[<span class="number">1</span>];</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">await</span> <span class="title function_">verifyToken</span>(token);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置验证成功的 Cookie</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">setSuccessResponse</span>(<span class="params">targetPath</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> payload = &#123;</span><br><span class="line">    <span class="attr">verified</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">iat</span>: <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Date</span>.<span class="title function_">now</span>() / <span class="number">1000</span>),</span><br><span class="line">    <span class="attr">exp</span>: <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Date</span>.<span class="title function_">now</span>() / <span class="number">1000</span>) + <span class="variable constant_">CONFIG</span>.<span class="property">COOKIE_EXPIRE</span>,</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> token = <span class="keyword">await</span> <span class="title function_">generateToken</span>(payload);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Cookie 设置: <span class="subst">$&#123;token&#125;</span>`</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;&quot;</span>, &#123;</span><br><span class="line">    <span class="attr">status</span>: <span class="number">302</span>,</span><br><span class="line">    <span class="attr">headers</span>: &#123;</span><br><span class="line">      <span class="title class_">Location</span>: targetPath,</span><br><span class="line">      <span class="string">&quot;Set-Cookie&quot;</span>: <span class="string">`<span class="subst">$&#123;CONFIG.COOKIE_NAME&#125;</span>=<span class="subst">$&#123;token&#125;</span>; Path=/; Max-Age=<span class="subst">$&#123;CONFIG.COOKIE_EXPIRE&#125;</span>; HttpOnly; SameSite=Lax; Secure`</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="keyword">async</span> <span class="title function_">fetch</span>(<span class="params">request, env, ctx</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> url = <span class="keyword">new</span> <span class="title function_">URL</span>(request.<span class="property">url</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查是否已验证</span></span><br><span class="line">    <span class="keyword">if</span> (!(<span class="keyword">await</span> <span class="title function_">isVerifiedToken</span>(request))) &#123;</span><br><span class="line">      <span class="comment">// 处理质询请求</span></span><br><span class="line">      <span class="keyword">if</span> (request.<span class="property">method</span> === <span class="string">&quot;POST&quot;</span>) &#123;</span><br><span class="line">        <span class="keyword">const</span> formData = <span class="keyword">await</span> request.<span class="title function_">formData</span>();</span><br><span class="line">        <span class="keyword">const</span> remoteip = request.<span class="property">headers</span>.<span class="title function_">get</span>(<span class="string">&quot;CF-Connecting-IP&quot;</span>);</span><br><span class="line">        <span class="keyword">const</span> response = formData.<span class="title function_">get</span>(<span class="string">&quot;cf-turnstile-response&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">await</span> <span class="title function_">verifyTurnstile</span>(response, remoteip)) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">await</span> <span class="title function_">setSuccessResponse</span>(url.<span class="property">pathname</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="string">&quot;验证失败&quot;</span>, &#123; <span class="attr">status</span>: <span class="number">403</span> &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 显示验证页面</span></span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;跳转 Turnstile 页面&quot;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="title function_">getTurnstileHTML</span>(), &#123;</span><br><span class="line">        <span class="attr">headers</span>: &#123; <span class="string">&quot;content-type&quot;</span>: <span class="string">&quot;text/html; charset=utf-8&quot;</span> &#125;,</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 代理到源站</span></span><br><span class="line">    <span class="keyword">const</span> target = <span class="variable constant_">CONFIG</span>.<span class="property">BLOG_SOURCE</span> + url.<span class="property">pathname</span> + url.<span class="property">search</span>;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`代理源站: <span class="subst">$&#123;target&#125;</span>`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">fetch</span>(target, request);</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>至此，就实现了通过访问 <code>blog.example.com</code> 显示一个验证页面的效果。<br><img src="https://images.zabrian.com/028c5ff7-7939-4fd4-dc38-3de8f13f4801/origin" title="Turnstile 验证页面" style="zoom:100%;" /><br>验证通过后即可访问静态页面，同时可以通过修改代码中的 <code>COOKIE_EXPIRE</code> 自行调整验证间隔时间。通过这种方式，源站点的 URL 不暴露，只通过代理站点的 URL 访问，即可实现定期通过 <code>Cloudflare Turnstile</code> 避免大量机器流量。</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>NexT 主题高级标签插件</title>
-    <url>/post/daa7f9d2.html</url>
-    <content><![CDATA[<p>Hexo NexT 主题提供了一系列的高级的标签插件，可以简单的实现一些复杂的功能。</p>
-<span id="more"></span>
-
-<h1 id="按钮-Button"><a href="#按钮-Button" class="headerlink" title="按钮 Button"></a>按钮 Button</h1><h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% button url, text, icon [class], [title] %&#125;</span><br><span class="line">&#123;% btn url, text, icon [class], [title] %&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>url</code>: 绝对或相对路径的 URL</li>
-<li><code>text</code>: 按钮文本。如果未指定图标，则为必填项</li>
-<li><code>icon</code>: <span class="exturl" data-url="aHR0cHM6Ly9mb250YXdlc29tZS5jb20vdjQvaWNvbnM=">FontAwesome<i class="fa fa-external-link-alt"></i></span> 图标。如果未指定文本，则为必填项</li>
-<li><code>[class]</code>: 可选参数; 默认 <code>fa-fw</code>; 可选: <code>fa-fw</code> | <code>fa-lg</code> | <code>fa-2x</code> | <code>fa-3x</code> | <code>fa-4x</code> | <code>fa-5x</code></li>
-<li><code>[title]</code>: 可选参数; 鼠标悬停时提示</li>
-</ul>
-<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% button #, 按钮文本 %&#125;</span><br></pre></td></tr></table></figure>
-<a class="btn" href="#">按钮文本</a>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% btn #, 按钮文本 %&#125; &#123;% btn #, 按钮文本 &amp; 按钮标题,, 按钮标题 %&#125;</span><br></pre></td></tr></table></figure>
-<a class="btn" href="#">按钮文本</a> <a class="btn" href="#" title="按钮标题">按钮文本 & 按钮标题</a>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% btn #,, home %&#125;</span><br><span class="line">&#123;% btn #,, home fa-lg %&#125;</span><br><span class="line">&#123;% btn #,, home fa-2x %&#125;</span><br><span class="line">&#123;% btn #,, home fa-3x %&#125;</span><br><span class="line">&#123;% btn #,, home fa-4x %&#125;</span><br><span class="line">&#123;% btn #,, home fa-5x %&#125;</span><br></pre></td></tr></table></figure>
-<a class="btn" href="#"><i class="fa fa-home"></i></a>
-<a class="btn" href="#"><i class="fa fa-home fa-lg"></i></a>
-<a class="btn" href="#"><i class="fa fa-home fa-2x"></i></a>
-<a class="btn" href="#"><i class="fa fa-home fa-3x"></i></a>
-<a class="btn" href="#"><i class="fa fa-home fa-4x"></i></a>
-<a class="btn" href="#"><i class="fa fa-home fa-5x"></i></a>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% btn #, 按钮文本, home %&#125;</span><br></pre></td></tr></table></figure>
-<a class="btn" href="#"><i class="fa fa-home"></i>按钮文本</a>
-
-<h1 id="笔记-Note"><a href="#笔记-Note" class="headerlink" title="笔记 Note"></a>笔记 Note</h1><h2 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h2><figure class="highlight yml"><figcaption><span>NexT _config.yml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># Note tag (bootstrap callout)</span></span><br><span class="line"><span class="attr">note:</span></span><br><span class="line">  <span class="comment"># Note tag style values:</span></span><br><span class="line">  <span class="comment">#  - simple    bootstrap callout old alert style. Default.</span></span><br><span class="line">  <span class="comment">#  - modern    bootstrap callout new (v2-v3) alert style.</span></span><br><span class="line">  <span class="comment">#  - flat      flat callout style with background, like on Mozilla or StackOverflow.</span></span><br><span class="line">  <span class="comment">#  - disabled  disable all CSS styles import of note tag.</span></span><br><span class="line">  <span class="attr">style:</span> <span class="string">modern</span></span><br><span class="line">  <span class="attr">icons:</span> <span class="literal">false</span></span><br><span class="line">  <span class="comment"># Offset lighter of background in % for modern and flat styles (modern: -12 | 12; flat: -18 | 6).</span></span><br><span class="line">  <span class="comment"># Offset also applied to label tag variables. This option can work with disabled note tag.</span></span><br><span class="line">  <span class="attr">light_bg_offset:</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="用法-1"><a href="#用法-1" class="headerlink" title="用法"></a>用法</h2><figure class="highlight jinja"><table><tr><td class="code"><pre><span class="line"><span class="template-tag">&#123;% <span class="name">note</span> [class] [no-icon] [summary] %&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">笔记内容</span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;% <span class="name">endnote</span> %&#125;</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>[class]</code>: 可选参数; 默认 <code>default</code>; 可选: <code>default</code> | <code>primary</code> | <code>success</code> | <code>info</code> | <code>warning</code> | <code>danger</code></li>
-<li><code>[no-icon]</code>: 可选参数; 禁用 icon</li>
-<li><code>[summary]</code>: 可选参数; 笔记摘要</li>
-</ul>
-<h2 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h2><div class="note default"><p>default 样例</p>
-</div>
-<div class="note primary"><p>primary 样例</p>
-</div>
-<div class="note success"><p>success 样例</p>
-</div>
-<div class="note info"><p>info 样例</p>
-</div>
-<div class="note warning"><p>warning 样例</p>
-</div>
-<div class="note danger"><p>danger 样例</p>
-</div>
-
-<h1 id="标签页-Tabs"><a href="#标签页-Tabs" class="headerlink" title="标签页 Tabs"></a>标签页 Tabs</h1><h2 id="设置-1"><a href="#设置-1" class="headerlink" title="设置"></a>设置</h2><figure class="highlight yml"><figcaption><span>NexT _config.yml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># Tabs tag</span></span><br><span class="line"><span class="attr">tabs:</span></span><br><span class="line">  <span class="comment"># Make the nav bar of tabs with long content stick to the top.</span></span><br><span class="line">  <span class="attr">sticky:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">transition:</span></span><br><span class="line">    <span class="attr">tabs:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">labels:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="用法-2"><a href="#用法-2" class="headerlink" title="用法"></a>用法</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% tabs Unique name, [index] %&#125;</span><br><span class="line">  &lt;!-- tab [Tab caption] [@icon] --&gt;</span><br><span class="line">  标签页内容</span><br><span class="line">  &lt;!-- endtab --&gt;</span><br><span class="line">&#123;% endtabs %&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>Unique name</code>: 当前页面下唯一名称</li>
-<li><code>[index]</code>: 活动标签页索引</li>
-<li><code>[Tab caption]</code>: 标签页标题</li>
-<li><code>[@icon]</code>: <span class="exturl" data-url="aHR0cHM6Ly9mb250YXdlc29tZS5jb20vdjQvaWNvbnM=">FontAwesome<i class="fa fa-external-link-alt"></i></span> 图标</li>
-</ul>
-<h2 id="例子-2"><a href="#例子-2" class="headerlink" title="例子"></a>例子</h2><div class="tabs" id="标签页"><ul class="nav-tabs"><li class="tab active"><a href="#标签页-1"><i class="fa fa-table"></i>表格</a></li><li class="tab"><a href="#标签页-2"><i class="fa fa-code"></i>代码块</a></li><li class="tab"><a href="#标签页-3"><i class="fa fa-camera"></i>图片</a></li></ul><div class="tab-content"><div class="tab-pane active" id="标签页-1"><table>
-<thead>
-<tr>
-<th align="left">左对齐列</th>
-<th align="right">右对齐列</th>
-<th align="center">居中列</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">11</td>
-<td align="right">12</td>
-<td align="center">13</td>
-</tr>
-<tr>
-<td align="left">21</td>
-<td align="right">22</td>
-<td align="center">23</td>
-</tr>
-<tr>
-<td align="left">31</td>
-<td align="right">32</td>
-<td align="center">33</td>
-</tr>
-</tbody></table></div><div class="tab-pane" id="标签页-2"><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">def</span> <span class="title function_">fib</span>(<span class="params">n</span>):</span><br><span class="line">    a,b = <span class="number">1</span>,<span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n-<span class="number">1</span>):</span><br><span class="line">        a,b = b,a+b</span><br><span class="line">    <span class="keyword">return</span> a</span><br></pre></td></tr></table></figure></div><div class="tab-pane" id="标签页-3"><p>  <img src="https://images.zabrian.com/e9347cac-bb91-4e23-392c-536d7ae0b401/origin"></p></div></div></div>
-
-<h1 id="文本标签-Label"><a href="#文本标签-Label" class="headerlink" title="文本标签 Label"></a>文本标签 Label</h1><h2 id="用法-3"><a href="#用法-3" class="headerlink" title="用法"></a>用法</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% label [class]@text %&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>[class]</code>: 可选参数; 默认 <code>default</code>; 可选: <code>default</code> | <code>primary</code> | <code>success</code> | <code>info</code> | <code>warning</code> | <code>danger</code></li>
-<li><code>text</code>: 标签文本</li>
-</ul>
-<h2 id="例子-3"><a href="#例子-3" class="headerlink" title="例子"></a>例子</h2><p>曲曲折折的荷塘上面，弥望旳是田田的叶子。叶子出水很高，像<mark class="label default">亭亭旳舞女旳裙</mark>。<br>层层的叶子中间，零星地点缀着些白花，有袅娜地开着旳，有羞涩地打着朵儿旳；正如<mark class="label primary">一粒粒的明珠</mark>，又如<mark class="label success">碧天里的星星</mark>，又如<mark class="label info">刚出浴的美人</mark>。<br>微风过处，送来缕缕清香，<mark class="label warning">仿佛远处高楼上渺茫的歌声似的</mark>。这时候叶子与花也有一丝的颤动，像闪电般，霎时传过荷塘的那边去了。<br>叶子本是肩并肩密密地挨着，这便宛然有了一道<mark class="label danger">凝碧的波痕</mark>。叶子底下是脉脉的流水，遮住了，不能见一些颜色；而叶子却更见风致了。</p>
 ]]></content>
   </entry>
   <entry>
@@ -383,65 +289,97 @@
 ]]></content>
   </entry>
   <entry>
-    <title>北京联通异地宽带办理指南</title>
-    <url>/post/de583f28.html</url>
-    <content><![CDATA[<p>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。</p>
-<ul>
-<li>1000 Mbps 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30 元</li>
-<li>500 Mbps 无合约 166 元&#x2F;月</li>
-</ul>
-<p>因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。</p>
+    <title>NexT 主题高级标签插件</title>
+    <url>/post/daa7f9d2.html</url>
+    <content><![CDATA[<p>Hexo NexT 主题提供了一系列的高级的标签插件，可以简单的实现一些复杂的功能。</p>
 <span id="more"></span>
 
-<p>北京地区的异地宽带分两种</p>
+<h1 id="按钮-Button"><a href="#按钮-Button" class="headerlink" title="按钮 Button"></a>按钮 Button</h1><h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% button url, text, icon [class], [title] %&#125;</span><br><span class="line">&#123;% btn url, text, icon [class], [title] %&#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li>300 Mbps 60 元&#x2F;月</li>
-<li>500 Mbps 80 元&#x2F;月</li>
+<li><code>url</code>: 绝对或相对路径的 URL</li>
+<li><code>text</code>: 按钮文本。如果未指定图标，则为必填项</li>
+<li><code>icon</code>: <span class="exturl" data-url="aHR0cHM6Ly9mb250YXdlc29tZS5jb20vdjQvaWNvbnM=">FontAwesome<i class="fa fa-external-link-alt"></i></span> 图标。如果未指定文本，则为必填项</li>
+<li><code>[class]</code>: 可选参数; 默认 <code>fa-fw</code>; 可选: <code>fa-fw</code> | <code>fa-lg</code> | <code>fa-2x</code> | <code>fa-3x</code> | <code>fa-4x</code> | <code>fa-5x</code></li>
+<li><code>[title]</code>: 可选参数; 鼠标悬停时提示</li>
 </ul>
-<img src="https://images.zabrian.com/8ec6254c-3291-42f6-69b0-2c8d53f22901/origin" title="异地宽带套餐" style="zoom:62%;" />
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% button #, 按钮文本 %&#125;</span><br></pre></td></tr></table></figure>
+<a class="btn" href="#">按钮文本</a>
 
-<h1 id="办卡"><a href="#办卡" class="headerlink" title="办卡"></a>办卡</h1><p>既然是异地宽带，首先是需要一个异地手机卡。在某宝找了一个办卡，选了一个 19 块钱的套餐，反正就是能办多便宜就多便宜。19 差不多就是能在开卡的最便宜了。异地选的天津，主要就是离北京近，方便。</p>
-<p>然后记得询问一下卡是不是能正常改套餐办宽带啥的，别办物联网卡就行，要办的一定是正常的手机卡。然后配送地址写一个天津的地址，千万不能写异地，因为天津联通不能异地配送。必须要天津本地的地址。为了方便，我就直接写到了天津站。</p>
-<p>然后就是提交身份证啥的审核，当天审核通过下午显示就分配了小哥上门送卡。然后就是打电话给小哥改一下时间。毕竟当天下午已经 3 点了，还在上班咋，可能到天津取卡。</p>
-<p>然后我就约到了周六下午 3 点了。然后就是买了周六 14:09 ~ 14:42 从北京到天津的去程，15:22 ~ 15:52 从天津到北京南的返程。一共花了 100 过点。</p>
-<p>当天上车之后给小哥打了个电话，说了下是专程来办卡的，返程时间比较紧，希望能尽快到。小哥表示没问题。然后我快到站的时候小哥来电话了说他已经到了（d&#x3D;(´▽ ｀)&#x3D;b）</p>
-<p>然后就和小哥在车站里面碰上面了。拍照办卡一气呵成，全程花了不到 5 分钟。交了 500 块钱话费结束。然后返程回家。</p>
-<h1 id="改套餐"><a href="#改套餐" class="headerlink" title="改套餐"></a>改套餐</h1><p>开卡的时候选的是 19 块钱的套餐，第二天第一件事就是改到 8 元保号套餐。所以上面办卡的时候需要确认卡片套餐能否修改（有的有合约，不能修改或者得过几个月才能修改）可以直接打电话给联通，转到人工改。但是我嫌打电话麻烦，下载了联通 app，用新办的手机卡登录，右上角在线客服修改套餐到 8 元保号套餐就行。客服会告诉你会有专属经理 48h 内联系，但是我的当天下午就来电联系了，确认修改后次月就生效了。</p>
-<img src="https://images.zabrian.com/83d18cc4-1a34-43d3-043c-b63386745e01/origin" title="联系客服修改套餐" style="zoom:62%;" />
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% btn #, 按钮文本 %&#125; &#123;% btn #, 按钮文本 &amp; 按钮标题,, 按钮标题 %&#125;</span><br></pre></td></tr></table></figure>
+<a class="btn" href="#">按钮文本</a> <a class="btn" href="#" title="按钮标题">按钮文本 & 按钮标题</a>
 
-<h1 id="办宽带"><a href="#办宽带" class="headerlink" title="办宽带"></a>办宽带</h1><p>这里办宽带一定要从联通 app 上办理，去营业厅是办不了这个价格的异地宽带。</p>
-<p>app 里面的位置在这里</p>
-<img src="https://images.zabrian.com/8d192054-73d8-4156-87f5-c8f5eed0fd01/origin" title="异地同享专区" style="zoom:62%;" />
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% btn #,, home %&#125;</span><br><span class="line">&#123;% btn #,, home fa-lg %&#125;</span><br><span class="line">&#123;% btn #,, home fa-2x %&#125;</span><br><span class="line">&#123;% btn #,, home fa-3x %&#125;</span><br><span class="line">&#123;% btn #,, home fa-4x %&#125;</span><br><span class="line">&#123;% btn #,, home fa-5x %&#125;</span><br></pre></td></tr></table></figure>
+<a class="btn" href="#"><i class="fa fa-home"></i></a>
+<a class="btn" href="#"><i class="fa fa-home fa-lg"></i></a>
+<a class="btn" href="#"><i class="fa fa-home fa-2x"></i></a>
+<a class="btn" href="#"><i class="fa fa-home fa-3x"></i></a>
+<a class="btn" href="#"><i class="fa fa-home fa-4x"></i></a>
+<a class="btn" href="#"><i class="fa fa-home fa-5x"></i></a>
 
-<p>然后选择全国一家亲异地宽带</p>
-<img src="https://images.zabrian.com/32f222f5-5e1f-4b39-5329-848898dd2f01/origin" title="全国一家亲异地宽带" style="zoom:62%;" />
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% btn #, 按钮文本, home %&#125;</span><br></pre></td></tr></table></figure>
+<a class="btn" href="#"><i class="fa fa-home"></i>按钮文本</a>
 
-<p>然后进去之后选择宽带办理的城市，我这里就是北京，然后就会有能办理的类型，包括 300 Mbps 和 500 Mbps 选好之后填写下面的具体的内容，提交预约即可。</p>
-<p>然后过了几个小时就有联通的电话了，确定办理的宽带后，表示北京有一个 300 块钱的安装费。次月从话费里面扣除。确定无误后客服给我发了一个短信，里面有个链接。需要上传身份证正反面和拍摄一张免冠自拍照。然后就等着分配小哥吧。</p>
-<h1 id="上门安装"><a href="#上门安装" class="headerlink" title="上门安装"></a>上门安装</h1><p>到了预约的那天，小哥上门。确认了信息之后就开始装光猫啥的。在这个途中，因为现在北京天气已经很热了，小哥又是中午上门的。递上瓶水，拿个板凳坐会儿。要是抽烟可以再递个烟啥的。之后就开始表达自己想要公网 IP 的诉求（毕竟求人办事儿，所以前面就客气点）小哥问了个原因，我说家里有监控需要。然后小哥还拍了个监控的照片，并且还说：“现在公网 IP 不好拿，需要有明确的需求才能申请，你这个要用监控。但其实现在监控这个理由不怎么能过了。你要是有明确诉求可以给你申请。”（反正就是一边表达不好搞，但是一边还都给申请了）然后就顺便连桥接一起给办了，顺便加了一下小哥私人的微信（虽然现在一般都是要加企微，但是小哥还是给了他私人的微信）最后装好后他那走了个测速，安装 500 M 实际测速能到 650。还不错。最后记了一下宽带的密码，搞定。从上门到最后小哥走一共花了不到 10 min，外加一瓶水的钱。</p>
-<h1 id="办理上行提速"><a href="#办理上行提速" class="headerlink" title="办理上行提速"></a>办理上行提速</h1><p>500 Mbps 的宽带下行对应上行才给 30 Mbps 是真的拉跨，但是可以办理加速包: <span class="exturl" data-url="aHR0cHM6Ly93b2t1YW4uMTE0bWVuaHUuY29tLw==">沃宽<i class="fa fa-external-link-alt"></i></span></p>
-<p>用办理宽带的异地手机号登录</p>
-<img src="https://images.zabrian.com/29685c89-0b86-439b-be44-1ea181ba1601/origin" title="沃宽登陆界面" style="zoom:39%;" />
+<h1 id="笔记-Note"><a href="#笔记-Note" class="headerlink" title="笔记 Note"></a>笔记 Note</h1><h2 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h2><figure class="highlight yml"><figcaption><span>NexT _config.yml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># Note tag (bootstrap callout)</span></span><br><span class="line"><span class="attr">note:</span></span><br><span class="line">  <span class="comment"># Note tag style values:</span></span><br><span class="line">  <span class="comment">#  - simple    bootstrap callout old alert style. Default.</span></span><br><span class="line">  <span class="comment">#  - modern    bootstrap callout new (v2-v3) alert style.</span></span><br><span class="line">  <span class="comment">#  - flat      flat callout style with background, like on Mozilla or StackOverflow.</span></span><br><span class="line">  <span class="comment">#  - disabled  disable all CSS styles import of note tag.</span></span><br><span class="line">  <span class="attr">style:</span> <span class="string">modern</span></span><br><span class="line">  <span class="attr">icons:</span> <span class="literal">false</span></span><br><span class="line">  <span class="comment"># Offset lighter of background in % for modern and flat styles (modern: -12 | 12; flat: -18 | 6).</span></span><br><span class="line">  <span class="comment"># Offset also applied to label tag variables. This option can work with disabled note tag.</span></span><br><span class="line">  <span class="attr">light_bg_offset:</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
 
-<p>然后在左侧【我的宽带】中添加当前宽带</p>
-<img src="https://images.zabrian.com/214b8dce-750d-4fea-cb68-b81701392d01/origin" title="沃宽添加宽带" style="zoom:40%;" />
-
-<p>添加成功后再左侧 【我要购买】中应该可以看到一个【宽带上行提速包 100 M】这里一次最多可以购买 6 个（连续半年，到期后可以继续购买）</p>
-<img src="https://images.zabrian.com/13a412ea-2b2b-4be8-4013-821b35e6d201/origin" title="购买上行提速包" style="zoom:40%;" />
-
-<p>购买成功后，在左侧【首页】点击【点我提速】就可以了，无需重启光猫即可享受 100 Mbps 的上行速率了。</p>
-<img src="https://images.zabrian.com/1b239e28-26bc-43cd-e168-d7970cc88701/origin" title="上行提速" style="zoom:39%;" />
-
-<h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>最后算一下成本</p>
+<h2 id="用法-1"><a href="#用法-1" class="headerlink" title="用法"></a>用法</h2><figure class="highlight jinja"><table><tr><td class="code"><pre><span class="line"><span class="template-tag">&#123;% <span class="name">note</span> [class] [no-icon] [summary] %&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">笔记内容</span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;% <span class="name">endnote</span> %&#125;</span></span><br></pre></td></tr></table></figure>
 <ul>
-<li>一次性成本：来回 100 元路费 + 装机费 300 元（唯一的坑点） &#x3D; 400 元</li>
-<li>周期性成本：每月异地号码套餐 8 元 + 宽带费用 80 元 + 上行加速包 30 元 &#x3D; 118 元</li>
+<li><code>[class]</code>: 可选参数; 默认 <code>default</code>; 可选: <code>default</code> | <code>primary</code> | <code>success</code> | <code>info</code> | <code>warning</code> | <code>danger</code></li>
+<li><code>[no-icon]</code>: 可选参数; 禁用 icon</li>
+<li><code>[summary]</code>: 可选参数; 笔记摘要</li>
 </ul>
-<p>总体还是比 500 Mbps 的融合套便宜很多的。</p>
-<p>最后附上 speedtest 和 ustc 的测速结果吧</p>
-<img src="https://images.zabrian.com/ac825486-02e6-43f8-1e06-419808a0da01/origin" title="SpeedTest 测速" style="zoom:100%;" />
+<h2 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h2><div class="note default"><p>default 样例</p>
+</div>
+<div class="note primary"><p>primary 样例</p>
+</div>
+<div class="note success"><p>success 样例</p>
+</div>
+<div class="note info"><p>info 样例</p>
+</div>
+<div class="note warning"><p>warning 样例</p>
+</div>
+<div class="note danger"><p>danger 样例</p>
+</div>
 
-<img src="https://images.zabrian.com/8cb09a0c-3136-4487-8e35-a242c3ecf601/origin" title="USTC 测速" style="zoom:85%;" />
+<h1 id="标签页-Tabs"><a href="#标签页-Tabs" class="headerlink" title="标签页 Tabs"></a>标签页 Tabs</h1><h2 id="设置-1"><a href="#设置-1" class="headerlink" title="设置"></a>设置</h2><figure class="highlight yml"><figcaption><span>NexT _config.yml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># Tabs tag</span></span><br><span class="line"><span class="attr">tabs:</span></span><br><span class="line">  <span class="comment"># Make the nav bar of tabs with long content stick to the top.</span></span><br><span class="line">  <span class="attr">sticky:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">transition:</span></span><br><span class="line">    <span class="attr">tabs:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">labels:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="用法-2"><a href="#用法-2" class="headerlink" title="用法"></a>用法</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% tabs Unique name, [index] %&#125;</span><br><span class="line">  &lt;!-- tab [Tab caption] [@icon] --&gt;</span><br><span class="line">  标签页内容</span><br><span class="line">  &lt;!-- endtab --&gt;</span><br><span class="line">&#123;% endtabs %&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>Unique name</code>: 当前页面下唯一名称</li>
+<li><code>[index]</code>: 活动标签页索引</li>
+<li><code>[Tab caption]</code>: 标签页标题</li>
+<li><code>[@icon]</code>: <span class="exturl" data-url="aHR0cHM6Ly9mb250YXdlc29tZS5jb20vdjQvaWNvbnM=">FontAwesome<i class="fa fa-external-link-alt"></i></span> 图标</li>
+</ul>
+<h2 id="例子-2"><a href="#例子-2" class="headerlink" title="例子"></a>例子</h2><div class="tabs" id="标签页"><ul class="nav-tabs"><li class="tab active"><a href="#标签页-1"><i class="fa fa-table"></i>表格</a></li><li class="tab"><a href="#标签页-2"><i class="fa fa-code"></i>代码块</a></li><li class="tab"><a href="#标签页-3"><i class="fa fa-camera"></i>图片</a></li></ul><div class="tab-content"><div class="tab-pane active" id="标签页-1"><table>
+<thead>
+<tr>
+<th align="left">左对齐列</th>
+<th align="right">右对齐列</th>
+<th align="center">居中列</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">11</td>
+<td align="right">12</td>
+<td align="center">13</td>
+</tr>
+<tr>
+<td align="left">21</td>
+<td align="right">22</td>
+<td align="center">23</td>
+</tr>
+<tr>
+<td align="left">31</td>
+<td align="right">32</td>
+<td align="center">33</td>
+</tr>
+</tbody></table></div><div class="tab-pane" id="标签页-2"><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">def</span> <span class="title function_">fib</span>(<span class="params">n</span>):</span><br><span class="line">    a,b = <span class="number">1</span>,<span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n-<span class="number">1</span>):</span><br><span class="line">        a,b = b,a+b</span><br><span class="line">    <span class="keyword">return</span> a</span><br></pre></td></tr></table></figure></div><div class="tab-pane" id="标签页-3"><p>  <img src="https://images.zabrian.com/e9347cac-bb91-4e23-392c-536d7ae0b401/origin"></p></div></div></div>
+
+<h1 id="文本标签-Label"><a href="#文本标签-Label" class="headerlink" title="文本标签 Label"></a>文本标签 Label</h1><h2 id="用法-3"><a href="#用法-3" class="headerlink" title="用法"></a>用法</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% label [class]@text %&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>[class]</code>: 可选参数; 默认 <code>default</code>; 可选: <code>default</code> | <code>primary</code> | <code>success</code> | <code>info</code> | <code>warning</code> | <code>danger</code></li>
+<li><code>text</code>: 标签文本</li>
+</ul>
+<h2 id="例子-3"><a href="#例子-3" class="headerlink" title="例子"></a>例子</h2><p>曲曲折折的荷塘上面，弥望旳是田田的叶子。叶子出水很高，像<mark class="label default">亭亭旳舞女旳裙</mark>。<br>层层的叶子中间，零星地点缀着些白花，有袅娜地开着旳，有羞涩地打着朵儿旳；正如<mark class="label primary">一粒粒的明珠</mark>，又如<mark class="label success">碧天里的星星</mark>，又如<mark class="label info">刚出浴的美人</mark>。<br>微风过处，送来缕缕清香，<mark class="label warning">仿佛远处高楼上渺茫的歌声似的</mark>。这时候叶子与花也有一丝的颤动，像闪电般，霎时传过荷塘的那边去了。<br>叶子本是肩并肩密密地挨着，这便宛然有了一道<mark class="label danger">凝碧的波痕</mark>。叶子底下是脉脉的流水，遮住了，不能见一些颜色；而叶子却更见风致了。</p>
 ]]></content>
   </entry>
   <entry>
@@ -614,6 +552,65 @@
 ]]></content>
   </entry>
   <entry>
+    <title>搭建家庭私人 GitLab 服务器</title>
+    <url>/post/8d4f8799.html</url>
+    <content><![CDATA[<p>大概今年（2022）一月中旬的时候入手了一个 <span class="exturl" data-url="aHR0cHM6Ly9yODZzLm5ldC8=">R86S<i class="fa fa-external-link-alt"></i></span> 的小主机。因为错过了众筹的车，所以是直接下的单。最后入手了 16G 的黑色千兆版本。不上万兆一个原因是家里没有这个需求，还有一个就是万兆版的没有 NVME 硬盘位，这一点对我还是刚需。</p>
+<span id="more"></span>
+
+<p>最后用了差不多一周的时间，终于在年前，这个心心念的小主机到手了。<br>有关这个小主机我就不多做介绍了，今天主要是介绍一下我怎么用它在我的家庭环境搭建一个私人的 GitLab。这篇文章从我为什么要搭建家庭私人 GitLab 以及如何搭建。都会都做一个比较详细的介绍。</p>
+<h1 id="初衷"><a href="#初衷" class="headerlink" title="初衷"></a>初衷</h1><p>家里是有一个 J4125 的软路由，去年很早就买了。一直在我家作为主路由负责拨号和科学上网的功能，用的 OpenWrt 也是我自己配置和 GitHub Action 编译的，也满足了我家的基本需求。而且也因为是物理机直装，再加上害怕 J4125 玩起来怕性能不够，再影响了正常的网络。所以也就不想再折腾他了，就让他安安心心做我家的路由器就好了。</p>
+<p>但与此同时呢，作为一个爱折腾的程序员，身边的很多不管是硬件还是软件的小玩意儿都是有特别的需求的。</p>
+<p>就比如去年（2021）年买的一个 <span class="exturl" data-url="aHR0cHM6Ly9kcm9wLmNvbS9idXkvc3RhY2stb3ZlcmZsb3ctdGhlLWtleS1tYWNyb3BhZA==">STACK OVERFLOW THE KEY MACROPAD<i class="fa fa-external-link-alt"></i></span> 键盘，配上从淘宝买的键帽，因为使用 QMK 的键盘方案，所以可以定制固件。现在已经成为了我的专用密码输入器。但是问题来了，因为我现在还尝试看他还有没别的好玩的东西，所以我需要对这个键盘固件的代码不断进行修改、编译、刷入，然后再尝试修改、编译、刷入。这样的操作重复起来会让人很繁琐，但是因为固件中存在一些敏感代码（比如我的各种密码）所以不方便托管到 GitHub。所以之前我就在想要是能有一个私人的 Git 多好。除了代码的托管，如果还可以加入 CI&#x2F;CD 这种持续集成的能力，就可以解放很多无谓的重复的劳动。而能同时满足这个需求的让我想到的第一个解决方案就是 GitLab 了。</p>
+<p>除了上面说的那个键盘固件，还有比如说我的 Rime（鼠须管）的配置文件，因为词库中有很多的自定义词，以及还有人名通讯地址之类的敏感词，所以也是不方便把这个配置直接托管在 GitHub 上的。</p>
+<p>还有现在看到的这个博客，用 Hexo 生成的 GitHub Pages 静态页面，博客本身的代码我不想放到 GitHub 上，所以这时候的我也需要一个私人的 GitLab。除了能实现代码的托管，还能顺便利用 GitLab CI 实现一键发布，每次只要提交了代码，稍等片刻 GitHub Pages 就自动部署好了。</p>
+<h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>上面说了那么多。现在有了 R86S 这样一个性能跟得上的小主机，在东西到货的第二天，就开始了他的折腾之路。</p>
+<h2 id="安装硬件"><a href="#安装硬件" class="headerlink" title="安装硬件"></a>安装硬件</h2><p>因为这个 R86S 只带了一个电源，内置的一个 EMMC 容量只有 128G 且性能堪忧。所以第一步是安装一个自己的 NVME 固态。记得之前有一块买多了的吃灰三星 980 Pro 500G，都没有开封。之前还差点给挂到海鲜市场出掉，现在终于派上用场了。<br>安装好硬盘然后找一个网线，连接好路由器的 LAN 口和 R86S 的随便一个网口。连接好键盘鼠标，就可以插上电源自动上电开机了。</p>
+<h2 id="安装系统"><a href="#安装系统" class="headerlink" title="安装系统"></a>安装系统</h2><p>既然是是要做小型服务器，哪有用桌面操作系统的。所以这里就选择了 <span class="exturl" data-url="aHR0cHM6Ly91YnVudHUuY29tL2Rvd25sb2FkL3NlcnZlcg==">Ubuntu Server 20.04.3 LTS<i class="fa fa-external-link-alt"></i></span>。下载完镜像后，写入到 U 盘。然后就可以通过 U 盘 启动就可以进安装环节了。<br>安装系统有几个点需要注意一下</p>
+<ol>
+<li><p>分配 IP 地址的方式</p>
+<p>在进行网络配置的时候，既可以通过 DHCP 动态分配 IP，也可以手动指定。如果是 DHCP 分配，则后续需要到路由器中绑定一下 Mac 地址和 IP，毕竟我们在内网访问也是需要有一个内网的固定 IP。通过手动指定 IP 地址，要注意不要和现有分配的的地址冲突。手动指定 IP 就不需要后续到路由器绑定 Mac 地址和 IP 了。</p>
+</li>
+<li><p>选择安装硬盘</p>
+<p>因为主板上带一个 EMMC，所以在选择硬盘的时候记得选自己安装的 NVME SSD 上，而且调整根目录大小调整为剩余 SSD 所由空间。否则根目录默认只划分了 100G，后面进入系统后还需要手动扩容。</p>
+</li>
+<li><p>安装后修改网络配置</p>
+<p>安装完系统后重新启动有可能会出现日志 <code>A start job is running for wait for network to be configured.</code> 导致需要很长时间才能进入系统。这时候需要等进到系统后修改网络配置文件</p>
+<p><code>/etc/netplan/00-installer-config.yaml</code>（文件名 <code>00-installer-config.yaml</code> 不固定，但是文件名类似的一个 <code>yaml</code> 文件)</p>
+<p>在每一个设备下面添加 <code>optional: true</code></p>
+<p>最后的配置应该类似</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">network:</span></span><br><span class="line">  <span class="attr">ethernets:</span></span><br><span class="line">    <span class="attr">enp1s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp2s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp3s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>然后应用更改</p>
+<figure class="highlight coq"><table><tr><td class="code"><pre><span class="line">netplan <span class="built_in">apply</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="创建-GitLab-备份位置"><a href="#创建-GitLab-备份位置" class="headerlink" title="创建 GitLab 备份位置"></a>创建 GitLab 备份位置</h2><p>上面说到了，这个 R86S 自带一个 128G 的 EMMC 存储，虽然性能比较差，但是东西不能浪费了。所以这里我拿来作为一个独立的 GitLab 数据备份存储，即使是主硬盘挂了，还有一份独立的备份存在，而且短时间内 128G 还是够用的。</p>
+<h3 id="创建新的硬盘分区"><a href="#创建新的硬盘分区" class="headerlink" title="创建新的硬盘分区"></a>创建新的硬盘分区</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> cfdisk /dev/mmcblk0        <span class="comment"># mmcblk0 是 EMMC 设备</span></span><br><span class="line"><span class="built_in">sudo</span> mkfs.ext4 /dev/mmcblk0     <span class="comment"># 格式化为 ext4</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="挂载到-mmc"><a href="#挂载到-mmc" class="headerlink" title="挂载到 &#x2F;mmc"></a>挂载到 &#x2F;mmc</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/fstab</span><br><span class="line"><span class="comment"># 添加一行</span></span><br><span class="line">/dev/mmcblk0 /mmc ext4 defaults 0 0</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装-GitLab"><a href="#安装-GitLab" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h2><h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install -y curl openssh-server ca-certificates tzdata perl</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加-GitLab-源"><a href="#添加-GitLab-源" class="headerlink" title="添加 GitLab 源"></a>添加 GitLab 源</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | <span class="built_in">sudo</span> bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-GitLab-1"><a href="#安装-GitLab-1" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install gitlab-ce</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取-root-用户密码"><a href="#获取-root-用户密码" class="headerlink" title="获取 root 用户密码"></a>获取 root 用户密码</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /etc/gitlab/initial_root_password</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意，这个文件后面会被自动删除。因此请及时保管好该密码或者及时进行修改。</strong></p>
+<h3 id="配置-GitLab"><a href="#配置-GitLab" class="headerlink" title="配置 GitLab"></a>配置 GitLab</h3><p>如果上面几步都比较顺利，不出意外，现在应该已经在这个系统中安装好了 GitLab。接下来先进行一些简要地配置。</p>
+<p>GitLab 的配置文件是 <code>/etc/gitlab/gitlab.rb</code></p>
+<p>我家 OpenWrt 主路由在 DHCP 中设置的 <code>本地服务器</code> 和 <code>本地域名</code> 分别为 <code>/home/</code> 和 <code>home</code>，同时我也希望能通过域名访问这个 GitLab 服务器。所以我还添加了一条 <code>自定义挟持域名</code>，其中域名为 <code>git</code>，IP 地址为 R86S 分配的固定 IP（比如我家的是 <code>192.168.50.50</code>）。这样我就可以通过域名 <code>http://git.home</code> 来访问这个 GitLab 服务器了。</p>
+<p>根据以上前提，这里需要修改的几个地方</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">external_url</span> <span class="string">&#x27;http://git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;gitlab_ssh_host&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;time_zone&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;Asia/Shanghai&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;backup_path&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;/mmc&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>backup_path</code> 即为 <a href="#%E5%88%9B%E5%BB%BA-GitLab-%E5%A4%87%E4%BB%BD%E4%BD%8D%E7%BD%AE">EMMC 设备的挂载点</a></p>
+<p>修改完 <code>gitlab.rb</code> 后需要重新配置 GitLab 才能生效</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
+
+<p>稍等片刻，在浏览器中打开 <span class="exturl" data-url="aHR0cDovL2dpdC5ob21lLw==">http://git.home<i class="fa fa-external-link-alt"></i></span> 就可以看到搭建好的 GitLab 了。</p>
+]]></content>
+  </entry>
+  <entry>
     <title>更改 macOS 强调色</title>
     <url>/post/c59c6467.html</url>
     <content><![CDATA[<p>Apple 在 <span class="exturl" data-url="aHR0cHM6Ly93d3cuYXBwbGUuY29tL2ltYWMtMjQ=">iMac 24”<i class="fa fa-external-link-alt"></i></span> Mac 中首次使用了新的强调色，这些强调色是这些 Mac 独有的。但是现在只要是 macOS 11.3.1 以上的系统，即使不是 iMac 24” 机器，也可以使用这些特有的强调色。</p>
@@ -715,65 +712,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>搭建家庭私人 GitLab 服务器</title>
-    <url>/post/8d4f8799.html</url>
-    <content><![CDATA[<p>大概今年（2022）一月中旬的时候入手了一个 <span class="exturl" data-url="aHR0cHM6Ly9yODZzLm5ldC8=">R86S<i class="fa fa-external-link-alt"></i></span> 的小主机。因为错过了众筹的车，所以是直接下的单。最后入手了 16G 的黑色千兆版本。不上万兆一个原因是家里没有这个需求，还有一个就是万兆版的没有 NVME 硬盘位，这一点对我还是刚需。</p>
-<span id="more"></span>
-
-<p>最后用了差不多一周的时间，终于在年前，这个心心念的小主机到手了。<br>有关这个小主机我就不多做介绍了，今天主要是介绍一下我怎么用它在我的家庭环境搭建一个私人的 GitLab。这篇文章从我为什么要搭建家庭私人 GitLab 以及如何搭建。都会都做一个比较详细的介绍。</p>
-<h1 id="初衷"><a href="#初衷" class="headerlink" title="初衷"></a>初衷</h1><p>家里是有一个 J4125 的软路由，去年很早就买了。一直在我家作为主路由负责拨号和科学上网的功能，用的 OpenWrt 也是我自己配置和 GitHub Action 编译的，也满足了我家的基本需求。而且也因为是物理机直装，再加上害怕 J4125 玩起来怕性能不够，再影响了正常的网络。所以也就不想再折腾他了，就让他安安心心做我家的路由器就好了。</p>
-<p>但与此同时呢，作为一个爱折腾的程序员，身边的很多不管是硬件还是软件的小玩意儿都是有特别的需求的。</p>
-<p>就比如去年（2021）年买的一个 <span class="exturl" data-url="aHR0cHM6Ly9kcm9wLmNvbS9idXkvc3RhY2stb3ZlcmZsb3ctdGhlLWtleS1tYWNyb3BhZA==">STACK OVERFLOW THE KEY MACROPAD<i class="fa fa-external-link-alt"></i></span> 键盘，配上从淘宝买的键帽，因为使用 QMK 的键盘方案，所以可以定制固件。现在已经成为了我的专用密码输入器。但是问题来了，因为我现在还尝试看他还有没别的好玩的东西，所以我需要对这个键盘固件的代码不断进行修改、编译、刷入，然后再尝试修改、编译、刷入。这样的操作重复起来会让人很繁琐，但是因为固件中存在一些敏感代码（比如我的各种密码）所以不方便托管到 GitHub。所以之前我就在想要是能有一个私人的 Git 多好。除了代码的托管，如果还可以加入 CI&#x2F;CD 这种持续集成的能力，就可以解放很多无谓的重复的劳动。而能同时满足这个需求的让我想到的第一个解决方案就是 GitLab 了。</p>
-<p>除了上面说的那个键盘固件，还有比如说我的 Rime（鼠须管）的配置文件，因为词库中有很多的自定义词，以及还有人名通讯地址之类的敏感词，所以也是不方便把这个配置直接托管在 GitHub 上的。</p>
-<p>还有现在看到的这个博客，用 Hexo 生成的 GitHub Pages 静态页面，博客本身的代码我不想放到 GitHub 上，所以这时候的我也需要一个私人的 GitLab。除了能实现代码的托管，还能顺便利用 GitLab CI 实现一键发布，每次只要提交了代码，稍等片刻 GitHub Pages 就自动部署好了。</p>
-<h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>上面说了那么多。现在有了 R86S 这样一个性能跟得上的小主机，在东西到货的第二天，就开始了他的折腾之路。</p>
-<h2 id="安装硬件"><a href="#安装硬件" class="headerlink" title="安装硬件"></a>安装硬件</h2><p>因为这个 R86S 只带了一个电源，内置的一个 EMMC 容量只有 128G 且性能堪忧。所以第一步是安装一个自己的 NVME 固态。记得之前有一块买多了的吃灰三星 980 Pro 500G，都没有开封。之前还差点给挂到海鲜市场出掉，现在终于派上用场了。<br>安装好硬盘然后找一个网线，连接好路由器的 LAN 口和 R86S 的随便一个网口。连接好键盘鼠标，就可以插上电源自动上电开机了。</p>
-<h2 id="安装系统"><a href="#安装系统" class="headerlink" title="安装系统"></a>安装系统</h2><p>既然是是要做小型服务器，哪有用桌面操作系统的。所以这里就选择了 <span class="exturl" data-url="aHR0cHM6Ly91YnVudHUuY29tL2Rvd25sb2FkL3NlcnZlcg==">Ubuntu Server 20.04.3 LTS<i class="fa fa-external-link-alt"></i></span>。下载完镜像后，写入到 U 盘。然后就可以通过 U 盘 启动就可以进安装环节了。<br>安装系统有几个点需要注意一下</p>
-<ol>
-<li><p>分配 IP 地址的方式</p>
-<p>在进行网络配置的时候，既可以通过 DHCP 动态分配 IP，也可以手动指定。如果是 DHCP 分配，则后续需要到路由器中绑定一下 Mac 地址和 IP，毕竟我们在内网访问也是需要有一个内网的固定 IP。通过手动指定 IP 地址，要注意不要和现有分配的的地址冲突。手动指定 IP 就不需要后续到路由器绑定 Mac 地址和 IP 了。</p>
-</li>
-<li><p>选择安装硬盘</p>
-<p>因为主板上带一个 EMMC，所以在选择硬盘的时候记得选自己安装的 NVME SSD 上，而且调整根目录大小调整为剩余 SSD 所由空间。否则根目录默认只划分了 100G，后面进入系统后还需要手动扩容。</p>
-</li>
-<li><p>安装后修改网络配置</p>
-<p>安装完系统后重新启动有可能会出现日志 <code>A start job is running for wait for network to be configured.</code> 导致需要很长时间才能进入系统。这时候需要等进到系统后修改网络配置文件</p>
-<p><code>/etc/netplan/00-installer-config.yaml</code>（文件名 <code>00-installer-config.yaml</code> 不固定，但是文件名类似的一个 <code>yaml</code> 文件)</p>
-<p>在每一个设备下面添加 <code>optional: true</code></p>
-<p>最后的配置应该类似</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">network:</span></span><br><span class="line">  <span class="attr">ethernets:</span></span><br><span class="line">    <span class="attr">enp1s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp2s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp3s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
-
-<p>然后应用更改</p>
-<figure class="highlight coq"><table><tr><td class="code"><pre><span class="line">netplan <span class="built_in">apply</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="创建-GitLab-备份位置"><a href="#创建-GitLab-备份位置" class="headerlink" title="创建 GitLab 备份位置"></a>创建 GitLab 备份位置</h2><p>上面说到了，这个 R86S 自带一个 128G 的 EMMC 存储，虽然性能比较差，但是东西不能浪费了。所以这里我拿来作为一个独立的 GitLab 数据备份存储，即使是主硬盘挂了，还有一份独立的备份存在，而且短时间内 128G 还是够用的。</p>
-<h3 id="创建新的硬盘分区"><a href="#创建新的硬盘分区" class="headerlink" title="创建新的硬盘分区"></a>创建新的硬盘分区</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> cfdisk /dev/mmcblk0        <span class="comment"># mmcblk0 是 EMMC 设备</span></span><br><span class="line"><span class="built_in">sudo</span> mkfs.ext4 /dev/mmcblk0     <span class="comment"># 格式化为 ext4</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="挂载到-mmc"><a href="#挂载到-mmc" class="headerlink" title="挂载到 &#x2F;mmc"></a>挂载到 &#x2F;mmc</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/fstab</span><br><span class="line"><span class="comment"># 添加一行</span></span><br><span class="line">/dev/mmcblk0 /mmc ext4 defaults 0 0</span><br></pre></td></tr></table></figure>
-
-<h2 id="安装-GitLab"><a href="#安装-GitLab" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h2><h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install -y curl openssh-server ca-certificates tzdata perl</span><br></pre></td></tr></table></figure>
-
-<h3 id="添加-GitLab-源"><a href="#添加-GitLab-源" class="headerlink" title="添加 GitLab 源"></a>添加 GitLab 源</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | <span class="built_in">sudo</span> bash</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装-GitLab-1"><a href="#安装-GitLab-1" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install gitlab-ce</span><br></pre></td></tr></table></figure>
-
-<h3 id="获取-root-用户密码"><a href="#获取-root-用户密码" class="headerlink" title="获取 root 用户密码"></a>获取 root 用户密码</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /etc/gitlab/initial_root_password</span><br></pre></td></tr></table></figure>
-
-<p><strong>注意，这个文件后面会被自动删除。因此请及时保管好该密码或者及时进行修改。</strong></p>
-<h3 id="配置-GitLab"><a href="#配置-GitLab" class="headerlink" title="配置 GitLab"></a>配置 GitLab</h3><p>如果上面几步都比较顺利，不出意外，现在应该已经在这个系统中安装好了 GitLab。接下来先进行一些简要地配置。</p>
-<p>GitLab 的配置文件是 <code>/etc/gitlab/gitlab.rb</code></p>
-<p>我家 OpenWrt 主路由在 DHCP 中设置的 <code>本地服务器</code> 和 <code>本地域名</code> 分别为 <code>/home/</code> 和 <code>home</code>，同时我也希望能通过域名访问这个 GitLab 服务器。所以我还添加了一条 <code>自定义挟持域名</code>，其中域名为 <code>git</code>，IP 地址为 R86S 分配的固定 IP（比如我家的是 <code>192.168.50.50</code>）。这样我就可以通过域名 <code>http://git.home</code> 来访问这个 GitLab 服务器了。</p>
-<p>根据以上前提，这里需要修改的几个地方</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">external_url</span> <span class="string">&#x27;http://git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;gitlab_ssh_host&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;time_zone&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;Asia/Shanghai&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;backup_path&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;/mmc&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p><code>backup_path</code> 即为 <a href="#%E5%88%9B%E5%BB%BA-GitLab-%E5%A4%87%E4%BB%BD%E4%BD%8D%E7%BD%AE">EMMC 设备的挂载点</a></p>
-<p>修改完 <code>gitlab.rb</code> 后需要重新配置 GitLab 才能生效</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
-
-<p>稍等片刻，在浏览器中打开 <span class="exturl" data-url="aHR0cDovL2dpdC5ob21lLw==">http://git.home<i class="fa fa-external-link-alt"></i></span> 就可以看到搭建好的 GitLab 了。</p>
-]]></content>
-  </entry>
-  <entry>
     <title>有点意思的 Python 系列二 内置类型增加额外方法</title>
     <url>/post/5f8a6fc4.html</url>
     <content><![CDATA[<p>我们知道，如果想给一个自定义类型增加对应的方法，可以直接修改这个类就可以了，但是如果我们这个时候想给内置的类型增加一些自定义方法呢？</p>
@@ -802,21 +740,160 @@
 ]]></content>
   </entry>
   <entry>
+    <title>北京联通异地宽带办理指南</title>
+    <url>/post/de583f28.html</url>
+    <content><![CDATA[<p>众所周知，北京联通的宽带是真的贵。之前联系了联通的宽带专员，咨询了一下融合套餐。</p>
+<ul>
+<li>1000 Mbps 三年合约 149 元&#x2F;月（这个还是有优惠的价格）提前解约违约金 &#x3D; 未履约月数 ✖️ 30 元</li>
+<li>500 Mbps 无合约 166 元&#x2F;月</li>
+</ul>
+<p>因为我家所有的手机号都是联通的，套餐也都很够用，所以融合套的手机号套餐没啥用。了解到异地宽带价格很美丽后就想着办一个。</p>
+<span id="more"></span>
+
+<p>北京地区的异地宽带分两种</p>
+<ul>
+<li>300 Mbps 60 元&#x2F;月</li>
+<li>500 Mbps 80 元&#x2F;月</li>
+</ul>
+<img src="https://images.zabrian.com/8ec6254c-3291-42f6-69b0-2c8d53f22901/origin" title="异地宽带套餐" style="zoom:62%;" />
+
+<h1 id="办卡"><a href="#办卡" class="headerlink" title="办卡"></a>办卡</h1><p>既然是异地宽带，首先是需要一个异地手机卡。在某宝找了一个办卡，选了一个 19 块钱的套餐，反正就是能办多便宜就多便宜。19 差不多就是能在开卡的最便宜了。异地选的天津，主要就是离北京近，方便。</p>
+<p>然后记得询问一下卡是不是能正常改套餐办宽带啥的，别办物联网卡就行，要办的一定是正常的手机卡。然后配送地址写一个天津的地址，千万不能写异地，因为天津联通不能异地配送。必须要天津本地的地址。为了方便，我就直接写到了天津站。</p>
+<p>然后就是提交身份证啥的审核，当天审核通过下午显示就分配了小哥上门送卡。然后就是打电话给小哥改一下时间。毕竟当天下午已经 3 点了，还在上班咋，可能到天津取卡。</p>
+<p>然后我就约到了周六下午 3 点了。然后就是买了周六 14:09 ~ 14:42 从北京到天津的去程，15:22 ~ 15:52 从天津到北京南的返程。一共花了 100 过点。</p>
+<p>当天上车之后给小哥打了个电话，说了下是专程来办卡的，返程时间比较紧，希望能尽快到。小哥表示没问题。然后我快到站的时候小哥来电话了说他已经到了（d&#x3D;(´▽ ｀)&#x3D;b）</p>
+<p>然后就和小哥在车站里面碰上面了。拍照办卡一气呵成，全程花了不到 5 分钟。交了 500 块钱话费结束。然后返程回家。</p>
+<h1 id="改套餐"><a href="#改套餐" class="headerlink" title="改套餐"></a>改套餐</h1><p>开卡的时候选的是 19 块钱的套餐，第二天第一件事就是改到 8 元保号套餐。所以上面办卡的时候需要确认卡片套餐能否修改（有的有合约，不能修改或者得过几个月才能修改）可以直接打电话给联通，转到人工改。但是我嫌打电话麻烦，下载了联通 app，用新办的手机卡登录，右上角在线客服修改套餐到 8 元保号套餐就行。客服会告诉你会有专属经理 48h 内联系，但是我的当天下午就来电联系了，确认修改后次月就生效了。</p>
+<img src="https://images.zabrian.com/83d18cc4-1a34-43d3-043c-b63386745e01/origin" title="联系客服修改套餐" style="zoom:62%;" />
+
+<h1 id="办宽带"><a href="#办宽带" class="headerlink" title="办宽带"></a>办宽带</h1><p>这里办宽带一定要从联通 app 上办理，去营业厅是办不了这个价格的异地宽带。</p>
+<p>app 里面的位置在这里</p>
+<img src="https://images.zabrian.com/8d192054-73d8-4156-87f5-c8f5eed0fd01/origin" title="异地同享专区" style="zoom:62%;" />
+
+<p>然后选择全国一家亲异地宽带</p>
+<img src="https://images.zabrian.com/32f222f5-5e1f-4b39-5329-848898dd2f01/origin" title="全国一家亲异地宽带" style="zoom:62%;" />
+
+<p>然后进去之后选择宽带办理的城市，我这里就是北京，然后就会有能办理的类型，包括 300 Mbps 和 500 Mbps 选好之后填写下面的具体的内容，提交预约即可。</p>
+<p>然后过了几个小时就有联通的电话了，确定办理的宽带后，表示北京有一个 300 块钱的安装费。次月从话费里面扣除。确定无误后客服给我发了一个短信，里面有个链接。需要上传身份证正反面和拍摄一张免冠自拍照。然后就等着分配小哥吧。</p>
+<h1 id="上门安装"><a href="#上门安装" class="headerlink" title="上门安装"></a>上门安装</h1><p>到了预约的那天，小哥上门。确认了信息之后就开始装光猫啥的。在这个途中，因为现在北京天气已经很热了，小哥又是中午上门的。递上瓶水，拿个板凳坐会儿。要是抽烟可以再递个烟啥的。之后就开始表达自己想要公网 IP 的诉求（毕竟求人办事儿，所以前面就客气点）小哥问了个原因，我说家里有监控需要。然后小哥还拍了个监控的照片，并且还说：“现在公网 IP 不好拿，需要有明确的需求才能申请，你这个要用监控。但其实现在监控这个理由不怎么能过了。你要是有明确诉求可以给你申请。”（反正就是一边表达不好搞，但是一边还都给申请了）然后就顺便连桥接一起给办了，顺便加了一下小哥私人的微信（虽然现在一般都是要加企微，但是小哥还是给了他私人的微信）最后装好后他那走了个测速，安装 500 M 实际测速能到 650。还不错。最后记了一下宽带的密码，搞定。从上门到最后小哥走一共花了不到 10 min，外加一瓶水的钱。</p>
+<h1 id="办理上行提速"><a href="#办理上行提速" class="headerlink" title="办理上行提速"></a>办理上行提速</h1><p>500 Mbps 的宽带下行对应上行才给 30 Mbps 是真的拉跨，但是可以办理加速包: <span class="exturl" data-url="aHR0cHM6Ly93b2t1YW4uMTE0bWVuaHUuY29tLw==">沃宽<i class="fa fa-external-link-alt"></i></span></p>
+<p>用办理宽带的异地手机号登录</p>
+<img src="https://images.zabrian.com/29685c89-0b86-439b-be44-1ea181ba1601/origin" title="沃宽登陆界面" style="zoom:39%;" />
+
+<p>然后在左侧【我的宽带】中添加当前宽带</p>
+<img src="https://images.zabrian.com/214b8dce-750d-4fea-cb68-b81701392d01/origin" title="沃宽添加宽带" style="zoom:40%;" />
+
+<p>添加成功后再左侧 【我要购买】中应该可以看到一个【宽带上行提速包 100 M】这里一次最多可以购买 6 个（连续半年，到期后可以继续购买）</p>
+<img src="https://images.zabrian.com/13a412ea-2b2b-4be8-4013-821b35e6d201/origin" title="购买上行提速包" style="zoom:40%;" />
+
+<p>购买成功后，在左侧【首页】点击【点我提速】就可以了，无需重启光猫即可享受 100 Mbps 的上行速率了。</p>
+<img src="https://images.zabrian.com/1b239e28-26bc-43cd-e168-d7970cc88701/origin" title="上行提速" style="zoom:39%;" />
+
+<h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>最后算一下成本</p>
+<ul>
+<li>一次性成本：来回 100 元路费 + 装机费 300 元（唯一的坑点） &#x3D; 400 元</li>
+<li>周期性成本：每月异地号码套餐 8 元 + 宽带费用 80 元 + 上行加速包 30 元 &#x3D; 118 元</li>
+</ul>
+<p>总体还是比 500 Mbps 的融合套便宜很多的。</p>
+<p>最后附上 speedtest 和 ustc 的测速结果吧</p>
+<img src="https://images.zabrian.com/ac825486-02e6-43f8-1e06-419808a0da01/origin" title="SpeedTest 测速" style="zoom:100%;" />
+
+<img src="https://images.zabrian.com/8cb09a0c-3136-4487-8e35-a242c3ecf601/origin" title="USTC 测速" style="zoom:85%;" />
+]]></content>
+  </entry>
+  <entry>
     <title>测试加密文章</title>
     <url>/post/19c1a188.html</url>
-    <content><![CDATA[<div class="encrypted-post-container" 
-     data-ciphertext="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"
-     data-iv="ldEbmkHE0c8ccltn"
-     data-auth-tag="KrUR1nS6H/co/WNduwyhlQ=="
-     data-key-hint="DksVBImhShNfPwBJQeCLV3UNusvTZi1A7h70AMxmyX0=">
-  <div class="encrypted-post-notice">
-    <button class="fido2-verify-btn" id="fido2-verify-btn">
-      <i class="fa fa-fingerprint"></i> 验证身份
-    </button>
-    <div class="verification-status" id="verification-status"></div>
-  </div>
-  <div class="decrypted-content" id="decrypted-content" style="display:none"></div>
-</div>]]></content>
+    <content><![CDATA[<span id="more"></span>
+
+<p>Hexo NexT 主题提供了一系列的高级的标签插件，可以简单的实现一些复杂的功能。</p>
+<h1 id="按钮-Button"><a href="#按钮-Button" class="headerlink" title="按钮 Button"></a>按钮 Button</h1><h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% button url, text, icon [class], [title] %&#125;</span><br><span class="line">&#123;% btn url, text, icon [class], [title] %&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>url</code>: 绝对或相对路径的 URL</li>
+<li><code>text</code>: 按钮文本。如果未指定图标，则为必填项</li>
+<li><code>icon</code>: <span class="exturl" data-url="aHR0cHM6Ly9mb250YXdlc29tZS5jb20vdjQvaWNvbnM=">FontAwesome<i class="fa fa-external-link-alt"></i></span> 图标。如果未指定文本，则为必填项</li>
+<li><code>[class]</code>: 可选参数; 默认 <code>fa-fw</code>; 可选: <code>fa-fw</code> | <code>fa-lg</code> | <code>fa-2x</code> | <code>fa-3x</code> | <code>fa-4x</code> | <code>fa-5x</code></li>
+<li><code>[title]</code>: 可选参数; 鼠标悬停时提示</li>
+</ul>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% button #, 按钮文本 %&#125;</span><br></pre></td></tr></table></figure>
+<a class="btn" href="#">按钮文本</a>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% btn #, 按钮文本 %&#125; &#123;% btn #, 按钮文本 &amp; 按钮标题,, 按钮标题 %&#125;</span><br></pre></td></tr></table></figure>
+<a class="btn" href="#">按钮文本</a> <a class="btn" href="#" title="按钮标题">按钮文本 & 按钮标题</a>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% btn #,, home %&#125;</span><br><span class="line">&#123;% btn #,, home fa-lg %&#125;</span><br><span class="line">&#123;% btn #,, home fa-2x %&#125;</span><br><span class="line">&#123;% btn #,, home fa-3x %&#125;</span><br><span class="line">&#123;% btn #,, home fa-4x %&#125;</span><br><span class="line">&#123;% btn #,, home fa-5x %&#125;</span><br></pre></td></tr></table></figure>
+<a class="btn" href="#"><i class="fa fa-home"></i></a>
+<a class="btn" href="#"><i class="fa fa-home fa-lg"></i></a>
+<a class="btn" href="#"><i class="fa fa-home fa-2x"></i></a>
+<a class="btn" href="#"><i class="fa fa-home fa-3x"></i></a>
+<a class="btn" href="#"><i class="fa fa-home fa-4x"></i></a>
+<a class="btn" href="#"><i class="fa fa-home fa-5x"></i></a>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% btn #, 按钮文本, home %&#125;</span><br></pre></td></tr></table></figure>
+<a class="btn" href="#"><i class="fa fa-home"></i>按钮文本</a>
+
+<h1 id="笔记-Note"><a href="#笔记-Note" class="headerlink" title="笔记 Note"></a>笔记 Note</h1><h2 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h2><figure class="highlight yml"><figcaption><span>NexT _config.yml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># Note tag (bootstrap callout)</span></span><br><span class="line"><span class="attr">note:</span></span><br><span class="line">  <span class="comment"># Note tag style values:</span></span><br><span class="line">  <span class="comment">#  - simple    bootstrap callout old alert style. Default.</span></span><br><span class="line">  <span class="comment">#  - modern    bootstrap callout new (v2-v3) alert style.</span></span><br><span class="line">  <span class="comment">#  - flat      flat callout style with background, like on Mozilla or StackOverflow.</span></span><br><span class="line">  <span class="comment">#  - disabled  disable all CSS styles import of note tag.</span></span><br><span class="line">  <span class="attr">style:</span> <span class="string">modern</span></span><br><span class="line">  <span class="attr">icons:</span> <span class="literal">false</span></span><br><span class="line">  <span class="comment"># Offset lighter of background in % for modern and flat styles (modern: -12 | 12; flat: -18 | 6).</span></span><br><span class="line">  <span class="comment"># Offset also applied to label tag variables. This option can work with disabled note tag.</span></span><br><span class="line">  <span class="attr">light_bg_offset:</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="用法-1"><a href="#用法-1" class="headerlink" title="用法"></a>用法</h2><figure class="highlight jinja"><table><tr><td class="code"><pre><span class="line"><span class="template-tag">&#123;% <span class="name">note</span> [class] [no-icon] [summary] %&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">笔记内容</span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;% <span class="name">endnote</span> %&#125;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>[class]</code>: 可选参数; 默认 <code>default</code>; 可选: <code>default</code> | <code>primary</code> | <code>success</code> | <code>info</code> | <code>warning</code> | <code>danger</code></li>
+<li><code>[no-icon]</code>: 可选参数; 禁用 icon</li>
+<li><code>[summary]</code>: 可选参数; 笔记摘要</li>
+</ul>
+<h2 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h2><div class="note default"><p>default 样例</p>
+</div>
+<div class="note primary"><p>primary 样例</p>
+</div>
+<div class="note success"><p>success 样例</p>
+</div>
+<div class="note info"><p>info 样例</p>
+</div>
+<div class="note warning"><p>warning 样例</p>
+</div>
+<div class="note danger"><p>danger 样例</p>
+</div>
+
+<h1 id="标签页-Tabs"><a href="#标签页-Tabs" class="headerlink" title="标签页 Tabs"></a>标签页 Tabs</h1><h2 id="设置-1"><a href="#设置-1" class="headerlink" title="设置"></a>设置</h2><figure class="highlight yml"><figcaption><span>NexT _config.yml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># Tabs tag</span></span><br><span class="line"><span class="attr">tabs:</span></span><br><span class="line">  <span class="comment"># Make the nav bar of tabs with long content stick to the top.</span></span><br><span class="line">  <span class="attr">sticky:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">transition:</span></span><br><span class="line">    <span class="attr">tabs:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">labels:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="用法-2"><a href="#用法-2" class="headerlink" title="用法"></a>用法</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% tabs Unique name, [index] %&#125;</span><br><span class="line">  &lt;!-- tab [Tab caption] [@icon] --&gt;</span><br><span class="line">  标签页内容</span><br><span class="line">  &lt;!-- endtab --&gt;</span><br><span class="line">&#123;% endtabs %&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>Unique name</code>: 当前页面下唯一名称</li>
+<li><code>[index]</code>: 活动标签页索引</li>
+<li><code>[Tab caption]</code>: 标签页标题</li>
+<li><code>[@icon]</code>: <span class="exturl" data-url="aHR0cHM6Ly9mb250YXdlc29tZS5jb20vdjQvaWNvbnM=">FontAwesome<i class="fa fa-external-link-alt"></i></span> 图标</li>
+</ul>
+<h2 id="例子-2"><a href="#例子-2" class="headerlink" title="例子"></a>例子</h2><div class="tabs" id="标签页"><ul class="nav-tabs"><li class="tab active"><a href="#标签页-1"><i class="fa fa-table"></i>表格</a></li><li class="tab"><a href="#标签页-2"><i class="fa fa-code"></i>代码块</a></li><li class="tab"><a href="#标签页-3"><i class="fa fa-camera"></i>图片</a></li></ul><div class="tab-content"><div class="tab-pane active" id="标签页-1"><table>
+<thead>
+<tr>
+<th align="left">左对齐列</th>
+<th align="right">右对齐列</th>
+<th align="center">居中列</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">11</td>
+<td align="right">12</td>
+<td align="center">13</td>
+</tr>
+<tr>
+<td align="left">21</td>
+<td align="right">22</td>
+<td align="center">23</td>
+</tr>
+<tr>
+<td align="left">31</td>
+<td align="right">32</td>
+<td align="center">33</td>
+</tr>
+</tbody></table></div><div class="tab-pane" id="标签页-2"><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">def</span> <span class="title function_">fib</span>(<span class="params">n</span>):</span><br><span class="line">    a,b = <span class="number">1</span>,<span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n-<span class="number">1</span>):</span><br><span class="line">        a,b = b,a+b</span><br><span class="line">    <span class="keyword">return</span> a</span><br></pre></td></tr></table></figure></div><div class="tab-pane" id="标签页-3"><p>  <img src="https://images.zabrian.com/e9347cac-bb91-4e23-392c-536d7ae0b401/origin"></p></div></div></div>
+
+<h1 id="文本标签-Label"><a href="#文本标签-Label" class="headerlink" title="文本标签 Label"></a>文本标签 Label</h1><h2 id="用法-3"><a href="#用法-3" class="headerlink" title="用法"></a>用法</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#123;% label [class]@text %&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>[class]</code>: 可选参数; 默认 <code>default</code>; 可选: <code>default</code> | <code>primary</code> | <code>success</code> | <code>info</code> | <code>warning</code> | <code>danger</code></li>
+<li><code>text</code>: 标签文本</li>
+</ul>
+<h2 id="例子-3"><a href="#例子-3" class="headerlink" title="例子"></a>例子</h2><p>曲曲折折的荷塘上面，弥望旳是田田的叶子。叶子出水很高，像<mark class="label default">亭亭旳舞女旳裙</mark>。<br>层层的叶子中间，零星地点缀着些白花，有袅娜地开着旳，有羞涩地打着朵儿旳；正如<mark class="label primary">一粒粒的明珠</mark>，又如<mark class="label success">碧天里的星星</mark>，又如<mark class="label info">刚出浴的美人</mark>。<br>微风过处，送来缕缕清香，<mark class="label warning">仿佛远处高楼上渺茫的歌声似的</mark>。这时候叶子与花也有一丝的颤动，像闪电般，霎时传过荷塘的那边去了。<br>叶子本是肩并肩密密地挨着，这便宛然有了一道<mark class="label danger">凝碧的波痕</mark>。叶子底下是脉脉的流水，遮住了，不能见一些颜色；而叶子却更见风致了。</p>
+]]></content>
   </entry>
   <entry>
     <title>调整 macOS 顶部菜单栏图标间距</title>
