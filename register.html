@@ -26,7 +26,6 @@
       }
 
       .container {
-        background: white;
         border-radius: 16px;
         max-width: 650px;
         width: 100%;
@@ -67,15 +66,13 @@
       .register-btn:disabled {
         opacity: 0.6;
         cursor: not-allowed;
-        transform: none;
       }
 
       .register-btn i {
         margin-right: 10px;
       }
 
-      #status,
-      #success {
+      #status {
         margin-top: 20px;
         display: none;
       }
@@ -136,6 +133,26 @@
       .copy-btn i {
         margin-right: 5px;
       }
+
+      .salt-container {
+        margin-bottom: 20px;
+      }
+
+      .salt-container label {
+        display: block;
+        margin-bottom: 8px;
+        color: #666;
+        font-size: 14px;
+      }
+
+      .salt-container input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 13px;
+        font-family: monospace;
+      }
     </style>
   </head>
   <body>
@@ -145,12 +162,16 @@
         使用 YubiKey、Touch ID 或其他 FIDO2 设备保护您的加密内容
       </p>
 
+      <div class="salt-container">
+        <label for="prf-salt-input">PRF Salt</label>
+        <input type="text" id="prf-salt-input" />
+      </div>
+
       <button class="register-btn" id="register-btn">
         <i class="fa fa-key"></i> 开始注册
       </button>
 
       <div id="status"></div>
-      <div id="success"></div>
     </div>
 
     <script>
@@ -204,7 +225,6 @@
                   userVerification: "preferred",
                 },
                 timeout: 60000,
-                attestation: "none",
                 extensions: {
                   prf: {},
                 },
@@ -237,6 +257,9 @@
 
         async generateEncryptionKey() {
           try {
+            const prfSaltInput = document.getElementById("prf-salt-input");
+            const prfSaltString = prfSaltInput.value.trim();
+
             this.show(
               '<div class="note info"><p>正在生成加密密钥...</p></div>'
             );
@@ -244,7 +267,7 @@
             const challenge = crypto.getRandomValues(new Uint8Array(32));
             const prfSalt = await crypto.subtle.digest(
               "SHA-256",
-              new TextEncoder().encode(`${getRPID()}-encryption-key`)
+              new TextEncoder().encode(prfSaltString)
             );
 
             const assertion = await navigator.credentials.get({
@@ -275,11 +298,10 @@
                 <p>
                   <code id="encryption-key">${encryptionKeyHex}</code>
                   <button class="copy-btn" onclick="copyEncryptionKey(event)">
-                  <i class="fa fa-copy"></i> 复制密钥
-                </button>
+                    <i class="fa fa-copy"></i> 复制密钥
+                  </button>
                 </p>
               </div>`);
-            document.getElementById("success").style.display = "block";
           } catch (e) {
             this.show(
               `<div class="note danger"><p>生成密钥失败: ${e.message}</p></div>`

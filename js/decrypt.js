@@ -19,6 +19,8 @@ class FIDO2Decryptor {
       iv: this.container.dataset.iv,
       authTag: this.container.dataset.authTag,
       abbrlink: this.container.dataset.abbrlink,
+      wrappedKeys: JSON.parse(this.container.dataset.wrappedKeys || "[]"),
+      prfSalt: this.container.dataset.prfSalt,
     };
 
     if (!window.PublicKeyCredential) {
@@ -40,22 +42,17 @@ class FIDO2Decryptor {
 
   checkCache() {
     try {
-      const cacheKey = this.getCacheKey();
-      const cached = localStorage.getItem(cacheKey);
+      const cached = localStorage.getItem(this.getCacheKey());
       if (!cached) return false;
 
       const { html, timestamp } = JSON.parse(cached);
-      const now = Date.now();
-      const expiry = 10 * 60 * 1000;
-
-      if (now - timestamp < expiry) {
+      if (Date.now() - timestamp < 10 * 60 * 1000) {
         this.render(html);
         setTimeout(() => this.hideStatus(), 2000);
         return true;
-      } else {
-        localStorage.removeItem(cacheKey);
-        return false;
       }
+      localStorage.removeItem(this.getCacheKey());
+      return false;
     } catch (e) {
       return false;
     }
@@ -63,11 +60,12 @@ class FIDO2Decryptor {
 
   saveCache(html) {
     try {
-      const cacheKey = this.getCacheKey();
-      const cacheData = { html, timestamp: Date.now() };
-      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+      localStorage.setItem(
+        this.getCacheKey(),
+        JSON.stringify({ html, timestamp: Date.now() })
+      );
     } catch (e) {
-      console.warn("缓存保存失败:", e);
+      console.warn(`缓存失败: ${e}`);
     }
   }
 
@@ -79,7 +77,7 @@ class FIDO2Decryptor {
 
       const prfSalt = await crypto.subtle.digest(
         "SHA-256",
-        new TextEncoder().encode(`${getRPID()}-encryption-key`)
+        new TextEncoder().encode(this.data.prfSalt)
       );
 
       const assertion = await navigator.credentials.get({
@@ -88,23 +86,17 @@ class FIDO2Decryptor {
           rpId: this.rpId,
           userVerification: "preferred",
           timeout: 60000,
-          extensions: {
-            prf: {
-              eval: { first: prfSalt },
-            },
-          },
+          extensions: { prf: { eval: { first: prfSalt } } },
         },
       });
-
-      if (!assertion) throw new Error("获取凭证失败");
 
       const prfResults = assertion.getClientExtensionResults().prf;
       if (!prfResults?.results?.first) throw new Error("PRF 扩展不可用");
 
-      const decryptionKey = prfResults.results.first;
+      const wrappingKey = prfResults.results.first;
 
-      this.showStatus("验证成功", "success");
-      setTimeout(() => this.decryptContent(decryptionKey), 300);
+      this.showStatus("验证成功，正在解密...", "success");
+      setTimeout(() => this.unwrapAndDecrypt(wrappingKey), 300);
     } catch (e) {
       if (e.name === "NotAllowedError") {
         this.showError("验证被拒绝");
@@ -113,6 +105,49 @@ class FIDO2Decryptor {
       } else {
         this.showError(`验证失败: ${e.message}`);
       }
+    }
+  }
+
+  async unwrapAndDecrypt(wrappingKey) {
+    try {
+      this.showStatus("正在解密密钥...", "info");
+
+      const wrapKeyBuffer = await crypto.subtle.importKey(
+        "raw",
+        wrappingKey,
+        { name: "AES-GCM" },
+        false,
+        ["decrypt"]
+      );
+
+      let cek = null;
+      for (const wrapped of this.data.wrappedKeys) {
+        try {
+          const encCEK = this.b64ToAB(wrapped.encryptedCEK);
+          const wrapIV = this.b64ToAB(wrapped.iv);
+          const wrapAuthTag = this.b64ToAB(wrapped.authTag);
+
+          const wrappedCEK = new Uint8Array(
+            encCEK.byteLength + wrapAuthTag.byteLength
+          );
+          wrappedCEK.set(new Uint8Array(encCEK), 0);
+          wrappedCEK.set(new Uint8Array(wrapAuthTag), encCEK.byteLength);
+
+          cek = await crypto.subtle.decrypt(
+            { name: "AES-GCM", iv: wrapIV, tagLength: 128 },
+            wrapKeyBuffer,
+            wrappedCEK
+          );
+          break;
+        } catch (e) {}
+      }
+
+      if (!cek) throw new Error("通行密钥无权限");
+
+      await this.decryptContent(cek);
+    } catch (e) {
+      console.error(`解密密钥失败: ${e}`);
+      this.showError(`解密失败: ${e.message}`);
     }
   }
 
@@ -137,7 +172,6 @@ class FIDO2Decryptor {
         false,
         ["decrypt"]
       );
-
       const decrypted = await crypto.subtle.decrypt(
         { name: "AES-GCM", iv, tagLength: 128 },
         key,
@@ -147,7 +181,6 @@ class FIDO2Decryptor {
       const html = new TextDecoder().decode(decrypted);
       this.saveCache(html);
       this.render(html);
-
       setTimeout(() => this.hideStatus(), 2000);
     } catch (e) {
       this.showError(`解密失败: ${e.message}`);
@@ -157,22 +190,18 @@ class FIDO2Decryptor {
   render(html) {
     const content = document.getElementById("decrypted-content");
     const notice = document.querySelector(".encrypted-post-notice");
-    if (content && notice) {
-      notice.style.display = "none";
-      content.innerHTML = html;
-      content.style.display = "block";
+    if (!content || !notice) return;
 
-      try {
-        if (
-          typeof NexT !== "undefined" &&
-          NexT.boot &&
-          typeof NexT.boot.refresh === "function"
-        ) {
-          NexT.boot.refresh();
-        }
-      } catch (e) {
-        console.warn(`Hexo NexT 主题功能初始化失败: ${e}`);
+    notice.style.display = "none";
+    content.innerHTML = html;
+    content.style.display = "block";
+
+    try {
+      if (typeof NexT !== "undefined" && NexT.boot?.refresh) {
+        NexT.boot.refresh();
       }
+    } catch (e) {
+      console.warn(`NexT 主题功能初始化失败: ${e}`);
     }
   }
 
@@ -185,7 +214,7 @@ class FIDO2Decryptor {
       error: "fa-times-circle",
     };
     el.style.display = "block";
-    el.className = "verification-status " + type;
+    el.className = `verification-status ${type}`;
     el.innerHTML = `<i class="fa ${icons[type]}"></i> ${msg}`;
   }
 
@@ -206,9 +235,7 @@ class FIDO2Decryptor {
   }
 }
 
-window.FIDO2Decryptor = new FIDO2Decryptor();
+const decryptor = new FIDO2Decryptor();
 document.addEventListener("DOMContentLoaded", () => {
-  if (document.querySelector(".encrypted-post-container")) {
-    window.FIDO2Decryptor.init();
-  }
+  if (document.querySelector(".encrypted-post-container")) decryptor.init();
 });
