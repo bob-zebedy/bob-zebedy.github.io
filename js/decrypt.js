@@ -1,13 +1,13 @@
 function getRPID() {
-  const h = location.hostname;
-  return h === "127.0.0.1" ? "localhost" : h;
+  const hostname = location.hostname;
+  return hostname === "127.0.0.1" ? "localhost" : hostname;
 }
 
 class FIDO2Decryptor {
   constructor() {
     this.container = null;
     this.data = null;
-    this.config = null;
+    this.rpId = getRPID();
   }
 
   init() {
@@ -18,56 +18,29 @@ class FIDO2Decryptor {
       ciphertext: this.container.dataset.ciphertext,
       iv: this.container.dataset.iv,
       authTag: this.container.dataset.authTag,
-      keyHint: this.container.dataset.keyHint,
-    };
-
-    this.config = {
-      rpName: this.container.dataset.rpName || "Undefined Blog",
-      rpId: getRPID(),
+      abbrlink: this.container.dataset.abbrlink,
     };
 
     if (!window.PublicKeyCredential) {
-      this.showError("此浏览器不支持 FIDO2/WebAuthn");
+      this.showError("浏览器不支持 FIDO2/WebAuthn");
       return;
     }
 
     if (this.checkCache()) return;
 
     const btn = document.getElementById("fido2-verify-btn");
-    if (btn) btn.onclick = () => this.authenticate();
+    if (!btn) return;
+
+    btn.onclick = () => this.authenticate();
   }
 
-  async authenticate() {
-    this.showStatus("请验证身份...", "info");
-
-    try {
-      const challenge = crypto.getRandomValues(new Uint8Array(32));
-      const assertion = await navigator.credentials.get({
-        publicKey: {
-          challenge,
-          rpId: this.config.rpId,
-          userVerification: "preferred",
-          timeout: 60000,
-        },
-      });
-
-      if (!assertion) throw new Error("未知错误");
-      this.showStatus("验证成功", "success");
-      setTimeout(() => this.decrypt(), 500);
-    } catch (e) {
-      if (e.name === "NotAllowedError") {
-        this.showError("验证被拒绝");
-      } else if (e.name === "InvalidStateError" || e.name === "NotFoundError") {
-        this.showError("未注册的安全密钥");
-      } else {
-        this.showError(`验证失败: ${e.message}`);
-      }
-    }
+  getCacheKey() {
+    return this.data.abbrlink || location.pathname;
   }
 
   checkCache() {
     try {
-      const cacheKey = `fido2_cache_${this.data.keyHint}`;
+      const cacheKey = this.getCacheKey();
       const cached = localStorage.getItem(cacheKey);
       if (!cached) return false;
 
@@ -90,19 +63,63 @@ class FIDO2Decryptor {
 
   saveCache(html) {
     try {
-      const cacheKey = `fido2_cache_${this.data.keyHint}`;
+      const cacheKey = this.getCacheKey();
       const cacheData = { html, timestamp: Date.now() };
       localStorage.setItem(cacheKey, JSON.stringify(cacheData));
     } catch (e) {
-      console.warn(`缓存失败: ${e}`);
+      console.warn("缓存保存失败:", e);
     }
   }
 
-  async decrypt() {
+  async authenticate() {
+    this.showStatus("正在验证身份...", "info");
+
+    try {
+      const challenge = crypto.getRandomValues(new Uint8Array(32));
+
+      const prfSalt = await crypto.subtle.digest(
+        "SHA-256",
+        new TextEncoder().encode(`${getRPID()}-encryption-key`)
+      );
+
+      const assertion = await navigator.credentials.get({
+        publicKey: {
+          challenge,
+          rpId: this.rpId,
+          userVerification: "preferred",
+          timeout: 60000,
+          extensions: {
+            prf: {
+              eval: { first: prfSalt },
+            },
+          },
+        },
+      });
+
+      if (!assertion) throw new Error("获取凭证失败");
+
+      const prfResults = assertion.getClientExtensionResults().prf;
+      if (!prfResults?.results?.first) throw new Error("PRF 扩展不可用");
+
+      const decryptionKey = prfResults.results.first;
+
+      this.showStatus("验证成功", "success");
+      setTimeout(() => this.decryptContent(decryptionKey), 300);
+    } catch (e) {
+      if (e.name === "NotAllowedError") {
+        this.showError("验证被拒绝");
+      } else if (e.name === "InvalidStateError" || e.name === "NotFoundError") {
+        this.showError("未注册的通行密钥");
+      } else {
+        this.showError(`验证失败: ${e.message}`);
+      }
+    }
+  }
+
+  async decryptContent(decryptionKey) {
     try {
       this.showStatus("正在解密...", "info");
 
-      const keyBuffer = this.b64ToAB(this.data.keyHint);
       const ciphertext = this.b64ToAB(this.data.ciphertext);
       const iv = this.b64ToAB(this.data.iv);
       const authTag = this.b64ToAB(this.data.authTag);
@@ -115,11 +132,12 @@ class FIDO2Decryptor {
 
       const key = await crypto.subtle.importKey(
         "raw",
-        keyBuffer,
+        decryptionKey,
         { name: "AES-GCM" },
         false,
         ["decrypt"]
       );
+
       const decrypted = await crypto.subtle.decrypt(
         { name: "AES-GCM", iv, tagLength: 128 },
         key,
@@ -129,9 +147,10 @@ class FIDO2Decryptor {
       const html = new TextDecoder().decode(decrypted);
       this.saveCache(html);
       this.render(html);
+
       setTimeout(() => this.hideStatus(), 2000);
     } catch (e) {
-      this.showError("解密失败: 密钥不匹配或数据损坏");
+      this.showError(`解密失败: ${e.message}`);
     }
   }
 
