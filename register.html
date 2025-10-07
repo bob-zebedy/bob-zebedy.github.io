@@ -164,8 +164,10 @@
       </p>
 
       <div class="salt-container">
-        <label for="prf-salt-input">PRF Salt <span style="color: #ef4444;">*</span></label>
-        <input type="text" id="prf-salt-input" placeholder="请输入 PRF Salt" required />
+        <label for="prf-salt-input"
+          >PRF Salt <span style="color: #ef4444">*</span></label
+        >
+        <input type="text" id="prf-salt-input" placeholder="" required />
       </div>
 
       <button class="register-btn" id="register-btn">
@@ -185,7 +187,7 @@
         constructor() {
           this.btn = document.getElementById("register-btn");
           this.saltInput = document.getElementById("prf-salt-input");
-          
+
           this.btn.onclick = () => this.register();
           this.saltInput.addEventListener("input", () => this.validateInput());
           this.validateInput();
