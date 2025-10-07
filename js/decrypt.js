@@ -146,7 +146,6 @@ class FIDO2Decryptor {
 
       await this.decryptContent(cek);
     } catch (e) {
-      console.error(`解密密钥失败: ${e}`);
       this.showError(`解密失败: ${e.message}`);
     }
   }
