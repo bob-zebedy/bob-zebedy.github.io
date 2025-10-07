@@ -232,8 +232,9 @@
                   { alg: -257, type: "public-key" },
                 ],
                 authenticatorSelection: {
-                  residentKey: "preferred",
+                  residentKey: "required",
                   userVerification: "preferred",
+                  requireResidentKey: true,
                 },
                 timeout: 60000,
                 extensions: {

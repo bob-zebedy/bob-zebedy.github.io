@@ -110,8 +110,6 @@ class FIDO2Decryptor {
 
   async unwrapAndDecrypt(wrappingKey) {
     try {
-      this.showStatus("正在解密密钥...", "info");
-
       const wrapKeyBuffer = await crypto.subtle.importKey(
         "raw",
         wrappingKey,
