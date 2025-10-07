@@ -38,7 +38,7 @@ class FIDO2Decryptor {
   }
 
   async authenticate() {
-    this.showStatus("请触摸安全密钥...", "info");
+    this.showStatus("请验证身份...", "info");
 
     try {
       const challenge = crypto.getRandomValues(new Uint8Array(32));
