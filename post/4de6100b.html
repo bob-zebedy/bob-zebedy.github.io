@@ -305,7 +305,7 @@
 <span id="more"></span>
 
 <p>这种方案的好处就是简单易用，对于需要保密的文章内容，只需要在使用插件并在文章头部增加密码即可。但是作为一个会点技术的折腾党怎么满足于每次手动输入密码？看着现在各大网站推行的通行密钥，登录只需要触摸一下 TouchID 的快感确实是传统输入密码不能比拟的。所以就在国庆期间好好探索了一下其可行性，最终也是在静态博客中用上了一触即达的通行密钥。</p>
-<h1 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h1><img src="https://images.zabrian.com/3766c386-532f-4825-1a18-28b785db8d01/origin" title="整体架构" style="zoom:16%;" />
+<h1 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h1><img src="https://images.zabrian.com/3766c386-532f-4825-1a18-28b785db8d01/origin" style="zoom:16%;" />
 
 <h1 id="核心内容-混合加密-Hybrid-Encryption"><a href="#核心内容-混合加密-Hybrid-Encryption" class="headerlink" title="核心内容: 混合加密 (Hybrid Encryption)"></a>核心内容: 混合加密 (Hybrid Encryption)</h1><div class="note info"><p>Q: 为什么不直接用 FIDO2 密钥加密内容?<br>A: 如果直接用 FIDO2 派生的密钥加密文章，无法添加多个 FIDO2 设备。</p>
 </div>
