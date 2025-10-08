@@ -29,14 +29,14 @@
 <meta property="og:site_name" content="Undefined">
 <meta property="og:description" content="Hexo 中主流使用 hexo-blog-encrypt 插件可以对文章进行加密。这种方法通过密码实现。相比更为简单的前端 JavaScript 密码比较验证，该方法的加密流程如下  Markdown 文章头部密码 → PBKDF2 派生密钥 → AES-256-CBC 加密原始内容 → 生成 HMAC 完整性校验 → 输出加密的 HTML  从而实现使用加密厚的内容替换原始内容，防止通过简单 J">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://images.zabrian.com/3766c386-532f-4825-1a18-28b785db8d01/origin">
-<meta property="og:image" content="https://images.zabrian.com/52064a29-e077-4261-346e-ce2b0ce93801/origin">
-<meta property="og:image" content="https://images.zabrian.com/04a19f96-ec3e-43f0-1f67-f3396b8fd001/origin">
+<meta property="og:image" content="https://images.zabrian.com/85d3037a-fadf-4e98-8ee2-d84196e8ce01/origin">
+<meta property="og:image" content="https://images.zabrian.com/bf70281b-6855-47bb-84b8-69fcb164db01/origin">
+<meta property="og:image" content="https://images.zabrian.com/95091fe2-c580-48cd-519f-b51d44611401/origin">
 <meta property="article:published_time" content="2025-10-08T07:19:49.000Z">
 <meta property="article:modified_time" content="2025-10-08T07:19:49.000Z">
 <meta property="article:author" content="Zebedy">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://images.zabrian.com/3766c386-532f-4825-1a18-28b785db8d01/origin">
+<meta name="twitter:image" content="https://images.zabrian.com/85d3037a-fadf-4e98-8ee2-d84196e8ce01/origin">
 
 
 <link rel="canonical" href="https://blog.zebedy.com/post/4de6100b.html">
@@ -305,7 +305,7 @@
 <span id="more"></span>
 
 <p>这种方案的好处就是简单易用，对于需要保密的文章内容，只需要在使用插件并在文章头部增加密码即可。但是作为一个会点技术的折腾党怎么满足于每次手动输入密码？看着现在各大网站推行的通行密钥，登录只需要触摸一下 TouchID 的快感确实是传统输入密码不能比拟的。所以就在国庆期间好好探索了一下其可行性，最终也是在静态博客中用上了一触即达的通行密钥。</p>
-<h1 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h1><img src="https://images.zabrian.com/3766c386-532f-4825-1a18-28b785db8d01/origin" style="zoom:16%;" />
+<h1 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h1><img src="https://images.zabrian.com/85d3037a-fadf-4e98-8ee2-d84196e8ce01/origin" style="zoom:16%;" />
 
 <h1 id="核心内容-混合加密-Hybrid-Encryption"><a href="#核心内容-混合加密-Hybrid-Encryption" class="headerlink" title="核心内容: 混合加密 (Hybrid Encryption)"></a>核心内容: 混合加密 (Hybrid Encryption)</h1><div class="note info"><p>Q: 为什么不直接用 FIDO2 密钥加密内容?<br>A: 如果直接用 FIDO2 派生的密钥加密文章，无法添加多个 FIDO2 设备。</p>
 </div>
@@ -313,9 +313,9 @@
 <div class="note success"><p>解决方案: 混合加密</p>
 </div>
 
-<img src="https://images.zabrian.com/52064a29-e077-4261-346e-ce2b0ce93801/origin" style="zoom:23%;" />
+<img src="https://images.zabrian.com/bf70281b-6855-47bb-84b8-69fcb164db01/origin" style="zoom:23%;" />
 
-<h1 id="效果展示"><a href="#效果展示" class="headerlink" title="效果展示"></a>效果展示</h1><img src="https://images.zabrian.com/04a19f96-ec3e-43f0-1f67-f3396b8fd001/origin" style="zoom:100%;" />
+<h1 id="效果展示"><a href="#效果展示" class="headerlink" title="效果展示"></a>效果展示</h1><img src="https://images.zabrian.com/95091fe2-c580-48cd-519f-b51d44611401/origin" style="zoom:100%;" />
     </div>
 
     
