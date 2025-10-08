@@ -156,7 +156,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%80%9D%E8%B7%AF"><span class="nav-text">整体思路</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%86%85%E5%AE%B9-%E6%B7%B7%E5%90%88%E5%8A%A0%E5%AF%86-Hybrid-Encryption"><span class="nav-text">核心内容: 混合加密 (Hybrid Encryption)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81"><span class="nav-text">核心代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="nav-text">效果展示</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%80%9D%E8%B7%AF"><span class="nav-text">整体思路</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B7%B7%E5%90%88%E5%8A%A0%E5%AF%86-Hybrid-Encryption"><span class="nav-text">混合加密 (Hybrid Encryption)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81"><span class="nav-text">核心代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="nav-text">效果展示</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -307,10 +307,7 @@
 <p>这种方案的好处就是简单易用，对于需要保密的文章内容，只需要在使用插件并在文章头部增加密码即可。但是作为一个会点技术的折腾党怎么满足于每次手动输入密码？看着现在各大网站推行的通行密钥，登录只需要触摸一下 TouchID 的快感确实是传统输入密码不能比拟的。所以就在国庆期间好好探索了一下其可行性，最终也是在静态博客中用上了一触即达的通行密钥。</p>
 <h1 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h1><img src="https://images.zabrian.com/85d3037a-fadf-4e98-8ee2-d84196e8ce01/origin" style="zoom:16%;" />
 
-<h1 id="核心内容-混合加密-Hybrid-Encryption"><a href="#核心内容-混合加密-Hybrid-Encryption" class="headerlink" title="核心内容: 混合加密 (Hybrid Encryption)"></a>核心内容: 混合加密 (Hybrid Encryption)</h1><div class="note info"><p>Q: 为什么不直接用 FIDO2 密钥加密内容?<br>A: 如果直接用 FIDO2 派生的密钥加密文章，无法添加多个 FIDO2 设备。</p>
-</div>
-
-<div class="note success"><p>解决方案: 混合加密</p>
+<h1 id="混合加密-Hybrid-Encryption"><a href="#混合加密-Hybrid-Encryption" class="headerlink" title="混合加密 (Hybrid Encryption)"></a>混合加密 (Hybrid Encryption)</h1><div class="note info"><p>Q: 为什么不直接用 FIDO2 密钥加密内容?<br>A: 如果直接用 FIDO2 派生的密钥加密文章，无法添加多个 FIDO2 设备。</p>
 </div>
 
 <img src="https://images.zabrian.com/bf70281b-6855-47bb-84b8-69fcb164db01/origin" style="zoom:23%;" />
