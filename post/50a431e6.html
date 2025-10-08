@@ -301,7 +301,6 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        
         <p>在 <a href="/post/ec93b507.html" title="Cloudflare 使用 Workers 建立 Images 代理">Cloudflare 使用 Workers 建立 Images 代理</a> 一文中。使用 Workers 搭建了一个 Images 代理，通过设置 <code>Referer</code> 和 URL 签名有效期实现简易的防盗链以及防刷流量。但是这些措施只能做到防君子不防小人，其实很轻易的就可以通过代码自动实现刷图片流量。为了避免这种情况，想着能不能使用 <code>Cloudflare Turnstile</code> 阻挡非人类请求的流量。但是研究了一下发现 <code>Cloudflare Turnstile</code> 需要 <strong><span class="exturl" data-url="aHR0cHM6Ly9kZXZlbG9wZXJzLmNsb3VkZmxhcmUuY29tL3R1cm5zdGlsZS9nZXQtc3RhcnRlZC9zZXJ2ZXItc2lkZS12YWxpZGF0aW9uLw==">服务端代码验证<i class="fa fa-external-link-alt"></i></span></strong> 但是很显然，<code>Hexo</code> 这种纯静态博客没有后端服务，所以思索了一下决定还是使用 Workers 实现一个支持静态网页的 <code>Cloudflare Turnstile</code> 方案。</p>
 <span id="more"></span>
 

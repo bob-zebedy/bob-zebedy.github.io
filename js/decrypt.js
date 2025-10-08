@@ -45,8 +45,8 @@ class FIDO2Decryptor {
       const cached = localStorage.getItem(this.getCacheKey());
       if (!cached) return false;
 
-      const { html, timestamp } = JSON.parse(cached);
-      if (Date.now() - timestamp < 10 * 60 * 1000) {
+      const { html, expired } = JSON.parse(cached);
+      if (Date.now() < expired) {
         this.render(html);
         setTimeout(() => this.hideStatus(), 2000);
         return true;
@@ -60,9 +60,10 @@ class FIDO2Decryptor {
 
   saveCache(html) {
     try {
+      const expired = Date.now() + 10 * 60 * 1000;
       localStorage.setItem(
         this.getCacheKey(),
-        JSON.stringify({ html, timestamp: Date.now() })
+        JSON.stringify({ html, expired })
       );
     } catch (e) {
       console.warn(`缓存失败: ${e}`);

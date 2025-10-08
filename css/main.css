@@ -3039,9 +3039,22 @@ mark.search-keyword {
 .encrypted-post-preview {
   padding: 20px;
   background: #f8f9fa;
-  border-left: 4px solid #667eea;
   border-radius: 4px;
   color: #666;
+}
+.encrypted-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 15px;
+}
+.encrypted-status i {
+  color: #667eea;
+}
+.encrypted-decrypted-preview {
+  animation: fadeIn 0.5s ease-in;
+  line-height: 1.8;
 }
 @media (prefers-color-scheme: dark) {
   .encrypted-post-notice {
@@ -3053,6 +3066,12 @@ mark.search-keyword {
   .encrypted-post-preview {
     background: #2d3748;
     color: #a0aec0;
+  }
+  .encrypted-status i {
+    color: #9fa8da;
+  }
+  .encrypted-decrypted-preview {
+    color: #e2e8f0;
   }
 }
 @-moz-keyframes pulse {

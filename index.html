@@ -266,14 +266,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>2.1k</span>
+      <span>36</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
+      <span>1 分钟</span>
     </span>
 </div>
 
@@ -284,8 +284,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <div class="encrypted-post-preview">
-            文章已被加密
+          <div class="encrypted-post-preview" id="encrypted-preview-19c1a188" data-abbrlink="19c1a188">
+            <div class="encrypted-status">
+              <i class="fa fa-shield-alt"></i> 文章已加密
+            </div>
+          </div>
+          <div class="encrypted-decrypted-preview" id="decrypted-preview-19c1a188" style="display:none;">
           </div>
           <!--noindex-->
             <div class="post-button">
@@ -294,6 +298,53 @@
               </a>
             </div>
           <!--/noindex-->
+          <script>
+            (function () {
+              const abbrlink = "19c1a188";
+              const cacheKey = abbrlink || location.pathname;
+              try {
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                  const { html, expired } = JSON.parse(cached);
+                  if (Date.now() < expired) {
+                    const tempDiv = document.createElement("div");
+                    tempDiv.innerHTML = html;
+
+                    const moreElement = tempDiv.querySelector("#more");
+                    let preview = "";
+
+                    if (moreElement) {
+                      const range = document.createRange();
+                      range.setStartBefore(tempDiv.firstChild);
+                      range.setEndBefore(moreElement);
+                      preview = range.cloneContents().textContent.trim();
+                    }
+
+                    if (!preview) {
+                      const text = tempDiv.textContent.trim();
+                      preview = text.substring(0, 200) + (text.length > 200 ? "..." : "");
+                    }
+
+                    if (preview) {
+                      const previewEl = document.getElementById(
+                        "decrypted-preview-19c1a188"
+                      );
+                      const encryptedEl = document.getElementById(
+                        "encrypted-preview-19c1a188"
+                      );
+                      if (previewEl) {
+                        previewEl.textContent = preview;
+                        previewEl.style.display = "block";
+                      }
+                      if (encryptedEl) encryptedEl.style.display = "none";
+                    }
+                  } else {
+                    localStorage.removeItem(cacheKey);
+                  }
+                }
+              } catch (e) {}
+            })();
+          </script>
         
       
     </div>

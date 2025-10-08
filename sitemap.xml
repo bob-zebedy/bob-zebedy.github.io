@@ -29,15 +29,6 @@
   </url>
   
   <url>
-    <loc>https://blog.zebedy.com/post/16e3b020.html</loc>
-    
-    <lastmod>2025-10-07</lastmod>
-    
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.zebedy.com/post/4a4b01f0.html</loc>
     
     <lastmod>2025-10-07</lastmod>
@@ -47,7 +38,7 @@
   </url>
   
   <url>
-    <loc>https://blog.zebedy.com/post/50a431e6.html</loc>
+    <loc>https://blog.zebedy.com/post/16e3b020.html</loc>
     
     <lastmod>2025-10-07</lastmod>
     
@@ -56,7 +47,7 @@
   </url>
   
   <url>
-    <loc>https://blog.zebedy.com/post/ec93b507.html</loc>
+    <loc>https://blog.zebedy.com/post/daa7f9d2.html</loc>
     
     <lastmod>2025-10-07</lastmod>
     
@@ -74,7 +65,7 @@
   </url>
   
   <url>
-    <loc>https://blog.zebedy.com/post/fbb67a4e.html</loc>
+    <loc>https://blog.zebedy.com/post/50a431e6.html</loc>
     
     <lastmod>2025-10-07</lastmod>
     
@@ -83,7 +74,7 @@
   </url>
   
   <url>
-    <loc>https://blog.zebedy.com/post/daa7f9d2.html</loc>
+    <loc>https://blog.zebedy.com/post/fbb67a4e.html</loc>
     
     <lastmod>2025-10-07</lastmod>
     
@@ -155,6 +146,15 @@
   </url>
   
   <url>
+    <loc>https://blog.zebedy.com/post/ec93b507.html</loc>
+    
+    <lastmod>2025-10-07</lastmod>
+    
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>https://blog.zebedy.com/post/baaa1138.html</loc>
     
     <lastmod>2025-10-07</lastmod>
@@ -184,7 +184,7 @@
 
   <url>
     <loc>https://blog.zebedy.com/</loc>
-    <lastmod>2025-10-07</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
