@@ -2974,12 +2974,16 @@ mark.search-keyword {
   border-radius: 12px;
   margin: 20px 0;
 }
-.encrypted-lock-icon {
-  color: #555;
-  margin-bottom: 20px;
-  animation: pulse 2s ease-in-out infinite;
+.decrypt-methods {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  max-width: 280px;
+  margin: 0 auto;
 }
-.fido2-verify-btn {
+.decrypt-btn {
+  width: 100%;
   background: #3b8fc7;
   color: #fff;
   border: none;
@@ -2989,16 +2993,43 @@ mark.search-keyword {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(59,143,199,0.4);
+  text-align: center;
 }
-.fido2-verify-btn:hover {
+.decrypt-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(59,143,199,0.6);
 }
-.fido2-verify-btn:active {
+.decrypt-btn:active {
   transform: translateY(0);
 }
-.fido2-verify-btn i {
+.decrypt-btn i {
   margin-right: 8px;
+}
+.password-decrypt-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.password-input-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.3s ease-in;
+}
+.password-input {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+.password-input:focus {
+  border-color: #3b8fc7;
 }
 .verification-status {
   margin-top: 20px;
@@ -3025,14 +3056,6 @@ mark.search-keyword {
 .verification-status i {
   margin-right: 8px;
 }
-.verification-status a {
-  color: inherit;
-  font-weight: bold;
-  transition: opacity 0.3s ease;
-}
-.verification-status a:hover {
-  opacity: 0.8;
-}
 .decrypted-content {
   animation: fadeIn 0.5s ease-in;
 }
@@ -3048,62 +3071,41 @@ mark.search-keyword {
   justify-content: center;
   gap: 8px;
   font-size: 15px;
+  color: #888;
 }
 .encrypted-status i {
   color: #667eea;
+  font-size: 16px;
 }
 .encrypted-decrypted-preview {
   animation: fadeIn 0.5s ease-in;
   line-height: 1.8;
+  color: #333;
 }
 @media (prefers-color-scheme: dark) {
   .encrypted-post-notice {
     background: transparent;
   }
-  .encrypted-lock-icon {
-    color: #cbd5e0;
+  .password-input {
+    background: #374151;
+    color: #f3f4f6;
+    border-color: #4b5563;
+  }
+  .password-input:focus {
+    border-color: #3b8fc7;
   }
   .encrypted-post-preview {
     background: #2d3748;
     color: #a0aec0;
   }
+  .encrypted-status {
+    color: #9ca3af;
+  }
   .encrypted-status i {
     color: #9fa8da;
   }
   .encrypted-decrypted-preview {
-    color: #e2e8f0;
-  }
-}
-@-moz-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-@-webkit-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-@-o-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
+    color: #e5e7eb;
   }
 }
 @-moz-keyframes fadeIn {

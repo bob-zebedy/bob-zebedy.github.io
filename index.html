@@ -22,7 +22,8 @@
   <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"blog.zebedy.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.9.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta property="og:type" content="website">
+
+  <meta property="og:type" content="website">
 <meta property="og:title" content="Undefined">
 <meta property="og:url" content="https://blog.zebedy.com/index.html">
 <meta property="og:site_name" content="Undefined">
@@ -379,11 +380,10 @@
     <div class="post-body" itemprop="articleBody">
           <div class="encrypted-post-preview" id="encrypted-preview-19c1a188" data-abbrlink="19c1a188">
             <div class="encrypted-status">
-              <i class="fa fa-shield-alt"></i> 文章已加密
+              <i class="fa fa-shield-alt"></i> 文章已加密保护
             </div>
           </div>
-          <div class="encrypted-decrypted-preview" id="decrypted-preview-19c1a188" style="display:none;">
-          </div>
+          <div class="encrypted-decrypted-preview" id="decrypted-preview-19c1a188" style="display:none;"></div>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/19c1a188.html">
@@ -393,48 +393,42 @@
           <!--/noindex-->
           <script>
             (function () {
-              const abbrlink = "19c1a188";
-              const cacheKey = abbrlink || location.pathname;
+              const cacheKey = "19c1a188" || location.pathname;
               try {
                 const cached = localStorage.getItem(cacheKey);
-                if (cached) {
-                  const { html, expired } = JSON.parse(cached);
-                  if (Date.now() < expired) {
-                    const tempDiv = document.createElement("div");
-                    tempDiv.innerHTML = html;
+                if (!cached) return;
 
-                    const moreElement = tempDiv.querySelector("#more");
-                    let preview = "";
-
-                    if (moreElement) {
-                      const range = document.createRange();
-                      range.setStartBefore(tempDiv.firstChild);
-                      range.setEndBefore(moreElement);
-                      preview = range.cloneContents().textContent.trim();
-                    }
-
-                    if (!preview) {
-                      const text = tempDiv.textContent.trim();
-                      preview = text.substring(0, 200) + (text.length > 200 ? "..." : "");
-                    }
-
-                    if (preview) {
-                      const previewEl = document.getElementById(
-                        "decrypted-preview-19c1a188"
-                      );
-                      const encryptedEl = document.getElementById(
-                        "encrypted-preview-19c1a188"
-                      );
-                      if (previewEl) {
-                        previewEl.textContent = preview;
-                        previewEl.style.display = "block";
-                      }
-                      if (encryptedEl) encryptedEl.style.display = "none";
-                    }
-                  } else {
-                    localStorage.removeItem(cacheKey);
-                  }
+                const { html, expired } = JSON.parse(cached);
+                if (Date.now() >= expired) {
+                  localStorage.removeItem(cacheKey);
+                  return;
                 }
+
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = html;
+                const moreElement = tempDiv.querySelector("#more");
+                
+                let preview = "";
+                if (moreElement) {
+                  const range = document.createRange();
+                  range.setStartBefore(tempDiv.firstChild);
+                  range.setEndBefore(moreElement);
+                  preview = range.cloneContents().textContent.trim();
+                }
+                
+                if (!preview) {
+                  const text = tempDiv.textContent.trim();
+                  preview = text ? text.substring(0, 200) + (text.length > 200 ? "..." : "") : "暂无预览";
+                }
+
+                const previewEl = document.getElementById("decrypted-preview-19c1a188");
+                const encryptedEl = document.getElementById("encrypted-preview-19c1a188");
+                
+                if (previewEl) {
+                  previewEl.textContent = preview;
+                  previewEl.style.display = "block";
+                }
+                if (encryptedEl) encryptedEl.style.display = "none";
               } catch (e) {}
             })();
           </script>
