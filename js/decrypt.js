@@ -1,9 +1,11 @@
+const PBKDF2_ITERATIONS = 500000;
+
 function getRPID() {
   const hostname = location.hostname;
   return hostname === "127.0.0.1" ? "localhost" : hostname;
 }
 
-class FIDO2Decryptor {
+class Decryptor {
   constructor() {
     this.container = null;
     this.data = null;
@@ -156,7 +158,7 @@ class FIDO2Decryptor {
     }
   }
 
-  async derivePBKDF2Key(password, salt, iterations = 10000) {
+  async derivePBKDF2Key(password, salt, iterations = PBKDF2_ITERATIONS) {
     const passwordBuffer = new TextEncoder().encode(password);
     const saltBuffer = new TextEncoder().encode(salt);
 
@@ -329,7 +331,7 @@ class FIDO2Decryptor {
   }
 }
 
-const decryptor = new FIDO2Decryptor();
+const decryptor = new Decryptor();
 document.addEventListener("DOMContentLoaded", () => {
   if (document.querySelector(".encrypted-post-container")) decryptor.init();
 });
