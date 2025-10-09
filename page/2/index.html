@@ -1039,14 +1039,60 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>这里会增量记录 OpenWrt 相关的一些技巧或者配置方法。</p>
+          <div class="encrypted-post-preview" id="encrypted-preview-465f36a1" data-abbrlink="465f36a1">
+            <div class="encrypted-status">
+              <i class="fa fa-shield-alt"></i> 文章已加密保护
+            </div>
+          </div>
+          <div class="encrypted-decrypted-preview" id="decrypted-preview-465f36a1" style="display:none;"></div>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/post/465f36a1.html#more" rel="contents">
+              <a class="btn" href="/post/465f36a1.html">
                 阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
+          <script>
+            (function () {
+              const cacheKey = "465f36a1" || location.pathname;
+              try {
+                const cached = localStorage.getItem(cacheKey);
+                if (!cached) return;
+
+                const { html, expired } = JSON.parse(cached);
+                if (Date.now() >= expired) {
+                  localStorage.removeItem(cacheKey);
+                  return;
+                }
+
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = html;
+                const moreElement = tempDiv.querySelector("#more");
+                
+                let preview = "";
+                if (moreElement) {
+                  const range = document.createRange();
+                  range.setStartBefore(tempDiv.firstChild);
+                  range.setEndBefore(moreElement);
+                  preview = range.cloneContents().textContent.trim();
+                }
+                
+                if (!preview) {
+                  const text = tempDiv.textContent.trim();
+                  preview = text ? text.substring(0, 200) + (text.length > 200 ? "..." : "") : "暂无预览";
+                }
+
+                const previewEl = document.getElementById("decrypted-preview-465f36a1");
+                const encryptedEl = document.getElementById("encrypted-preview-465f36a1");
+                
+                if (previewEl) {
+                  previewEl.textContent = preview;
+                  previewEl.style.display = "block";
+                }
+                if (encryptedEl) encryptedEl.style.display = "none";
+              } catch (e) {}
+            })();
+          </script>
         
       
     </div>
