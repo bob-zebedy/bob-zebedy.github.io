@@ -64,7 +64,25 @@ class FIDO2Decryptor {
 
     if (showBtn) showBtn.style.display = "none";
     if (inputGroup) inputGroup.style.display = "flex";
-    if (passwordInput) passwordInput.focus();
+    if (passwordInput) {
+      passwordInput.focus();
+      passwordInput.addEventListener("input", () =>
+        this.updatePasswordButtonState()
+      );
+    }
+    this.updatePasswordButtonState();
+  }
+
+  updatePasswordButtonState() {
+    const passwordInput = document.getElementById("password-input");
+    const passwordBtn = document.getElementById("password-decrypt-btn");
+
+    if (!passwordInput || !passwordBtn) return;
+
+    const hasPassword = passwordInput.value.trim().length > 0;
+    passwordBtn.disabled = !hasPassword;
+    passwordBtn.style.opacity = hasPassword ? "1" : "0.5";
+    passwordBtn.style.cursor = hasPassword ? "pointer" : "not-allowed";
   }
 
   checkCache() {

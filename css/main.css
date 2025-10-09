@@ -3002,6 +3002,15 @@ mark.search-keyword {
 .decrypt-btn:active {
   transform: translateY(0);
 }
+.decrypt-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.decrypt-btn:disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 15px rgba(59,143,199,0.4);
+}
 .decrypt-btn i {
   margin-right: 8px;
 }
@@ -3037,6 +3046,9 @@ mark.search-keyword {
   border-radius: 8px;
   font-size: 14px;
   display: none;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .verification-status.info {
   background: #e7f3ff;
