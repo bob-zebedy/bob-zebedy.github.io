@@ -21,26 +21,55 @@ class FIDO2Decryptor {
       abbrlink: this.container.dataset.abbrlink,
       wrappedKeys: JSON.parse(this.container.dataset.wrappedKeys || "[]"),
       prfSalt: this.container.dataset.prfSalt,
+      cache: parseInt(this.container.dataset.cache) || 0,
     };
-
-    if (!window.PublicKeyCredential) {
-      this.showError("浏览器不支持 FIDO2/WebAuthn");
-      return;
-    }
 
     if (this.checkCache()) return;
 
-    const btn = document.getElementById("fido2-verify-btn");
-    if (!btn) return;
+    const fido2Btn = document.getElementById("fido2-verify-btn");
+    if (fido2Btn) {
+      if (!window.PublicKeyCredential) {
+        this.showError("浏览器不支持 FIDO2/WebAuthn");
+      } else {
+        fido2Btn.onclick = () => this.authenticate();
+      }
+    }
 
-    btn.onclick = () => this.authenticate();
+    const showPasswordBtn = document.getElementById("show-password-btn");
+    if (showPasswordBtn) {
+      showPasswordBtn.onclick = () => this.showPasswordInput();
+    }
+
+    const passwordBtn = document.getElementById("password-decrypt-btn");
+    if (passwordBtn) {
+      passwordBtn.onclick = () => this.decryptWithPassword();
+    }
+
+    const passwordInput = document.getElementById("password-input");
+    if (passwordInput) {
+      passwordInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") this.decryptWithPassword();
+      });
+    }
   }
 
   getCacheKey() {
     return this.data.abbrlink || location.pathname;
   }
 
+  showPasswordInput() {
+    const showBtn = document.getElementById("show-password-btn");
+    const inputGroup = document.getElementById("password-input-group");
+    const passwordInput = document.getElementById("password-input");
+
+    if (showBtn) showBtn.style.display = "none";
+    if (inputGroup) inputGroup.style.display = "flex";
+    if (passwordInput) passwordInput.focus();
+  }
+
   checkCache() {
+    if (!this.data.cache) return false;
+
     try {
       const cached = localStorage.getItem(this.getCacheKey());
       if (!cached) return false;
@@ -59,15 +88,15 @@ class FIDO2Decryptor {
   }
 
   saveCache(html) {
+    if (!this.data.cache) return;
+
     try {
-      const expired = Date.now() + 10 * 60 * 1000;
+      const expired = Date.now() + this.data.cache * 60 * 1000;
       localStorage.setItem(
         this.getCacheKey(),
         JSON.stringify({ html, expired })
       );
-    } catch (e) {
-      console.warn(`缓存失败: ${e}`);
-    }
+    } catch (e) {}
   }
 
   async authenticate() {
@@ -109,7 +138,67 @@ class FIDO2Decryptor {
     }
   }
 
-  async unwrapAndDecrypt(wrappingKey) {
+  async derivePBKDF2Key(password, salt, iterations = 10000) {
+    const passwordBuffer = new TextEncoder().encode(password);
+    const saltBuffer = new TextEncoder().encode(salt);
+
+    const baseKey = await crypto.subtle.importKey(
+      "raw",
+      passwordBuffer,
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+
+    const derivedBits = await crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt: saltBuffer,
+        iterations: iterations,
+        hash: "SHA-256",
+      },
+      baseKey,
+      256
+    );
+
+    return derivedBits;
+  }
+
+  async decryptWithPassword() {
+    const passwordInput = document.getElementById("password-input");
+    const password = passwordInput?.value.trim();
+
+    if (!password) {
+      this.showError("请输入密码");
+      return;
+    }
+
+    this.showStatus("正在解密...", "info");
+
+    try {
+      const passwordWrapped = this.data.wrappedKeys.find(
+        (k) => k.type === "password"
+      );
+      if (!passwordWrapped) throw new Error("文章不支持密码");
+
+      const wrappingKey = await this.derivePBKDF2Key(
+        password,
+        passwordWrapped.salt
+      );
+      await this.unwrapAndDecrypt(wrappingKey, "password");
+    } catch (e) {
+      this.showError(`解密失败: ${e.message}`);
+    }
+  }
+
+  combineWithAuthTag(data, authTag) {
+    const combined = new Uint8Array(data.byteLength + authTag.byteLength);
+    combined.set(new Uint8Array(data), 0);
+    combined.set(new Uint8Array(authTag), data.byteLength);
+    return combined;
+  }
+
+  async unwrapAndDecrypt(wrappingKey, type = "fido2") {
     try {
       const wrapKeyBuffer = await crypto.subtle.importKey(
         "raw",
@@ -118,19 +207,15 @@ class FIDO2Decryptor {
         false,
         ["decrypt"]
       );
+      const targetKeys = this.data.wrappedKeys.filter((k) => k.type === type);
 
       let cek = null;
-      for (const wrapped of this.data.wrappedKeys) {
+      for (const wrapped of targetKeys) {
         try {
           const encCEK = this.b64ToAB(wrapped.encryptedCEK);
           const wrapIV = this.b64ToAB(wrapped.iv);
           const wrapAuthTag = this.b64ToAB(wrapped.authTag);
-
-          const wrappedCEK = new Uint8Array(
-            encCEK.byteLength + wrapAuthTag.byteLength
-          );
-          wrappedCEK.set(new Uint8Array(encCEK), 0);
-          wrappedCEK.set(new Uint8Array(wrapAuthTag), encCEK.byteLength);
+          const wrappedCEK = this.combineWithAuthTag(encCEK, wrapAuthTag);
 
           cek = await crypto.subtle.decrypt(
             { name: "AES-GCM", iv: wrapIV, tagLength: 128 },
@@ -141,8 +226,8 @@ class FIDO2Decryptor {
         } catch (e) {}
       }
 
-      if (!cek) throw new Error("通行密钥无权限");
-
+      if (!cek)
+        throw new Error(type === "password" ? "密码错误" : "通行密钥无权限");
       await this.decryptContent(cek);
     } catch (e) {
       this.showError(`解密失败: ${e.message}`);
@@ -156,12 +241,7 @@ class FIDO2Decryptor {
       const ciphertext = this.b64ToAB(this.data.ciphertext);
       const iv = this.b64ToAB(this.data.iv);
       const authTag = this.b64ToAB(this.data.authTag);
-
-      const encData = new Uint8Array(
-        ciphertext.byteLength + authTag.byteLength
-      );
-      encData.set(new Uint8Array(ciphertext), 0);
-      encData.set(new Uint8Array(authTag), ciphertext.byteLength);
+      const encData = this.combineWithAuthTag(ciphertext, authTag);
 
       const key = await crypto.subtle.importKey(
         "raw",
@@ -198,9 +278,7 @@ class FIDO2Decryptor {
       if (typeof NexT !== "undefined" && NexT.boot?.refresh) {
         NexT.boot.refresh();
       }
-    } catch (e) {
-      console.warn(`NexT 主题功能初始化失败: ${e}`);
-    }
+    } catch (e) {}
   }
 
   showStatus(msg, type = "info") {
