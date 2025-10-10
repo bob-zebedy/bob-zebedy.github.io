@@ -295,10 +295,10 @@ class Decryptor {
     content.style.display = "block";
 
     try {
-      if (typeof NexT !== "undefined" && NexT.boot?.refresh) {
-        NexT.boot.refresh();
-      }
-    } catch (e) {}
+      this.renderRefresh();
+    } catch (e) {
+      console.error(`刷新渲染失败: ${e.message}`);
+    }
   }
 
   showStatus(msg, type = "info") {
@@ -321,6 +321,79 @@ class Decryptor {
   hideStatus() {
     const el = document.getElementById("verification-status");
     if (el) el.style.display = "none";
+  }
+
+  rebuildTOC() {
+    try {
+      const content = document.getElementById("decrypted-content");
+      const tocWrap = document.querySelector(".post-toc-wrap");
+      const sidebar = document.querySelector(".sidebar-inner");
+      const utils = window.NexT?.utils;
+      if (!content || !tocWrap) return;
+
+      const headings = content.querySelectorAll("h1,h2,h3,h4,h5,h6");
+      const ensureToc = () =>
+        tocWrap.querySelector(".post-toc") ||
+        (() => {
+          const el = document.createElement("div");
+          el.className = "post-toc animated";
+          tocWrap.appendChild(el);
+          return el;
+        })();
+
+      if (!headings.length) {
+        const exist = tocWrap.querySelector(".post-toc");
+        if (exist) exist.innerHTML = "";
+        sidebar?.classList.remove("sidebar-nav-active", "sidebar-toc-active");
+        sidebar?.classList.add("sidebar-overview-active");
+        utils?.registerSidebarTOC?.();
+        return;
+      }
+
+      const { roots } = Array.from(headings).reduce(
+        (acc, h, i) => {
+          if (!h.id) h.id = `heading-${i}`;
+          const level = parseInt(h.tagName[1], 10);
+          const node = {
+            level,
+            id: h.id,
+            text: h.textContent.trim(),
+            children: [],
+          };
+          while (acc.stack.length && acc.stack.at(-1).level >= level)
+            acc.stack.pop();
+          (acc.stack.length ? acc.stack.at(-1).children : acc.roots).push(node);
+          acc.stack.push(node);
+          return acc;
+        },
+        { roots: [], stack: [] }
+      );
+
+      const render = (nodes, depth = 1) =>
+        nodes
+          .map((n) => {
+            const link = `<a class="nav-link" href="#${n.id}"><span class="nav-text">${n.text}</span></a>`;
+            const kids = n.children.length
+              ? `<ol class="nav-child">${render(n.children, depth + 1)}</ol>`
+              : "";
+            return `<li class="nav-item nav-level-${depth}">${link}${kids}</li>`;
+          })
+          .join("");
+
+      const toc = ensureToc();
+      toc.innerHTML = `<ol class="nav">${render(roots)}</ol>`;
+
+      sidebar?.classList.add("sidebar-nav-active", "sidebar-toc-active");
+      sidebar?.classList.remove("sidebar-overview-active");
+      utils?.registerSidebarTOC?.();
+    } catch (e) {
+      console.error(`TOC 重建失败: ${e.message}`);
+    }
+  }
+
+  renderRefresh() {
+    this.rebuildTOC();
+    NexT?.boot?.refresh?.();
   }
 
   b64ToAB(b64) {
