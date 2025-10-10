@@ -31,7 +31,7 @@ class Decryptor {
     const fido2Btn = document.getElementById("fido2-verify-btn");
     if (fido2Btn) {
       if (!window.PublicKeyCredential) {
-        this.showError("浏览器不支持 FIDO2/WebAuthn");
+        this.showStatus("浏览器不支持 FIDO2/WebAuthn", "error");
       } else {
         fido2Btn.onclick = () => this.authenticate();
       }
@@ -149,11 +149,11 @@ class Decryptor {
       setTimeout(() => this.unwrapAndDecrypt(wrappingKey), 300);
     } catch (e) {
       if (e.name === "NotAllowedError") {
-        this.showError("验证被拒绝");
+        this.showStatus("验证被拒绝", "error");
       } else if (e.name === "InvalidStateError" || e.name === "NotFoundError") {
-        this.showError("未注册的通行密钥");
+        this.showStatus("未注册的通行密钥", "error");
       } else {
-        this.showError(`验证失败: ${e.message}`);
+        this.showStatus(`验证失败: ${e.message}`, "error");
       }
     }
   }
@@ -189,7 +189,7 @@ class Decryptor {
     const password = passwordInput?.value.trim();
 
     if (!password) {
-      this.showError("请输入密码");
+      this.showStatus("未输入密码", "error");
       return;
     }
 
@@ -199,7 +199,7 @@ class Decryptor {
       const passwordWrapped = this.data.wrappedKeys.find(
         (k) => k.type === "password"
       );
-      if (!passwordWrapped) throw new Error("文章不支持密码");
+      if (!passwordWrapped) throw new Error("不支持密码认证");
 
       const wrappingKey = await this.derivePBKDF2Key(
         password,
@@ -207,7 +207,7 @@ class Decryptor {
       );
       await this.unwrapAndDecrypt(wrappingKey, "password");
     } catch (e) {
-      this.showError(`解密失败: ${e.message}`);
+      this.showStatus(`解密失败: ${e.message}`, "error");
     }
   }
 
@@ -250,7 +250,7 @@ class Decryptor {
         throw new Error(type === "password" ? "密码错误" : "通行密钥无权限");
       await this.decryptContent(cek);
     } catch (e) {
-      this.showError(`解密失败: ${e.message}`);
+      this.showStatus(`解密失败: ${e.message}`, "error");
     }
   }
 
@@ -281,7 +281,7 @@ class Decryptor {
       this.render(html);
       setTimeout(() => this.hideStatus(), 2000);
     } catch (e) {
-      this.showError(`解密失败: ${e.message}`);
+      this.showStatus(`解密失败: ${e.message}`, "error");
     }
   }
 
@@ -294,11 +294,7 @@ class Decryptor {
     content.innerHTML = html;
     content.style.display = "block";
 
-    try {
-      if (typeof NexT !== "undefined" && NexT.boot?.refresh) {
-        NexT.boot.refresh();
-      }
-    } catch (e) {}
+    this.renderRefresh();
   }
 
   showStatus(msg, type = "info") {
@@ -314,13 +310,82 @@ class Decryptor {
     el.innerHTML = `<i class="fa ${icons[type]}"></i> ${msg}`;
   }
 
-  showError(msg) {
-    this.showStatus(msg, "error");
-  }
-
   hideStatus() {
     const el = document.getElementById("verification-status");
     if (el) el.style.display = "none";
+  }
+
+  rebuildTOC() {
+    try {
+      const content = document.getElementById("decrypted-content");
+      const tocWrap = document.querySelector(".post-toc-wrap");
+      const sidebar = document.querySelector(".sidebar-inner");
+      const utils = window.NexT?.utils;
+      if (!content || !tocWrap) return;
+
+      const headings = content.querySelectorAll("h1,h2,h3,h4,h5,h6");
+      const ensureToc = () =>
+        tocWrap.querySelector(".post-toc") ||
+        (() => {
+          const el = document.createElement("div");
+          el.className = "post-toc animated";
+          tocWrap.appendChild(el);
+          return el;
+        })();
+
+      if (!headings.length) {
+        const exist = tocWrap.querySelector(".post-toc");
+        if (exist) exist.innerHTML = "";
+        sidebar?.classList.remove("sidebar-nav-active", "sidebar-toc-active");
+        sidebar?.classList.add("sidebar-overview-active");
+        utils?.registerSidebarTOC?.();
+        return;
+      }
+
+      const { roots } = Array.from(headings).reduce(
+        (acc, h, i) => {
+          if (!h.id) h.id = `heading-${i}`;
+          const level = parseInt(h.tagName[1], 10);
+          const node = {
+            level,
+            id: h.id,
+            text: h.textContent.trim(),
+            children: [],
+          };
+          while (acc.stack.length && acc.stack.at(-1).level >= level)
+            acc.stack.pop();
+          (acc.stack.length ? acc.stack.at(-1).children : acc.roots).push(node);
+          acc.stack.push(node);
+          return acc;
+        },
+        { roots: [], stack: [] }
+      );
+
+      const render = (nodes, depth = 1) =>
+        nodes
+          .map((n) => {
+            const link = `<a class="nav-link" href="#${n.id}"><span class="nav-text">${n.text}</span></a>`;
+            const kids = n.children.length
+              ? `<ol class="nav-child">${render(n.children, depth + 1)}</ol>`
+              : "";
+            return `<li class="nav-item nav-level-${depth}">${link}${kids}</li>`;
+          })
+          .join("");
+
+      const toc = ensureToc();
+      toc.innerHTML = `<ol class="nav">${render(roots)}</ol>`;
+
+      sidebar?.classList.add("sidebar-nav-active", "sidebar-toc-active");
+      sidebar?.classList.remove("sidebar-overview-active");
+      utils?.registerSidebarTOC?.();
+    } catch (e) {
+      console.error(`TOC 重建失败: ${e.message}`);
+    }
+  }
+
+  renderRefresh() {
+    this.rebuildTOC();
+    NexT?.boot?.refresh?.();
   }
 
   b64ToAB(b64) {
