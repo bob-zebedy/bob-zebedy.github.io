@@ -1,9 +1,11 @@
+const PBKDF2_ITERATIONS = 500000;
+
 function getRPID() {
   const hostname = location.hostname;
   return hostname === "127.0.0.1" ? "localhost" : hostname;
 }
 
-class FIDO2Decryptor {
+class Decryptor {
   constructor() {
     this.container = null;
     this.data = null;
@@ -54,7 +56,7 @@ class FIDO2Decryptor {
   }
 
   getCacheKey() {
-    return this.data.abbrlink || location.pathname;
+    return this.data.abbrlink;
   }
 
   showPasswordInput() {
@@ -64,7 +66,25 @@ class FIDO2Decryptor {
 
     if (showBtn) showBtn.style.display = "none";
     if (inputGroup) inputGroup.style.display = "flex";
-    if (passwordInput) passwordInput.focus();
+    if (passwordInput) {
+      passwordInput.focus();
+      passwordInput.addEventListener("input", () =>
+        this.updatePasswordButtonState()
+      );
+    }
+    this.updatePasswordButtonState();
+  }
+
+  updatePasswordButtonState() {
+    const passwordInput = document.getElementById("password-input");
+    const passwordBtn = document.getElementById("password-decrypt-btn");
+
+    if (!passwordInput || !passwordBtn) return;
+
+    const hasPassword = passwordInput.value.trim().length > 0;
+    passwordBtn.disabled = !hasPassword;
+    passwordBtn.style.opacity = hasPassword ? "1" : "0.5";
+    passwordBtn.style.cursor = hasPassword ? "pointer" : "not-allowed";
   }
 
   checkCache() {
@@ -138,7 +158,7 @@ class FIDO2Decryptor {
     }
   }
 
-  async derivePBKDF2Key(password, salt, iterations = 10000) {
+  async derivePBKDF2Key(password, salt, iterations = PBKDF2_ITERATIONS) {
     const passwordBuffer = new TextEncoder().encode(password);
     const saltBuffer = new TextEncoder().encode(salt);
 
@@ -311,7 +331,7 @@ class FIDO2Decryptor {
   }
 }
 
-const decryptor = new FIDO2Decryptor();
+const decryptor = new Decryptor();
 document.addEventListener("DOMContentLoaded", () => {
   if (document.querySelector(".encrypted-post-container")) decryptor.init();
 });

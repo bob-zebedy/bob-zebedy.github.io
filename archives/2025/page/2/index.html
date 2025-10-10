@@ -245,6 +245,27 @@
 
       <div class="post-title">
           <a class="post-title-link" href="/post/e6a2e300.html" itemprop="url">
+            <script>
+              (function () {
+                const cacheKey = "e6a2e300";
+                try {
+                  const cached = localStorage.getItem(cacheKey);
+                  if (!cached) return;
+
+                  const { expired } = JSON.parse(cached);
+                  if (Date.now() >= expired) {
+                    localStorage.removeItem(cacheKey);
+                    return;
+                  }
+                    
+                  const lockIcon = document.getElementById("lock-icon-small-e6a2e300");
+                  if (lockIcon) {
+                    lockIcon.classList.add('decrypted');
+                    lockIcon.className = lockIcon.className.replace('fa-lock', 'fa-unlock');
+                  }
+                } catch (e) {}
+              })();
+            </script>
             <span itemprop="name">Cloudflare 设置引用站点策略</span>
           </a>
       </div>
@@ -265,6 +286,27 @@
 
       <div class="post-title">
           <a class="post-title-link" href="/post/e72f1311.html" itemprop="url">
+            <script>
+              (function () {
+                const cacheKey = "e72f1311";
+                try {
+                  const cached = localStorage.getItem(cacheKey);
+                  if (!cached) return;
+
+                  const { expired } = JSON.parse(cached);
+                  if (Date.now() >= expired) {
+                    localStorage.removeItem(cacheKey);
+                    return;
+                  }
+                    
+                  const lockIcon = document.getElementById("lock-icon-small-e72f1311");
+                  if (lockIcon) {
+                    lockIcon.classList.add('decrypted');
+                    lockIcon.className = lockIcon.className.replace('fa-lock', 'fa-unlock');
+                  }
+                } catch (e) {}
+              })();
+            </script>
             <span itemprop="name">macOS Chrome '这些扩展程序不再受支持，因此已停用' 解决办法</span>
           </a>
       </div>
@@ -365,8 +407,6 @@
     <script type="text/javascript" src="/js/crash-cheat.js"></script>
   
 
-  
-    <script type="text/javascript" src="/js/oneko.js"></script>
   
 </body>
 </html>

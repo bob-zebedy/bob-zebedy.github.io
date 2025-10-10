@@ -245,6 +245,27 @@
 
       <div class="post-title">
           <a class="post-title-link" href="/post/daa7f9d2.html" itemprop="url">
+            <script>
+              (function () {
+                const cacheKey = "daa7f9d2";
+                try {
+                  const cached = localStorage.getItem(cacheKey);
+                  if (!cached) return;
+
+                  const { expired } = JSON.parse(cached);
+                  if (Date.now() >= expired) {
+                    localStorage.removeItem(cacheKey);
+                    return;
+                  }
+                    
+                  const lockIcon = document.getElementById("lock-icon-small-daa7f9d2");
+                  if (lockIcon) {
+                    lockIcon.classList.add('decrypted');
+                    lockIcon.className = lockIcon.className.replace('fa-lock', 'fa-unlock');
+                  }
+                } catch (e) {}
+              })();
+            </script>
             <span itemprop="name">NexT 主题高级标签插件</span>
           </a>
       </div>
@@ -265,6 +286,27 @@
 
       <div class="post-title">
           <a class="post-title-link" href="/post/958b861f.html" itemprop="url">
+            <script>
+              (function () {
+                const cacheKey = "958b861f";
+                try {
+                  const cached = localStorage.getItem(cacheKey);
+                  if (!cached) return;
+
+                  const { expired } = JSON.parse(cached);
+                  if (Date.now() >= expired) {
+                    localStorage.removeItem(cacheKey);
+                    return;
+                  }
+                    
+                  const lockIcon = document.getElementById("lock-icon-small-958b861f");
+                  if (lockIcon) {
+                    lockIcon.classList.add('decrypted');
+                    lockIcon.className = lockIcon.className.replace('fa-lock', 'fa-unlock');
+                  }
+                } catch (e) {}
+              })();
+            </script>
             <span itemprop="name">iPhone 17 壁纸</span>
           </a>
       </div>
@@ -362,8 +404,6 @@
     <script type="text/javascript" src="/js/crash-cheat.js"></script>
   
 
-  
-    <script type="text/javascript" src="/js/oneko.js"></script>
   
 </body>
 </html>

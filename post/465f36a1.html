@@ -23,17 +23,6 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"blog.zebedy.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.9.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="这里会增量记录 OpenWrt 相关的一些技巧或者配置方法。">
-<meta property="og:type" content="article">
-<meta property="og:title" content="OpenWrt 配置记录">
-<meta property="og:url" content="https://blog.zebedy.com/post/465f36a1.html">
-<meta property="og:site_name" content="Undefined">
-<meta property="og:description" content="这里会增量记录 OpenWrt 相关的一些技巧或者配置方法。">
-<meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-03-02T07:43:35.000Z">
-<meta property="article:modified_time" content="2025-10-07T06:54:07.000Z">
-<meta property="article:author" content="Zebedy">
-<meta name="twitter:card" content="summary">
 
 
 <link rel="canonical" href="https://blog.zebedy.com/post/465f36a1.html">
@@ -140,7 +129,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+    <div class="sidebar-inner sidebar-overview-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -153,7 +142,6 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E7%BD%91%E8%AE%BE%E5%A4%87%E7%9B%B4%E6%8E%A5%E8%AE%BF%E9%97%AE%E5%85%89%E7%8C%AB"><span class="nav-text">内网设备直接访问光猫</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87"><span class="nav-text">准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-text">配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%80%E5%90%AF-Dnsmasq-%E6%97%A5%E5%BF%97"><span class="nav-text">开启 Dnsmasq 日志</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E6%97%A5%E5%BF%97%E4%B8%AD%E5%B1%8F%E8%94%BD-crontab-%E7%9B%B8%E5%85%B3%E6%97%A5%E5%BF%97"><span class="nav-text">系统日志中屏蔽 crontab 相关日志</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -263,7 +251,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-10-07 14:54:07" itemprop="dateModified" datetime="2025-10-07T14:54:07+08:00">2025-10-07</time>
+      <time title="修改时间：2025-10-10 14:01:45" itemprop="dateModified" datetime="2025-10-10T14:01:45+08:00">2025-10-10</time>
     </span>
 
   
@@ -298,41 +286,26 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>这里会增量记录 OpenWrt 相关的一些技巧或者配置方法。</p>
-<span id="more"></span>
-
-<h1 id="内网设备直接访问光猫"><a href="#内网设备直接访问光猫" class="headerlink" title="内网设备直接访问光猫"></a>内网设备直接访问光猫</h1><p>在光猫桥接的情况下，一般 OpenWrt 和光猫的因为不在一个网段下，所以 OpenWrt 分配的 IP 并不能直接访问光猫。但是通过对 OpenWrt 防火墙进行相关的的配置可以实现访问光猫</p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ul>
-<li>OpenWrt WAN 口: eth0</li>
-<li>光猫 IP: 192.168.1.1</li>
-</ul>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>登录 OpenWrt 后台。在 <code>网络</code> -&gt; <code>防火墙</code> -&gt; <code>自定义规则</code> 下添加以下内容</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">ifconfig eth0 192.168.1.10 netmask 255.255.255.0 broadcast 192.168.1.255</span><br><span class="line">iptables -I forwarding_rule -d 192.168.1.1 -j ACCEPT</span><br><span class="line">iptables -t nat -I postrouting_rule -d 192.168.1.1 -j MASQUERADE</span><br></pre></td></tr></table></figure>
-
-<p>解释一下:</p>
-<ol>
-<li>第一行 <code>eth0</code> 是 OpenWrt WAN 口</li>
-<li>第一行 <code>192.168.1.10</code> 是手动分配给 <code>eth0</code> 一个光猫所在网段的 IP，可以时其他的地址，只要不和当前光猫网段下 IP 冲突就行</li>
-<li>第二行和第三行 <code>192.168.1.1</code> 是光猫的 IP 地址</li>
-</ol>
-<p>然后重启 OpenWrt，此时内网设备就可以通过浏览器访问 <code>192.168.1.1</code> 登录光猫后台了。</p>
-<h1 id="开启-Dnsmasq-日志"><a href="#开启-Dnsmasq-日志" class="headerlink" title="开启 Dnsmasq 日志"></a>开启 Dnsmasq 日志</h1><p>编辑 <code>dnsmasq</code> 配置 <code>/etc/dnsmasq.conf</code> 文件</p>
-<p>添加以下内容</p>
-<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line"><span class="built_in">log</span>-queries</span><br><span class="line"><span class="built_in">log</span>-facility=<span class="regexp">/tmp/</span>dnsmasq.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
-
-<p>重启 dnsmasq 服务</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">/etc/init.d/dnsmasq restart</span><br></pre></td></tr></table></figure>
-
-<p>添加日志解析器</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">tail</span> -f -n 1 /tmp/dnsmasq.log</span><br></pre></td></tr></table></figure>
-
-<h1 id="系统日志中屏蔽-crontab-相关日志"><a href="#系统日志中屏蔽-crontab-相关日志" class="headerlink" title="系统日志中屏蔽 crontab 相关日志"></a>系统日志中屏蔽 crontab 相关日志</h1><p>编辑系统配置 <code>/etc/config/system</code></p>
-<p>在 <code>system</code> 段中修改相关配置为以下内容</p>
-<figure class="highlight gams"><table><tr><td class="code"><pre><span class="line"><span class="keyword">option</span> cronloglevel <span class="string">&#x27;4&#x27;</span></span><br><span class="line"><span class="keyword">option</span> conloglevel <span class="string">&#x27;9&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>然后重启 crontab 服务即可</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">/etc/init.d/cron restart</span><br></pre></td></tr></table></figure>
-
+        <div class="encrypted-post-container" 
+    data-ciphertext="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"
+    data-iv="qMNSQTPwjGtnaZL0"
+    data-auth-tag="fqcpAUh4RmPBHgSlRSZBmQ=="
+    data-abbrlink="465f36a1"
+    data-wrapped-keys='[{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;lqhrf5eR9pRWx+otd+uBC+mEE+g3uRREplHimQaPSXA=&quot;,&quot;iv&quot;:&quot;u4d1jTnn/+LsKTws&quot;,&quot;authTag&quot;:&quot;De3Hb4UfSHdyB3YO+0MSlw==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;V3sU5MUYMM9GJ1aGeVQZAX9z+SzN9j1ewk/f4ITt2k4=&quot;,&quot;iv&quot;:&quot;jvQPAVVm2iQBMmYE&quot;,&quot;authTag&quot;:&quot;mctBQzRKNUmpHFX0MxUOxw==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;FKt2FEYknBmQZRl/CrKWefEDvjqUmpjAo9I+B64l3jc=&quot;,&quot;iv&quot;:&quot;xpzpa7IvLyiZ28sP&quot;,&quot;authTag&quot;:&quot;86hFs6a20e/LrF8c/U1pFg==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;jbchFWJ/3crOq2rSVas8Qffw1GU6MaZvUjSolqUgyYk=&quot;,&quot;iv&quot;:&quot;xlTwmEBmHomQ1hoo&quot;,&quot;authTag&quot;:&quot;tj+iSJXihNGrXO47VPOMgA==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;Go0C77t6Cli14fsOB4NMU1BabW6WwQ9trczdYSECCes=&quot;,&quot;iv&quot;:&quot;ho2dzpSkXiH9lnNP&quot;,&quot;authTag&quot;:&quot;dVyQmvY9YkUPOj8pXkfHtw==&quot;},{&quot;type&quot;:&quot;password&quot;,&quot;encryptedCEK&quot;:&quot;EcJrqRK8xhdiKhSJhQrEuShgKwQIKjjb/1Mr+CLv6po=&quot;,&quot;iv&quot;:&quot;OQ6nrN3Zv9Uok+Cy&quot;,&quot;authTag&quot;:&quot;eTxcY8mJ4bsTtRe4OLxMUA==&quot;,&quot;salt&quot;:&quot;1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b&quot;}]'
+    data-prf-salt="1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b"
+    data-cache="10">
+  <div class="encrypted-post-notice">
+    <div class="decrypt-methods"><button class="decrypt-btn" id="fido2-verify-btn"><i class="fa fa-fingerprint"></i> 通行密钥验证</button><div class="password-decrypt-group">
+        <button class="decrypt-btn" id="show-password-btn"><i class="fa fa-lock"></i> 密码验证</button>
+        <div class="password-input-group" id="password-input-group" style="display:none">
+          <input type="password" class="password-input" id="password-input" placeholder="输入密码" />
+          <button class="decrypt-btn" id="password-decrypt-btn"><i class="fa fa-key"></i> 确定</button>
+        </div>
+      </div></div>
+    <div class="verification-status" id="verification-status"></div>
+  </div>
+  <div class="decrypted-content" id="decrypted-content" style="display:none"></div>
+</div>
     </div>
 
     
@@ -464,7 +437,6 @@
   
 
   
-    <script type="text/javascript" src="/js/oneko.js"></script>
-  
+    <script type="text/javascript" src="/js/decrypt.js"></script>
 </body>
 </html>

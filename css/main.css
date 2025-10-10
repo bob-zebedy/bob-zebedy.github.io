@@ -3002,6 +3002,15 @@ mark.search-keyword {
 .decrypt-btn:active {
   transform: translateY(0);
 }
+.decrypt-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.decrypt-btn:disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 15px rgba(59,143,199,0.4);
+}
 .decrypt-btn i {
   margin-right: 8px;
 }
@@ -3037,6 +3046,9 @@ mark.search-keyword {
   border-radius: 8px;
   font-size: 14px;
   display: none;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .verification-status.info {
   background: #e7f3ff;
@@ -3082,6 +3094,29 @@ mark.search-keyword {
   line-height: 1.8;
   color: #333;
 }
+.encrypted-lock-icon-index {
+  color: #e74c3c;
+  margin-right: 8px;
+  font-size: 18px;
+  vertical-align: baseline;
+  position: relative;
+  top: -1px;
+  transition: color 0.3s ease;
+}
+.encrypted-lock-icon-index.decrypted {
+  color: #27ae60;
+}
+.encrypted-lock-icon-small {
+  color: #e74c3c;
+  margin-right: 6px;
+  font-size: 10px;
+  vertical-align: baseline;
+  position: relative;
+  top: -1px;
+}
+.encrypted-lock-icon-small.decrypted {
+  color: #27ae60;
+}
 @media (prefers-color-scheme: dark) {
   .encrypted-post-notice {
     background: transparent;
@@ -3106,6 +3141,18 @@ mark.search-keyword {
   }
   .encrypted-decrypted-preview {
     color: #e5e7eb;
+  }
+  .encrypted-lock-icon-index {
+    color: #ff6b6b;
+  }
+  .encrypted-lock-icon-index.decrypted {
+    color: #2ecc71;
+  }
+  .encrypted-lock-icon-small {
+    color: #ff6b6b;
+  }
+  .encrypted-lock-icon-small.decrypted {
+    color: #2ecc71;
   }
 }
 @-moz-keyframes fadeIn {

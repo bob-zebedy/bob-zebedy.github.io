@@ -245,6 +245,27 @@
 
       <div class="post-title">
           <a class="post-title-link" href="/post/de583f28.html" itemprop="url">
+            <script>
+              (function () {
+                const cacheKey = "de583f28";
+                try {
+                  const cached = localStorage.getItem(cacheKey);
+                  if (!cached) return;
+
+                  const { expired } = JSON.parse(cached);
+                  if (Date.now() >= expired) {
+                    localStorage.removeItem(cacheKey);
+                    return;
+                  }
+                    
+                  const lockIcon = document.getElementById("lock-icon-small-de583f28");
+                  if (lockIcon) {
+                    lockIcon.classList.add('decrypted');
+                    lockIcon.className = lockIcon.className.replace('fa-lock', 'fa-unlock');
+                  }
+                } catch (e) {}
+              })();
+            </script>
             <span itemprop="name">北京联通异地宽带办理指南</span>
           </a>
       </div>
@@ -342,8 +363,6 @@
     <script type="text/javascript" src="/js/crash-cheat.js"></script>
   
 
-  
-    <script type="text/javascript" src="/js/oneko.js"></script>
   
 </body>
 </html>

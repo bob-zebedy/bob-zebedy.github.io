@@ -245,6 +245,27 @@
 
       <div class="post-title">
           <a class="post-title-link" href="/post/4de6100b.html" itemprop="url">
+            <script>
+              (function () {
+                const cacheKey = "4de6100b";
+                try {
+                  const cached = localStorage.getItem(cacheKey);
+                  if (!cached) return;
+
+                  const { expired } = JSON.parse(cached);
+                  if (Date.now() >= expired) {
+                    localStorage.removeItem(cacheKey);
+                    return;
+                  }
+                    
+                  const lockIcon = document.getElementById("lock-icon-small-4de6100b");
+                  if (lockIcon) {
+                    lockIcon.classList.add('decrypted');
+                    lockIcon.className = lockIcon.className.replace('fa-lock', 'fa-unlock');
+                  }
+                } catch (e) {}
+              })();
+            </script>
             <span itemprop="name">Hexo 使用通行密钥对文章加密</span>
           </a>
       </div>
@@ -265,6 +286,28 @@
 
       <div class="post-title">
           <a class="post-title-link" href="/post/19c1a188.html" itemprop="url">
+              <i class="fa fa-lock encrypted-lock-icon-small" id="lock-icon-small-19c1a188"></i>
+            <script>
+              (function () {
+                const cacheKey = "19c1a188";
+                try {
+                  const cached = localStorage.getItem(cacheKey);
+                  if (!cached) return;
+
+                  const { expired } = JSON.parse(cached);
+                  if (Date.now() >= expired) {
+                    localStorage.removeItem(cacheKey);
+                    return;
+                  }
+                    
+                  const lockIcon = document.getElementById("lock-icon-small-19c1a188");
+                  if (lockIcon) {
+                    lockIcon.classList.add('decrypted');
+                    lockIcon.className = lockIcon.className.replace('fa-lock', 'fa-unlock');
+                  }
+                } catch (e) {}
+              })();
+            </script>
             <span itemprop="name">测试加密文章</span>
           </a>
       </div>
@@ -362,8 +405,6 @@
     <script type="text/javascript" src="/js/crash-cheat.js"></script>
   
 
-  
-    <script type="text/javascript" src="/js/oneko.js"></script>
   
 </body>
 </html>
