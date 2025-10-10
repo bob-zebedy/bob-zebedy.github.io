@@ -163,7 +163,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -225,13 +225,55 @@
   <div class="post-block">
     <div class="post-content">
       <div class="collection-title">
-        <span class="collection-header">嗯.. 目前共计 22 篇日志</span>
+        <span class="collection-header">嗯.. 目前共计 23 篇日志</span>
       </div>
 
       
     <div class="collection-year">
       <span class="collection-header">2025</span>
     </div>
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+      <div class="post-meta-container">
+        <time itemprop="dateCreated"
+              datetime="2025-10-10T15:23:05+08:00"
+              content="2025-10-10">
+          10-10
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/post/1ec3cb0f.html" itemprop="url">
+              <i class="fa fa-lock encrypted-lock-icon-small" id="lock-icon-small-1ec3cb0f"></i>
+            <script>
+              (function () {
+                const cacheKey = "1ec3cb0f";
+                try {
+                  const cached = localStorage.getItem(cacheKey);
+                  if (!cached) return;
+
+                  const { expired } = JSON.parse(cached);
+                  if (Date.now() >= expired) {
+                    localStorage.removeItem(cacheKey);
+                    return;
+                  }
+                    
+                  const lockIcon = document.getElementById("lock-icon-small-1ec3cb0f");
+                  if (lockIcon) {
+                    lockIcon.classList.add('decrypted');
+                    lockIcon.className = lockIcon.className.replace('fa-lock', 'fa-unlock');
+                  }
+                } catch (e) {}
+              })();
+            </script>
+            <span itemprop="name">Snippet</span>
+          </a>
+      </div>
+
+      
+    </header>
+  </article>
 
   <article itemscope itemtype="http://schema.org/Article">
     <header class="post-header">
@@ -596,47 +638,6 @@
               })();
             </script>
             <span itemprop="name">Cloudflare 使用 Workers 建立 Images 代理</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2025-07-30T15:46:11+08:00"
-              content="2025-07-30">
-          07-30
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/post/baaa1138.html" itemprop="url">
-            <script>
-              (function () {
-                const cacheKey = "baaa1138";
-                try {
-                  const cached = localStorage.getItem(cacheKey);
-                  if (!cached) return;
-
-                  const { expired } = JSON.parse(cached);
-                  if (Date.now() >= expired) {
-                    localStorage.removeItem(cacheKey);
-                    return;
-                  }
-                    
-                  const lockIcon = document.getElementById("lock-icon-small-baaa1138");
-                  if (lockIcon) {
-                    lockIcon.classList.add('decrypted');
-                    lockIcon.className = lockIcon.className.replace('fa-lock', 'fa-unlock');
-                  }
-                } catch (e) {}
-              })();
-            </script>
-            <span itemprop="name">调整 macOS 顶部菜单栏图标间距</span>
           </a>
       </div>
 
