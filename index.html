@@ -267,14 +267,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>30k</span>
+      <span>35k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>27 分钟</span>
+      <span>32 分钟</span>
     </span>
 </div>
 
@@ -339,7 +339,8 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/post/19c1a188.html" class="post-title-link" itemprop="url">测试加密文章</a>
+          
+              <i class="fa fa-lock encrypted-lock-icon-index" id="lock-icon-19c1a188" data-abbrlink="19c1a188"></i><a href="/post/19c1a188.html" class="post-title-link" itemprop="url">测试加密文章</a>
         </h2>
 
         <div class="post-meta-container">
@@ -400,7 +401,7 @@
           <!--/noindex-->
           <script>
             (function () {
-              const cacheKey = "19c1a188" || location.pathname;
+              const cacheKey = "19c1a188";
               try {
                 const cached = localStorage.getItem(cacheKey);
                 if (!cached) return;
@@ -436,6 +437,12 @@
                   previewEl.style.display = "block";
                 }
                 if (encryptedEl) encryptedEl.style.display = "none";
+                
+                const lockIcon = document.getElementById("lock-icon-19c1a188");
+                if (lockIcon) {
+                  lockIcon.classList.add('decrypted');
+                  lockIcon.className = lockIcon.className.replace('fa-lock', 'fa-unlock');
+                }
               } catch (e) {}
             })();
           </script>
