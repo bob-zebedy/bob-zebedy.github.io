@@ -56,7 +56,7 @@ class Decryptor {
   }
 
   getCacheKey() {
-    return this.data.abbrlink || location.pathname;
+    return this.data.abbrlink;
   }
 
   showPasswordInput() {
