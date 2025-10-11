@@ -325,7 +325,7 @@
 </ul>
 <p>即使知道 Salt，硬件密钥一般仅存在 FIDO2 设备中无法导出，因此没有硬件密钥仍然无法派生出 wrappingKey</p>
 <p><strong>Q</strong>: 下载了我的博客 HTML，能破解吗？<br><strong>A</strong>: <strong>不能</strong>，原因如下</p>
-<figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line">从 HTML 可以获得:</span><br><span class="line"><span class="bullet"> 1.</span> 加密的文章内容 (ciphertext)</span><br><span class="line"><span class="bullet"> 2.</span> 初始化向量 (iv, authTag)</span><br><span class="line"><span class="bullet"> 3.</span> 包装后的 CEK (wrappedKeys)</span><br><span class="line"><span class="bullet"> 4.</span> PRF Salt</span><br><span class="line"></span><br><span class="line">不能获得：</span><br><span class="line">  ❌ 包装密钥 (wrappingKey)</span><br><span class="line"><span class="code">     └─ 使用 AES-256-GCM 加密，安全性目前尚可</span></span><br></pre></td></tr></table></figure></div>
+<figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line">从 HTML 可以获得:</span><br><span class="line"><span class="bullet"> 1.</span> 加密的文章内容 (ciphertext)</span><br><span class="line"><span class="bullet"> 2.</span> 初始化向量 (iv, authTag)</span><br><span class="line"><span class="bullet"> 3.</span> 包装后的 CEK (wrappedKeys)</span><br><span class="line"><span class="bullet"> 4.</span> PRF Salt</span><br><span class="line"></span><br><span class="line">不能获得：</span><br><span class="line">  包装密钥 (wrappingKey)</span><br><span class="line"><span class="code">     └─ 使用 AES-256-GCM 加密，安全性目前尚可</span></span><br></pre></td></tr></table></figure></div>
 
 <h1 id="测试页面"><a href="#测试页面" class="headerlink" title="测试页面"></a>测试页面</h1><a href="/post/19c1a188.html" title="测试加密文章">测试加密文章</a>
 
