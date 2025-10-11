@@ -31,7 +31,7 @@ class Decryptor {
     const fido2Btn = document.getElementById("fido2-verify-btn");
     if (fido2Btn) {
       if (!window.PublicKeyCredential) {
-        this.showError("浏览器不支持 FIDO2/WebAuthn");
+        this.showStatus("浏览器不支持 FIDO2/WebAuthn", "error");
       } else {
         fido2Btn.onclick = () => this.authenticate();
       }
@@ -149,11 +149,11 @@ class Decryptor {
       setTimeout(() => this.unwrapAndDecrypt(wrappingKey), 300);
     } catch (e) {
       if (e.name === "NotAllowedError") {
-        this.showError("验证被拒绝");
+        this.showStatus("验证被拒绝", "error");
       } else if (e.name === "InvalidStateError" || e.name === "NotFoundError") {
-        this.showError("未注册的通行密钥");
+        this.showStatus("未注册的通行密钥", "error");
       } else {
-        this.showError(`验证失败: ${e.message}`);
+        this.showStatus(`验证失败: ${e.message}`, "error");
       }
     }
   }
@@ -189,7 +189,7 @@ class Decryptor {
     const password = passwordInput?.value.trim();
 
     if (!password) {
-      this.showError("请输入密码");
+      this.showStatus("未输入密码", "error");
       return;
     }
 
@@ -199,7 +199,7 @@ class Decryptor {
       const passwordWrapped = this.data.wrappedKeys.find(
         (k) => k.type === "password"
       );
-      if (!passwordWrapped) throw new Error("文章不支持密码");
+      if (!passwordWrapped) throw new Error("不支持密码认证");
 
       const wrappingKey = await this.derivePBKDF2Key(
         password,
@@ -207,7 +207,7 @@ class Decryptor {
       );
       await this.unwrapAndDecrypt(wrappingKey, "password");
     } catch (e) {
-      this.showError(`解密失败: ${e.message}`);
+      this.showStatus(`解密失败: ${e.message}`, "error");
     }
   }
 
@@ -250,7 +250,7 @@ class Decryptor {
         throw new Error(type === "password" ? "密码错误" : "通行密钥无权限");
       await this.decryptContent(cek);
     } catch (e) {
-      this.showError(`解密失败: ${e.message}`);
+      this.showStatus(`解密失败: ${e.message}`, "error");
     }
   }
 
@@ -281,7 +281,7 @@ class Decryptor {
       this.render(html);
       setTimeout(() => this.hideStatus(), 2000);
     } catch (e) {
-      this.showError(`解密失败: ${e.message}`);
+      this.showStatus(`解密失败: ${e.message}`, "error");
     }
   }
 
@@ -294,11 +294,7 @@ class Decryptor {
     content.innerHTML = html;
     content.style.display = "block";
 
-    try {
-      this.renderRefresh();
-    } catch (e) {
-      console.error(`刷新渲染失败: ${e.message}`);
-    }
+    this.renderRefresh();
   }
 
   showStatus(msg, type = "info") {
@@ -312,10 +308,6 @@ class Decryptor {
     el.style.display = "block";
     el.className = `verification-status ${type}`;
     el.innerHTML = `<i class="fa ${icons[type]}"></i> ${msg}`;
-  }
-
-  showError(msg) {
-    this.showStatus(msg, "error");
   }
 
   hideStatus() {
