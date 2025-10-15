@@ -2965,7 +2965,7 @@ mark.search-keyword {
   }
 }
 .encrypted-post-container {
-  min-height: 300px;
+  min-height: 100px;
 }
 .encrypted-post-notice {
   text-align: center;
