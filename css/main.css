@@ -3040,6 +3040,16 @@ mark.search-keyword {
 .password-input:focus {
   border-color: #3b8fc7;
 }
+.password-hint {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
 .verification-status {
   margin-top: 20px;
   padding: 12px 20px;
@@ -3153,6 +3163,11 @@ mark.search-keyword {
   }
   .encrypted-lock-icon-small.decrypted {
     color: #2ecc71;
+  }
+  .password-hint {
+    background: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
   }
 }
 @-moz-keyframes fadeIn {

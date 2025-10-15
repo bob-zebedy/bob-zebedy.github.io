@@ -24,6 +24,7 @@ class Decryptor {
       wrappedKeys: JSON.parse(this.container.dataset.wrappedKeys || "[]"),
       prfSalt: this.container.dataset.prfSalt,
       cache: parseInt(this.container.dataset.cache) || 0,
+      passwordHint: this.container.dataset.passwordHint || "",
     };
 
     if (this.checkCache()) return;
@@ -66,6 +67,8 @@ class Decryptor {
 
     if (showBtn) showBtn.style.display = "none";
     if (inputGroup) inputGroup.style.display = "flex";
+    if (this.data.passwordHint) this.showPasswordHint();
+    
     if (passwordInput) {
       passwordInput.focus();
       passwordInput.addEventListener("input", () =>
@@ -73,6 +76,19 @@ class Decryptor {
       );
     }
     this.updatePasswordButtonState();
+  }
+
+  showPasswordHint() {
+    const inputGroup = document.getElementById("password-input-group");
+    if (!inputGroup) return;
+
+    let hintElement = inputGroup.querySelector(".password-hint");
+    if (!hintElement) {
+      hintElement = document.createElement("div");
+      hintElement.className = "password-hint";
+      inputGroup.appendChild(hintElement);
+    }
+    hintElement.textContent = this.data.passwordHint;
   }
 
   updatePasswordButtonState() {
