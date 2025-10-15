@@ -310,7 +310,68 @@ class Decryptor {
     content.innerHTML = html;
     content.style.display = "block";
 
+    this.addRelockButton();
+
     this.renderRefresh();
+  }
+
+  addRelockButton() {
+    try {
+      const content = document.getElementById("decrypted-content");
+      if (!content) return;
+
+      const old = content.querySelector(".relock-container");
+      if (old) old.remove();
+
+      const container = document.createElement("div");
+      container.className = "relock-container";
+      container.style.display = "flex";
+      container.style.justifyContent = "flex-end";
+      container.style.margin = "8px 0 16px";
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "relock-btn";
+      btn.textContent = "Re-encrypt";
+      btn.style.cursor = "pointer";
+      btn.style.padding = "6px 12px";
+      btn.style.border = "1px solid var(--btn-border, #ccc)";
+      btn.style.background = "var(--btn-bg, #f5f5f5)";
+      btn.style.borderRadius = "6px";
+      btn.style.fontSize = "0.9em";
+
+      btn.addEventListener("click", () => this.relock());
+
+      container.appendChild(btn);
+      content.prepend(container);
+    } catch (_) {}
+  }
+
+  relock() {
+    try {
+      localStorage.removeItem(this.getCacheKey());
+    } catch (_) {}
+    this.resetToEncryptedState();
+  }
+
+  resetToEncryptedState() {
+    const content = document.getElementById("decrypted-content");
+    const notice = document.querySelector(".encrypted-post-notice");
+    if (!content || !notice) return;
+
+    content.style.display = "none";
+    content.innerHTML = "";
+
+    notice.style.display = "block";
+
+    const showBtn = document.getElementById("show-password-btn");
+    const inputGroup = document.getElementById("password-input-group");
+    const passwordInput = document.getElementById("password-input");
+    if (passwordInput) passwordInput.value = "";
+    if (inputGroup) inputGroup.style.display = "none";
+    if (showBtn) showBtn.style.display = "";
+
+    this.hideStatus();
   }
 
   showStatus(msg, type = "info") {
