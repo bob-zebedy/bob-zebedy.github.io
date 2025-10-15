@@ -102,7 +102,7 @@ class Decryptor {
       }
       localStorage.removeItem(this.getCacheKey());
       return false;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }
@@ -116,7 +116,7 @@ class Decryptor {
         this.getCacheKey(),
         JSON.stringify({ html, expired })
       );
-    } catch (e) {}
+    } catch (_) {}
   }
 
   async authenticate() {
@@ -243,7 +243,7 @@ class Decryptor {
             wrappedCEK
           );
           break;
-        } catch (e) {}
+        } catch (_) {}
       }
 
       if (!cek)
