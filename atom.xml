@@ -14,24 +14,9 @@
     
   </author>
   
-  <generator uri="https://hexo.io/">Hexo</generator>
   
-  <entry>
-    <title>Snippet</title>
-    <link href="https://blog.zebedy.com/post/1ec3cb0f.html"/>
-    <id>https://blog.zebedy.com/post/1ec3cb0f.html</id>
-    <published>2025-10-10T07:23:05.000Z</published>
-    <updated>2025-10-14T02:08:00.000Z</updated>
-    
-    <content type="html"><![CDATA[<div class="encrypted-post-container"     data-ciphertext="sdhRegbux4lLrnzur2dBIHtLox0PizzpaWrAwgQgdLNtpMKEvwCtVSL/juB7PuVeb6GWArh8aEsY88hZZLt0wYihg95eadRAdqjVuTh6BioaZGavywfpfcEy1JbotHy9MbeMEMdjW0MUI7xfvRoXSZcp272Za9WdDA1whULzSEQKOmsBVbfXuftkTbGIAFxXrbQzgKJJ/6lXi0DIYUL92cnq5g5q4NS14f9AwLil6r0sOhldr0SCXTg6305VKzR7ovyAQAg+vp5sL0evguXS8QGp+KG6TR4aE+H9oRef9KsIV0Llsk4okCzEbiuIKmosyIpm/IAi0ie1iJZZA/oUjGvXaiAEDRJ1uqOBWSwTsqsJydhJ4tzarw2nrJezJs/BR+vWmGygrCwCGM96BWzUcEFmskKJcFy8r/dHlSraRze2x2FLHcqYIVIWNfGDApRWfFM+VYqXF4GpWeYPCAZPhbfO"    data-iv="JK+5lyjeenz/l5zk"    data-auth-tag="qpkAivnkyitpJiN7n8h2dg=="    data-abbrlink="1ec3cb0f"    data-wrapped-keys='[{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;OLmZeVy+Uy0dcdb2pnqdWnAVEpz8qDDjc7f0Wu+egME=&quot;,&quot;iv&quot;:&quot;Or68ZhNo4RtFlzBi&quot;,&quot;authTag&quot;:&quot;IabwRZVBg/g4DGfMkvpBww==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;qsYzmjM3/f94L/UarzaKxUnCs5z9rvfkCwpsVdX0Nro=&quot;,&quot;iv&quot;:&quot;HETaDW6vdwGv1Mlb&quot;,&quot;authTag&quot;:&quot;Es4YXUByUYkqY1AUruxsvQ==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;+0OwtNe3uzU38F2fNRnGdS2yyodv3H2ODW2iH3mXTrs=&quot;,&quot;iv&quot;:&quot;bk6i47ruba9Pr0aw&quot;,&quot;authTag&quot;:&quot;TwRgJo0ABRJAvpJr5JKBLg==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;TIfxHXFrhuX5TVlqJWB7u2RFt5GPtPP7mZQVx7d8bv8=&quot;,&quot;iv&quot;:&quot;BRNNmacbXasfaa65&quot;,&quot;authTag&quot;:&quot;Zb/EzRXII+Jx0ONGE2BSuQ==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;dMErF9kusYnR73I6pFVTo4fJfij6mCDvQ/1FTYSfYaU=&quot;,&quot;iv&quot;:&quot;VqU2ewErgEUzodoe&quot;,&quot;authTag&quot;:&quot;65c7AvirFtpAN/lAZvp/AA==&quot;}]'    data-prf-salt="1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b"    data-cache="10"    data-password-hint="">  <div class="encrypted-post-notice">    <div class="decrypt-methods"><button class="decrypt-btn" id="fido2-verify-btn"><i class="fa fa-fingerprint"></i> 通行密钥验证</button></div>    <div class="verification-status" id="verification-status"></div>  </div>  <div class="decrypted-content" id="decrypted-content" style="display:none"></div></div>]]></content>
-    
-    
-    <summary type="html">&lt;p&gt;Snippet&lt;/p&gt;</summary>
-    
-    
-    
-    
-  </entry>
+  
+  
   
   <entry>
     <title>Hexo 使用通行密钥对文章加密</title>
@@ -57,22 +42,9 @@
     
   </entry>
   
-  <entry>
-    <title>测试加密文章</title>
-    <link href="https://blog.zebedy.com/post/19c1a188.html"/>
-    <id>https://blog.zebedy.com/post/19c1a188.html</id>
-    <published>2025-10-06T14:46:04.000Z</published>
-    <updated>2025-10-14T02:08:00.000Z</updated>
-    
-    <content type="html"><![CDATA[<div class="encrypted-post-container"     data-ciphertext="6asjKx5obDT9haNQJHxI3srMANe49Evi2mnHhj9+qjPlAdB0cIAwSqUnHGXUxr///inW+BCXlxwr9blmoBhFGLXY8iG61VUfToMwuOjP/c6v1fyLTBD9otIqBK/hKv5L4K1qMGQCltn6pgLWPhpvPzIjHXc+rX477H/5yVseZsKQ6D7cYslBrHaZkd6onK7445QY9/0="    data-iv="OCcqwFcvoIuPFn9k"    data-auth-tag="EKIFAtaH/SyD4BO/TV2etg=="    data-abbrlink="19c1a188"    data-wrapped-keys='[{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;8jYnFFhbCseERqCVFDIZKTcMnvxER0u5B/QYBPac29A=&quot;,&quot;iv&quot;:&quot;UQXyvGbjgtdIWOVJ&quot;,&quot;authTag&quot;:&quot;BBzt4AMK2+kBQOHyN5YeWA==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;hWuGfON33CyuUzi07dv5VoAZdGFdFYyssadFCTWkBHM=&quot;,&quot;iv&quot;:&quot;lupcnZn6YhWpMd59&quot;,&quot;authTag&quot;:&quot;hg6RTzzlxvPvDDcBNoJYgg==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;L72dpmwjp3J4HMnDlnTScKQSJzkrkg3Il/5BCRlpX4k=&quot;,&quot;iv&quot;:&quot;6053+jK7W8HcsCQV&quot;,&quot;authTag&quot;:&quot;Xr1yQrLLdV/Oc9TA6dRaHg==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;Sf9jF0BrQZzQzLOOidKXO8QWXsD2+my8X/2Mgtmi3vk=&quot;,&quot;iv&quot;:&quot;93hrkT32a+kpkn03&quot;,&quot;authTag&quot;:&quot;ia4MY3fiNtV5SDAppfAStQ==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;dJWhQmN6Ho9ayQ9QxSFxjncqQDX5BfXt4ItJ2OYYSsY=&quot;,&quot;iv&quot;:&quot;2PfkauWc8U2+sIXR&quot;,&quot;authTag&quot;:&quot;TXQrojr0pviq5N6W7kpKLw==&quot;},{&quot;type&quot;:&quot;password&quot;,&quot;encryptedCEK&quot;:&quot;PDXZvdu+Id8ViaUJB8Glq9GR/eNXvAjsP4M775IlxmM=&quot;,&quot;iv&quot;:&quot;IFX4XtE4wUGahDOJ&quot;,&quot;authTag&quot;:&quot;j12nzh2lKWg+gcF2z9+2uQ==&quot;,&quot;salt&quot;:&quot;1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b&quot;}]'    data-prf-salt="1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b"    data-cache="10"    data-password-hint="密码 123456">  <div class="encrypted-post-notice">    <div class="decrypt-methods"><button class="decrypt-btn" id="fido2-verify-btn"><i class="fa fa-fingerprint"></i> 通行密钥验证</button><div class="password-decrypt-group">        <button class="decrypt-btn" id="show-password-btn"><i class="fa fa-lock"></i> 密码验证</button>        <div class="password-input-group" id="password-input-group" style="display:none">          <input type="password" class="password-input" id="password-input" placeholder="输入密码" />          <button class="decrypt-btn" id="password-decrypt-btn"><i class="fa fa-key"></i> 确定</button>        </div>      </div></div>    <div class="verification-status" id="verification-status"></div>  </div>  <div class="decrypted-content" id="decrypted-content" style="display:none"></div></div>]]></content>
-    
-    
-    <summary type="html">&lt;p&gt;本文为测试文章，此处为首页预览内容。&lt;/p&gt;</summary>
-    
-    
-    
-    
-  </entry>
+  
+  
+  
   
   <entry>
     <title>NexT 主题高级标签插件</title>
@@ -91,6 +63,8 @@
     
   </entry>
   
+  
+  
   <entry>
     <title>iPhone 17 壁纸</title>
     <link href="https://blog.zebedy.com/post/958b861f.html"/>
@@ -108,6 +82,8 @@
     
   </entry>
   
+  
+  
   <entry>
     <title>Cloudflare Workers 通用 Turnstile 验证模块</title>
     <link href="https://blog.zebedy.com/post/7b67508c.html"/>
@@ -124,6 +100,8 @@
     
     
   </entry>
+  
+  
   
   <entry>
     <title>Windy 自定义色层</title>
@@ -143,6 +121,8 @@
     
   </entry>
   
+  
+  
   <entry>
     <title>Hexo 静态博客使用 Cloudflare Turnstile</title>
     <link href="https://blog.zebedy.com/post/50a431e6.html"/>
@@ -159,6 +139,8 @@
     
     
   </entry>
+  
+  
   
   <entry>
     <title>Garmin 国行码表使用 OSM 地图</title>
@@ -177,6 +159,8 @@
     
   </entry>
   
+  
+  
   <entry>
     <title>Cloudflare 使用 Workers 建立 Images 代理</title>
     <link href="https://blog.zebedy.com/post/ec93b507.html"/>
@@ -193,6 +177,8 @@
     
     
   </entry>
+  
+  
   
   <entry>
     <title>调整 macOS 顶部菜单栏图标间距</title>
@@ -211,6 +197,8 @@
     
   </entry>
   
+  
+  
   <entry>
     <title>Cloudflare 设置引用站点策略</title>
     <link href="https://blog.zebedy.com/post/e6a2e300.html"/>
@@ -227,6 +215,8 @@
     
     
   </entry>
+  
+  
   
   <entry>
     <title>macOS Chrome &#39;这些扩展程序不再受支持，因此已停用&#39; 解决办法</title>
@@ -247,6 +237,8 @@
     
   </entry>
   
+  
+  
   <entry>
     <title>有点意思的 Python 系列二 内置类型增加额外方法(二)</title>
     <link href="https://blog.zebedy.com/post/dd9207d9.html"/>
@@ -263,6 +255,8 @@
     
     
   </entry>
+  
+  
   
   <entry>
     <title>有点意思的 Python 系列二 内置类型增加额外方法</title>
@@ -281,6 +275,8 @@
     
   </entry>
   
+  
+  
   <entry>
     <title>有点意思的 Python 系列一 数学函数和导数计算</title>
     <link href="https://blog.zebedy.com/post/e0c91e46.html"/>
@@ -298,6 +294,8 @@
     
     
   </entry>
+  
+  
   
   <entry>
     <title>北京联通异地宽带办理指南</title>
@@ -321,6 +319,8 @@
     
   </entry>
   
+  
+  
   <entry>
     <title>macOS GPG 使用指南</title>
     <link href="https://blog.zebedy.com/post/cb9ee24d.html"/>
@@ -340,6 +340,8 @@
     
   </entry>
   
+  
+  
   <entry>
     <title>更改 macOS 强调色</title>
     <link href="https://blog.zebedy.com/post/c59c6467.html"/>
@@ -357,21 +359,68 @@
     
   </entry>
   
+  
+  
+  
+  
   <entry>
-    <title>OpenWrt 配置记录</title>
-    <link href="https://blog.zebedy.com/post/465f36a1.html"/>
-    <id>https://blog.zebedy.com/post/465f36a1.html</id>
-    <published>2022-03-02T07:43:35.000Z</published>
+    <title>GitLab 自动部署 GitHub Pages 博客</title>
+    <link href="https://blog.zebedy.com/post/4a4b01f0.html"/>
+    <id>https://blog.zebedy.com/post/4a4b01f0.html</id>
+    <published>2022-02-14T06:26:03.000Z</published>
     <updated>2025-10-14T02:08:00.000Z</updated>
     
-    <content type="html"><![CDATA[<div class="encrypted-post-container"     data-ciphertext="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"    data-iv="GD5wXkb4Y0mOEls3"    data-auth-tag="JfAF8wUEnMa+IFVdB5DBJA=="    data-abbrlink="465f36a1"    data-wrapped-keys='[{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;kUhmvmlZy3aEErYGTalOZ3UNGoq0FKnVFkvCJeqks54=&quot;,&quot;iv&quot;:&quot;oH6B4KVV+lJK4/l7&quot;,&quot;authTag&quot;:&quot;2wrjojP1969eVQ0U0arTDg==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;jLyYcIe/zE1TJEOYoahKrUEozMlHPucggkVHtlgYpkc=&quot;,&quot;iv&quot;:&quot;eVVjPPc6gObbP1Tk&quot;,&quot;authTag&quot;:&quot;c/0v9y8HnNemXvHv8VjHeA==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;NVaorMj/b18Un+pLXol9Qe4Dy8IPyKk3vJ4xjI8UoTw=&quot;,&quot;iv&quot;:&quot;t3l31hwymuhgb1id&quot;,&quot;authTag&quot;:&quot;j1f+82p0lw+M8pEBEF9Bdg==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;3yow1UAo7VvZbVvA3KGgRejiEUThE8rkD5hidGMG3f0=&quot;,&quot;iv&quot;:&quot;shMqYfvxncbi8aYl&quot;,&quot;authTag&quot;:&quot;FQwXChMIYZkbmFwUnJ8U5w==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;DmO5IEyOsg64XISb8PZ2MVyc9fCOY9JGpCSHVpDDWtU=&quot;,&quot;iv&quot;:&quot;7fqW+MIBP3Eq6okK&quot;,&quot;authTag&quot;:&quot;f70+e/Q/4EIbHUstyDS+AA==&quot;},{&quot;type&quot;:&quot;password&quot;,&quot;encryptedCEK&quot;:&quot;gOG4tCKYkQQd5PSADKD73YQ1oRIYb9fjT30WM4goK9U=&quot;,&quot;iv&quot;:&quot;qAvF8d4r++yQuogj&quot;,&quot;authTag&quot;:&quot;mGnNfUNdpFPKvDwYULtmTw==&quot;,&quot;salt&quot;:&quot;1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b&quot;}]'    data-prf-salt="1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b"    data-cache="10"    data-password-hint="">  <div class="encrypted-post-notice">    <div class="decrypt-methods"><button class="decrypt-btn" id="fido2-verify-btn"><i class="fa fa-fingerprint"></i> 通行密钥验证</button><div class="password-decrypt-group">        <button class="decrypt-btn" id="show-password-btn"><i class="fa fa-lock"></i> 密码验证</button>        <div class="password-input-group" id="password-input-group" style="display:none">          <input type="password" class="password-input" id="password-input" placeholder="输入密码" />          <button class="decrypt-btn" id="password-decrypt-btn"><i class="fa fa-key"></i> 确定</button>        </div>      </div></div>    <div class="verification-status" id="verification-status"></div>  </div>  <div class="decrypted-content" id="decrypted-content" style="display:none"></div></div>]]></content>
+    <content type="html"><![CDATA[<p>在之前《<a href="/post/8d4f8799.html" title="搭建家庭私人 GitLab 服务器">搭建家庭私人 GitLab 服务器</a>》说到我现在有这样的需求，而且根据上一篇，我们已经搭建好了这样的一个环境。那么有什么就赶紧用起来吧。</p><span id="more"></span><p>那么这一篇主要是介绍一下如何用这个家庭私人 GitLab 实现自动部署托管在 GitHub Pages 上的博客。本文使用的是 <code>Hexo</code> 框架 + <code>Next</code> 主题，其他的静态博客框架大同小异。这的关注点不在搭建博客，这里假定你已经有了一个正在托管的 GitHub Pages 博客。这篇文章将此博客为例子讲解一下。</p><h1 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h1><p>用过 <code>Hexo</code> 的都知道，它需要在你的本地电脑上搭建一个 <code>Node</code> 环境。安装框架、自定义修改配置、Markdown 写文章，然后生成、最后利用 Git 推送到 GitHub 仓库 然后才能在网上看到发布的文章。那么这样带来了一个问题：如果某一天你本地的写博客的环境丢失了（比如电脑坏了，硬盘坏了等等等等）那么如果你想再更新你的博客就需要再次搭建这样一个环境，除了需要将所有的配置再次配置一遍，关键是旧的 Markdown 文章已经几乎再找不回来了。</p><p>几年前我也是因为这个原因导致放弃了之前写了很多文章的博客。那到这里就有人想了，如果我把位于本地的那个 ‘环境’ 也用 Git 管理起来呢？不错的想法，之后我也是这样做的，在 GitHub 上再新建一个仓库，用来保存本地写博客的环境，这样一来，即使换电脑了，只需要把这个仓库 clone 下来，安装一下相关的依赖，就可以继续了。</p><p>看起来很美好，但很快就遇到另一个问题：这里相当于把你的博客所有源码都公开了出去，有什么弊端么？比如假如你使用了 <code>hexo-blog-encrypt</code> 插件对某些博客进行加密，密码使需要明文写在待加密博客的头部信息里的。好家伙，这样一来，不就成了防君子不防小人了？所以这就需要把源码托管在我们之前搭建那个家庭私人的 GitLab 上的。</p><p>但是过了一段时间，我又双叒叕发现了一个问题：我经常忘记把本地的博客源码 push 到 GitLab 上。大部分的时候都是本地写完，修改的差不多之后就 <code>hexo deploy</code> 部署后就忘了 push 到 GitLab，导致用的时候该丢的文章还是丢了。恼羞成怒之下，萌生了利用 GitLab CI&#x2F;CD 自动部署。实现每次写完文章，只需要 push 本地源码到 GitLab，然后 GitLab 自动部署。这样一来就不怕每次写完文章手动部署之后忘记提交本地源码，二来也减少了需要手动的步骤。毕竟懒惰才是人类的第一生产力。</p><h1 id="开始吧"><a href="#开始吧" class="headerlink" title="开始吧"></a>开始吧</h1><h2 id="安装-Docker"><a href="#安装-Docker" class="headerlink" title="安装 Docker"></a>安装 Docker</h2><p>使用 GitLab CI&#x2F;CD 功能不是必须 Docker，但是容器化的 Docker 能够隔离物理机，防止一言不合一个 <code>rm -rf /*</code> 让你的心血白费。</p><p>以下命令需要 ssh 到 GitLab 服务所在的机器中进行</p><ol><li>卸载旧版本 Docker（如果没安装过，可以省略）</li></ol><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt remove docker docker-engine docker.io containerd runc</span><br></pre></td></tr></table></figure><ol start="2"><li>安装必要依赖</li></ol><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update &amp;&amp; <span class="built_in">sudo</span> apt install apt-transport-https ca-certificates curl gnupg lsb-release</span><br></pre></td></tr></table></figure><ol start="3"><li>添加 apt 源</li></ol><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | <span class="built_in">sudo</span> gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> \</span><br><span class="line"> <span class="string">&quot;deb [arch=<span class="subst">$(dpkg --print-architecture)</span> signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \</span></span><br><span class="line"><span class="string"> <span class="subst">$(lsb_release -cs)</span> stable&quot;</span> | <span class="built_in">sudo</span> <span class="built_in">tee</span> /etc/apt/sources.list.d/docker.list &gt; /dev/null</span><br></pre></td></tr></table></figure><ol start="4"><li>安装 Docker</li></ol><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update &amp;&amp; <span class="built_in">sudo</span> apt install docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure><ol start="5"><li>启动 Docker</li></ol><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> docker</span><br><span class="line"><span class="built_in">sudo</span> systemctl start docker</span><br></pre></td></tr></table></figure><p>如果以上命令没有出现错误，那么 docker 就已经安装到服务器上了。如果不放心，可以通过 <code>sudo docker -v</code> 命令，如果输出类似 <code>Docker version 20.10.12, build e91ed57</code> 就说明 docker 已经正确安装了。</p><h2 id="安装-Gitlab-Runner"><a href="#安装-Gitlab-Runner" class="headerlink" title="安装 Gitlab-Runner"></a>安装 Gitlab-Runner</h2><p>以下的命令都需要 ssh 到 GitLab 服务所在的机器中进行</p><ol><li>添加 gitlab-runner 库</li></ol><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -L <span class="string">&quot;https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh&quot;</span> | <span class="built_in">sudo</span> bash</span><br></pre></td></tr></table></figure><ol start="2"><li>安装 gitlab-runner</li></ol><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install gitlab-runner</span><br></pre></td></tr></table></figure><p>如果一切顺利，gitlab-runner 就安装好了，可以运行 <code>sudo gitlab-runner -v</code> 如果没有错误，则说明 gitlab-runner 安装成功。</p><h2 id="注册-Runner"><a href="#注册-Runner" class="headerlink" title="注册 Runner"></a>注册 Runner</h2><p>首先使用 <code>root</code> 用户登录 gitlab -&gt; 点击左上方 <code>Menu</code> -&gt; 进入 <code>Admin</code> -&gt; 点击左侧面板 <code>Overview</code> 下的 <code>Runners</code><br><img data-src="https://images.zabrian.com/4dc2c2e2-dffb-44f5-2a7e-4140ab776f01/origin" title="GitLab-Admin-Runners" style="zoom:100%;" /></p><p>然后点击右上方 Register an instance runner，复制 Registration token<br><img data-src="https://images.zabrian.com/fc6c425a-3304-44c8-a670-b425588c6101/origin" title="Register an instance runner" style="zoom:100%;" /></p><p>再次通过 ssh 连接 GitLab 服务器注册一个共享 Runner</p><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-runner register</span><br><span class="line">Enter the GitLab instance URL (<span class="keyword">for</span> example, https://gitlab.com/):</span><br><span class="line">http://git.home/            <span class="comment"># 本地 GitLab 域名或者IP</span></span><br><span class="line">Enter the registration token:</span><br><span class="line">xxxxxxxxxxxxxxxx            <span class="comment"># 上面获取到的 token</span></span><br><span class="line">Enter a description <span class="keyword">for</span> the runner:</span><br><span class="line">[ubuntu]: node              <span class="comment"># runner 自定一个名字</span></span><br><span class="line">Enter tags <span class="keyword">for</span> the runner (comma-separated):</span><br><span class="line">node                        <span class="comment"># runner tag 的名字，通过 tag 指定运行 runner</span></span><br><span class="line">Registering runner... succeeded                     runner=xxxxxx</span><br><span class="line">Enter an executor: custom, ssh, docker-ssh+machine, kubernetes, docker, docker-ssh, parallels, shell, virtualbox, docker+machine:</span><br><span class="line">docker                      <span class="comment"># 这里选择 docker</span></span><br><span class="line">Enter the default Docker image (<span class="keyword">for</span> example, ruby:2.6):</span><br><span class="line">node:17                     <span class="comment"># docker 镜像以及版本</span></span><br><span class="line">Runner registered successfully. Feel free to start it, but <span class="keyword">if</span> it<span class="string">&#x27;s running already the config should be automatically reloaded!</span></span><br></pre></td></tr></table></figure><p>当创建好 Runner 之后，再次回到 <code>Runners</code> 页面刷新就可以显示刚刚创建的 Runner 了。</p><h2 id="创建-SSH-密钥对"><a href="#创建-SSH-密钥对" class="headerlink" title="创建 SSH 密钥对"></a>创建 SSH 密钥对</h2><p>在本地或者服务器上执行</p><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">ssh-keygen -f blog -t rsa -b 2048 -C <span class="string">&quot;xxxx@xxx.xxx&quot;</span>     <span class="comment"># 邮箱自行替换</span></span><br></pre></td></tr></table></figure><p>生成一个无密码的 SSH 的密钥对</p><p>公钥为 <code>blog.pub</code>，私钥为 <code>blog</code></p><h2 id="GitHub-添加-Deploy-keys"><a href="#GitHub-添加-Deploy-keys" class="headerlink" title="GitHub 添加 Deploy keys"></a>GitHub 添加 Deploy keys</h2><p>登录 GitHub，进入部署的博客仓库，点击 <code>Settings</code> -&gt; <code>Deploy keys</code> -&gt; <code>Add deploy key</code></p><p>将 <code>blog.pub</code> 公钥的内容全部复制到 <code>Key</code> 中，然后 <code>Title</code> 处自定义一个名字</p><h2 id="GitLab-配置-CI-CD"><a href="#GitLab-配置-CI-CD" class="headerlink" title="GitLab 配置 CI&#x2F;CD"></a>GitLab 配置 CI&#x2F;CD</h2><p>进入 GitLab 博客项目，点击 <code>Settings</code> 下的 <code>CI/CD</code>，右侧展开 <code>Runners</code> 选项卡，右侧 <code>Shared runners</code> 打开 <code>Enable shared runners for this project</code> 选项<br><img data-src="https://images.zabrian.com/6f66496d-6e87-463b-1fe6-657a77a5d801/origin" title="Enable shared runners for this project" style="zoom:25%;" /></p><p>然后再展开到下方 <code>Variables</code></p><p>添加两个环境变量分别是</p><ul><li><code>SSH_KNOWN_HOSTS</code></li></ul><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=</span><br></pre></td></tr></table></figure><ul><li><code>SSH_PRIVATE_KEY</code><br><a href="#%E5%88%9B%E5%BB%BA-SSH-%E5%AF%86%E9%92%A5%E5%AF%B9">创建 SSH 密钥对</a> 中的私钥 <code>blog</code> 内容<img data-src="https://images.zabrian.com/5f546e74-b6d1-4751-a4d7-c80d71e37801/origin" title="GitLab-CICD-Settings-Variables" style="zoom:47%;" /></li></ul><h2 id="项目-gitlab-ci-yml-配置"><a href="#项目-gitlab-ci-yml-配置" class="headerlink" title="项目 .gitlab-ci.yml 配置"></a>项目 <code>.gitlab-ci.yml</code> 配置</h2><p>经过以上配置，现在离成功有一步之遥。</p><p>在 GitLab 博客源码项目根目录下创建一个 <code>.gitlab-ci.yml</code> 的配置文件</p><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">deploy</span></span><br><span class="line"></span><br><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">main</span> <span class="comment"># 指定只有主分支触发该 CI</span></span><br><span class="line">  <span class="attr">tags:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">node</span> <span class="comment"># 此处 tag 指定创建 GitLab Runner 时候填写 tag 名字</span></span><br><span class="line">  <span class="attr">before_script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ln</span> <span class="string">-sf</span> <span class="string">/usr/share/zoneinfo/Asia/Shanghai</span> <span class="string">/etc/localtime</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&quot;which ssh-agent || ( apt-get update -y &amp;&amp; apt-get install openssh-client -y )&quot;</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">eval</span> <span class="string">$(ssh-agent</span> <span class="string">-s)</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">mkdir</span> <span class="string">-p</span> <span class="string">~/.ssh</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">rm</span> <span class="string">-rf</span> <span class="string">~/.ssh/id_rsa</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">touch</span> <span class="string">~/.ssh/id_rsa</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">echo</span> <span class="string">&quot;$SSH_PRIVATE_KEY&quot;</span> <span class="string">&gt;</span> <span class="string">~/.ssh/id_rsa</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">rm</span> <span class="string">-rf</span> <span class="string">~/.ssh/known_hosts</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">touch</span> <span class="string">~/.ssh/known_hosts</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">echo</span> <span class="string">&quot;$SSH_KNOWN_HOSTS&quot;</span> <span class="string">&gt;</span> <span class="string">~/.ssh/known_hosts</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">chmod</span> <span class="number">700</span> <span class="string">~/.ssh</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">chmod</span> <span class="number">700</span> <span class="string">~/.ssh/*</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">git</span> <span class="string">config</span> <span class="string">--global</span> <span class="string">user.email</span> <span class="string">&quot;xxxx@xxx.xxx&quot;</span> <span class="comment"># GitHub 的邮箱</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">git</span> <span class="string">config</span> <span class="string">--global</span> <span class="string">user.name</span> <span class="string">&quot;xxxx&quot;</span> <span class="comment"># GitHub 的名字</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">git</span> <span class="string">config</span> <span class="string">--global</span> <span class="string">init.defaultBranch</span> <span class="string">main</span> <span class="comment"># GitHub 项目的主分支 main 或者 master</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">-g</span> <span class="string">hexo-cli</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-deployer-git</span> <span class="string">--save</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-renderer-swig</span> <span class="string">--save</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-generator-searchdb</span> <span class="string">--save</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-symbols-count-time</span> <span class="string">--save</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-generator-sitemap</span> <span class="string">--save</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-abbrlink</span> <span class="string">--save</span> <span class="comment"># 以上 npm 步骤根据自己添加的插件自定义</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">hexo</span> <span class="string">clean</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">hexo</span> <span class="string">generate</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">hexo</span> <span class="string">deploy</span></span><br></pre></td></tr></table></figure><p>然后 <code>git add .gitlab-ci.yml</code> 最后推送到仓库之后，从侧边 <code>CI/CD</code> 下 <code>Pipelines</code> 就可以看到自动运行部署工作了</p><h1 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h1><p>经过以上的步骤，现在就可以每次在本地编辑后，只需要推送到 GitLab 并稍等片刻，GitHub Pages 的页面就有最新的内容了。</p>]]></content>
     
     
-    <summary type="html">&lt;p&gt;这里会增量记录 OpenWrt 相关的一些技巧或者配置方法。&lt;/p&gt;</summary>
+    <summary type="html">&lt;p&gt;在之前《&lt;a href=&quot;/post/8d4f8799.html&quot; title=&quot;搭建家庭私人 GitLab 服务器&quot;&gt;搭建家庭私人 GitLab 服务器&lt;/a&gt;》说到我现在有这样的需求，而且根据上一篇，我们已经搭建好了这样的一个环境。那么有什么就赶紧用起来吧。&lt;/p&gt;</summary>
     
     
     
     
   </entry>
+  
+  
+  
+  <entry>
+    <title>搭建家庭私人 GitLab 服务器</title>
+    <link href="https://blog.zebedy.com/post/8d4f8799.html"/>
+    <id>https://blog.zebedy.com/post/8d4f8799.html</id>
+    <published>2022-02-05T13:12:34.000Z</published>
+    <updated>2025-10-14T02:08:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>大概今年（2022）一月中旬的时候入手了一个 <span class="exturl" data-url="aHR0cHM6Ly9yODZzLm5ldC8=">R86S<i class="fa fa-external-link-alt"></i></span> 的小主机。因为错过了众筹的车，所以是直接下的单。最后入手了 16G 的黑色千兆版本。不上万兆一个原因是家里没有这个需求，还有一个就是万兆版的没有 NVME 硬盘位，这一点对我还是刚需。</p><span id="more"></span><p>最后用了差不多一周的时间，终于在年前，这个心心念的小主机到手了。<br>有关这个小主机我就不多做介绍了，今天主要是介绍一下我怎么用它在我的家庭环境搭建一个私人的 GitLab。这篇文章从我为什么要搭建家庭私人 GitLab 以及如何搭建。都会都做一个比较详细的介绍。</p><h1 id="初衷"><a href="#初衷" class="headerlink" title="初衷"></a>初衷</h1><p>家里是有一个 J4125 的软路由，去年很早就买了。一直在我家作为主路由负责拨号和科学上网的功能，用的 OpenWrt 也是我自己配置和 GitHub Action 编译的，也满足了我家的基本需求。而且也因为是物理机直装，再加上害怕 J4125 玩起来怕性能不够，再影响了正常的网络。所以也就不想再折腾他了，就让他安安心心做我家的路由器就好了。</p><p>但与此同时呢，作为一个爱折腾的程序员，身边的很多不管是硬件还是软件的小玩意儿都是有特别的需求的。</p><p>就比如去年（2021）年买的一个 <span class="exturl" data-url="aHR0cHM6Ly9kcm9wLmNvbS9idXkvc3RhY2stb3ZlcmZsb3ctdGhlLWtleS1tYWNyb3BhZA==">STACK OVERFLOW THE KEY MACROPAD<i class="fa fa-external-link-alt"></i></span> 键盘，配上从淘宝买的键帽，因为使用 QMK 的键盘方案，所以可以定制固件。现在已经成为了我的专用密码输入器。但是问题来了，因为我现在还尝试看他还有没别的好玩的东西，所以我需要对这个键盘固件的代码不断进行修改、编译、刷入，然后再尝试修改、编译、刷入。这样的操作重复起来会让人很繁琐，但是因为固件中存在一些敏感代码（比如我的各种密码）所以不方便托管到 GitHub。所以之前我就在想要是能有一个私人的 Git 多好。除了代码的托管，如果还可以加入 CI&#x2F;CD 这种持续集成的能力，就可以解放很多无谓的重复的劳动。而能同时满足这个需求的让我想到的第一个解决方案就是 GitLab 了。</p><p>除了上面说的那个键盘固件，还有比如说我的 Rime（鼠须管）的配置文件，因为词库中有很多的自定义词，以及还有人名通讯地址之类的敏感词，所以也是不方便把这个配置直接托管在 GitHub 上的。</p><p>还有现在看到的这个博客，用 Hexo 生成的 GitHub Pages 静态页面，博客本身的代码我不想放到 GitHub 上，所以这时候的我也需要一个私人的 GitLab。除了能实现代码的托管，还能顺便利用 GitLab CI 实现一键发布，每次只要提交了代码，稍等片刻 GitHub Pages 就自动部署好了。</p><h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>上面说了那么多。现在有了 R86S 这样一个性能跟得上的小主机，在东西到货的第二天，就开始了他的折腾之路。</p><h2 id="安装硬件"><a href="#安装硬件" class="headerlink" title="安装硬件"></a>安装硬件</h2><p>因为这个 R86S 只带了一个电源，内置的一个 EMMC 容量只有 128G 且性能堪忧。所以第一步是安装一个自己的 NVME 固态。记得之前有一块买多了的吃灰三星 980 Pro 500G，都没有开封。之前还差点给挂到海鲜市场出掉，现在终于派上用场了。<br>安装好硬盘然后找一个网线，连接好路由器的 LAN 口和 R86S 的随便一个网口。连接好键盘鼠标，就可以插上电源自动上电开机了。</p><h2 id="安装系统"><a href="#安装系统" class="headerlink" title="安装系统"></a>安装系统</h2><p>既然是是要做小型服务器，哪有用桌面操作系统的。所以这里就选择了 <span class="exturl" data-url="aHR0cHM6Ly91YnVudHUuY29tL2Rvd25sb2FkL3NlcnZlcg==">Ubuntu Server 20.04.3 LTS<i class="fa fa-external-link-alt"></i></span>。下载完镜像后，写入到 U 盘。然后就可以通过 U 盘 启动就可以进安装环节了。<br>安装系统有几个点需要注意一下</p><ol><li><p>分配 IP 地址的方式</p><p>在进行网络配置的时候，既可以通过 DHCP 动态分配 IP，也可以手动指定。如果是 DHCP 分配，则后续需要到路由器中绑定一下 Mac 地址和 IP，毕竟我们在内网访问也是需要有一个内网的固定 IP。通过手动指定 IP 地址，要注意不要和现有分配的的地址冲突。手动指定 IP 就不需要后续到路由器绑定 Mac 地址和 IP 了。</p></li><li><p>选择安装硬盘</p><p>因为主板上带一个 EMMC，所以在选择硬盘的时候记得选自己安装的 NVME SSD 上，而且调整根目录大小调整为剩余 SSD 所由空间。否则根目录默认只划分了 100G，后面进入系统后还需要手动扩容。</p></li><li><p>安装后修改网络配置</p><p>安装完系统后重新启动有可能会出现日志 <code>A start job is running for wait for network to be configured.</code> 导致需要很长时间才能进入系统。这时候需要等进到系统后修改网络配置文件</p><p><code>/etc/netplan/00-installer-config.yaml</code>（文件名 <code>00-installer-config.yaml</code> 不固定，但是文件名类似的一个 <code>yaml</code> 文件)</p><p>在每一个设备下面添加 <code>optional: true</code></p><p>最后的配置应该类似</p><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">network:</span></span><br><span class="line">  <span class="attr">ethernets:</span></span><br><span class="line">    <span class="attr">enp1s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp2s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">enp3s0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">optional:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">2</span></span><br></pre></td></tr></table></figure><p>然后应用更改</p><figure class="highlight coq"><table><tr><td class="code"><pre><span class="line">netplan <span class="built_in">apply</span></span><br></pre></td></tr></table></figure></li></ol><h2 id="创建-GitLab-备份位置"><a href="#创建-GitLab-备份位置" class="headerlink" title="创建 GitLab 备份位置"></a>创建 GitLab 备份位置</h2><p>上面说到了，这个 R86S 自带一个 128G 的 EMMC 存储，虽然性能比较差，但是东西不能浪费了。所以这里我拿来作为一个独立的 GitLab 数据备份存储，即使是主硬盘挂了，还有一份独立的备份存在，而且短时间内 128G 还是够用的。</p><h3 id="创建新的硬盘分区"><a href="#创建新的硬盘分区" class="headerlink" title="创建新的硬盘分区"></a>创建新的硬盘分区</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> cfdisk /dev/mmcblk0        <span class="comment"># mmcblk0 是 EMMC 设备</span></span><br><span class="line"><span class="built_in">sudo</span> mkfs.ext4 /dev/mmcblk0     <span class="comment"># 格式化为 ext4</span></span><br></pre></td></tr></table></figure><h3 id="挂载到-mmc"><a href="#挂载到-mmc" class="headerlink" title="挂载到 &#x2F;mmc"></a>挂载到 &#x2F;mmc</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> vim /etc/fstab</span><br><span class="line"><span class="comment"># 添加一行</span></span><br><span class="line">/dev/mmcblk0 /mmc ext4 defaults 0 0</span><br></pre></td></tr></table></figure><h2 id="安装-GitLab"><a href="#安装-GitLab" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h2><h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install -y curl openssh-server ca-certificates tzdata perl</span><br></pre></td></tr></table></figure><h3 id="添加-GitLab-源"><a href="#添加-GitLab-源" class="headerlink" title="添加 GitLab 源"></a>添加 GitLab 源</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | <span class="built_in">sudo</span> bash</span><br></pre></td></tr></table></figure><h3 id="安装-GitLab-1"><a href="#安装-GitLab-1" class="headerlink" title="安装 GitLab"></a>安装 GitLab</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install gitlab-ce</span><br></pre></td></tr></table></figure><h3 id="获取-root-用户密码"><a href="#获取-root-用户密码" class="headerlink" title="获取 root 用户密码"></a>获取 root 用户密码</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /etc/gitlab/initial_root_password</span><br></pre></td></tr></table></figure><p><strong>注意，这个文件后面会被自动删除。因此请及时保管好该密码或者及时进行修改。</strong></p><h3 id="配置-GitLab"><a href="#配置-GitLab" class="headerlink" title="配置 GitLab"></a>配置 GitLab</h3><p>如果上面几步都比较顺利，不出意外，现在应该已经在这个系统中安装好了 GitLab。接下来先进行一些简要地配置。</p><p>GitLab 的配置文件是 <code>/etc/gitlab/gitlab.rb</code></p><p>我家 OpenWrt 主路由在 DHCP 中设置的 <code>本地服务器</code> 和 <code>本地域名</code> 分别为 <code>/home/</code> 和 <code>home</code>，同时我也希望能通过域名访问这个 GitLab 服务器。所以我还添加了一条 <code>自定义挟持域名</code>，其中域名为 <code>git</code>，IP 地址为 R86S 分配的固定 IP（比如我家的是 <code>192.168.50.50</code>）。这样我就可以通过域名 <code>http://git.home</code> 来访问这个 GitLab 服务器了。</p><p>根据以上前提，这里需要修改的几个地方</p><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">external_url</span> <span class="string">&#x27;http://git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;gitlab_ssh_host&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;git.home&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;time_zone&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;Asia/Shanghai&#x27;</span></span><br><span class="line"><span class="string">gitlab_rails[&#x27;backup_path&#x27;]</span> <span class="string">=</span> <span class="string">&#x27;/mmc&#x27;</span></span><br></pre></td></tr></table></figure><p><code>backup_path</code> 即为 <a href="#%E5%88%9B%E5%BB%BA-GitLab-%E5%A4%87%E4%BB%BD%E4%BD%8D%E7%BD%AE">EMMC 设备的挂载点</a></p><p>修改完 <code>gitlab.rb</code> 后需要重新配置 GitLab 才能生效</p><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure><p>稍等片刻，在浏览器中打开 <span class="exturl" data-url="aHR0cDovL2dpdC5ob21lLw==">http://git.home<i class="fa fa-external-link-alt"></i></span> 就可以看到搭建好的 GitLab 了。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;大概今年（2022）一月中旬的时候入手了一个 &lt;span class=&quot;exturl&quot; data-url=&quot;aHR0cHM6Ly9yODZzLm5ldC8=&quot;&gt;R86S&lt;i class=&quot;fa fa-external-link-alt&quot;&gt;&lt;/i&gt;&lt;/span&gt; 的小主机。因为错过了众筹的车，所以是直接下的单。最后入手了 16G 的黑色千兆版本。不上万兆一个原因是家里没有这个需求，还有一个就是万兆版的没有 NVME 硬盘位，这一点对我还是刚需。&lt;/p&gt;</summary>
+    
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="https://blog.zebedy.com/post/4a17b156.html"/>
+    <id>https://blog.zebedy.com/post/4a17b156.html</id>
+    <published>2022-02-05T05:51:50.000Z</published>
+    <updated>2025-10-14T02:08:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<center>Hello World</center>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;center&gt;Hello World&lt;/center&gt;
+</summary>
+      
+    
+    
+    
+    
+  </entry>
+  
   
 </feed>
