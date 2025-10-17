@@ -310,7 +310,38 @@ class Decryptor {
     content.innerHTML = html;
     content.style.display = "block";
 
+    this.updateLockIconState(true);
     this.renderRefresh();
+  }
+
+  updateLockIconState(isDecrypted) {
+    const abbr = this.getCacheKey?.() || this.data?.abbrlink;
+    if (!abbr) return;
+
+    const lockIcon = document.getElementById(`lock-icon-${abbr}`);
+    if (!lockIcon) return;
+
+    if (isDecrypted) {
+      lockIcon.classList.add("decrypted");
+      lockIcon.classList.remove("fa-lock");
+      lockIcon.classList.add("fa-unlock");
+      lockIcon.style.cursor = "pointer";
+      lockIcon.addEventListener(
+        "click",
+        () => {
+          try {
+            localStorage.removeItem(abbr);
+          } catch (_) {}
+          location.reload();
+        },
+        { once: true }
+      );
+    } else {
+      lockIcon.classList.remove("decrypted");
+      lockIcon.classList.remove("fa-unlock");
+      lockIcon.classList.add("fa-lock");
+      lockIcon.style.cursor = "";
+    }
   }
 
   showStatus(msg, type = "info") {
