@@ -47,6 +47,17 @@
   
   
   <url>
+    <loc>https://blog.zebedy.com/post/50a431e6.html</loc>
+    
+    <lastmod>2025-10-14</lastmod>
+    
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  
+  
+  <url>
     <loc>https://blog.zebedy.com/post/daa7f9d2.html</loc>
     
     <lastmod>2025-10-14</lastmod>
@@ -60,7 +71,7 @@
   
   
   <url>
-    <loc>https://blog.zebedy.com/post/50a431e6.html</loc>
+    <loc>https://blog.zebedy.com/post/fbb67a4e.html</loc>
     
     <lastmod>2025-10-14</lastmod>
     
@@ -70,8 +81,10 @@
   
   
   
+  
+  
   <url>
-    <loc>https://blog.zebedy.com/post/fbb67a4e.html</loc>
+    <loc>https://blog.zebedy.com/post/e72f1311.html</loc>
     
     <lastmod>2025-10-14</lastmod>
     
@@ -104,7 +117,7 @@
   
   
   <url>
-    <loc>https://blog.zebedy.com/post/8d4f8799.html</loc>
+    <loc>https://blog.zebedy.com/post/c59c6467.html</loc>
     
     <lastmod>2025-10-14</lastmod>
     
@@ -115,7 +128,7 @@
   
   
   <url>
-    <loc>https://blog.zebedy.com/post/c59c6467.html</loc>
+    <loc>https://blog.zebedy.com/post/8d4f8799.html</loc>
     
     <lastmod>2025-10-14</lastmod>
     
@@ -147,8 +160,6 @@
   
   
   
-  
-  
   <url>
     <loc>https://blog.zebedy.com/post/5f8a6fc4.html</loc>
     
@@ -160,21 +171,10 @@
   
   
   
+  
+  
   <url>
     <loc>https://blog.zebedy.com/post/baaa1138.html</loc>
-    
-    <lastmod>2025-10-14</lastmod>
-    
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  
-  
-  
-  
-  <url>
-    <loc>https://blog.zebedy.com/post/e72f1311.html</loc>
     
     <lastmod>2025-10-14</lastmod>
     
@@ -196,7 +196,7 @@
   
   
   <url>
-    <loc>https://blog.zebedy.com/post/ec93b507.html</loc>
+    <loc>https://blog.zebedy.com/post/e6a2e300.html</loc>
     
     <lastmod>2025-10-14</lastmod>
     
@@ -207,7 +207,7 @@
   
   
   <url>
-    <loc>https://blog.zebedy.com/post/e6a2e300.html</loc>
+    <loc>https://blog.zebedy.com/post/ec93b507.html</loc>
     
     <lastmod>2025-10-14</lastmod>
     
@@ -219,7 +219,7 @@
 
   <url>
     <loc>https://blog.zebedy.com/</loc>
-    <lastmod>2025-10-20</lastmod>
+    <lastmod>2025-10-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
