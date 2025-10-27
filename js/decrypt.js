@@ -24,6 +24,7 @@ class Decryptor {
       wrappedKeys: JSON.parse(this.container.dataset.wrappedKeys || "[]"),
       prfSalt: this.container.dataset.prfSalt,
       cache: parseInt(this.container.dataset.cache) || 0,
+      passwordHint: this.container.dataset.passwordHint || "",
     };
 
     if (this.checkCache()) return;
@@ -66,6 +67,8 @@ class Decryptor {
 
     if (showBtn) showBtn.style.display = "none";
     if (inputGroup) inputGroup.style.display = "flex";
+    if (this.data.passwordHint) this.showPasswordHint();
+
     if (passwordInput) {
       passwordInput.focus();
       passwordInput.addEventListener("input", () =>
@@ -73,6 +76,19 @@ class Decryptor {
       );
     }
     this.updatePasswordButtonState();
+  }
+
+  showPasswordHint() {
+    const inputGroup = document.getElementById("password-input-group");
+    if (!inputGroup) return;
+
+    let hintElement = inputGroup.querySelector(".password-hint");
+    if (!hintElement) {
+      hintElement = document.createElement("div");
+      hintElement.className = "password-hint";
+      inputGroup.appendChild(hintElement);
+    }
+    hintElement.textContent = this.data.passwordHint;
   }
 
   updatePasswordButtonState() {
@@ -102,7 +118,7 @@ class Decryptor {
       }
       localStorage.removeItem(this.getCacheKey());
       return false;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }
@@ -116,7 +132,7 @@ class Decryptor {
         this.getCacheKey(),
         JSON.stringify({ html, expired })
       );
-    } catch (e) {}
+    } catch (_) {}
   }
 
   async authenticate() {
@@ -243,7 +259,7 @@ class Decryptor {
             wrappedCEK
           );
           break;
-        } catch (e) {}
+        } catch (_) {}
       }
 
       if (!cek)
@@ -285,6 +301,18 @@ class Decryptor {
     }
   }
 
+  executeScripts(container) {
+    const scripts = container.querySelectorAll("script");
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement("script");
+      Array.from(oldScript.attributes).forEach((attr) => {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      newScript.textContent = oldScript.textContent;
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+  }
+
   render(html) {
     const content = document.getElementById("decrypted-content");
     const notice = document.querySelector(".encrypted-post-notice");
@@ -292,9 +320,41 @@ class Decryptor {
 
     notice.style.display = "none";
     content.innerHTML = html;
+    this.executeScripts(content);
     content.style.display = "block";
 
+    this.updateLockIconState(true);
     this.renderRefresh();
+  }
+
+  updateLockIconState(isDecrypted) {
+    const abbr = this.getCacheKey?.() || this.data?.abbrlink;
+    if (!abbr) return;
+
+    const lockIcon = document.getElementById(`lock-icon-${abbr}`);
+    if (!lockIcon) return;
+
+    if (isDecrypted) {
+      lockIcon.classList.add("decrypted");
+      lockIcon.classList.remove("fa-lock");
+      lockIcon.classList.add("fa-unlock");
+      lockIcon.style.cursor = "pointer";
+      lockIcon.addEventListener(
+        "click",
+        () => {
+          try {
+            localStorage.removeItem(abbr);
+          } catch (_) {}
+          location.reload();
+        },
+        { once: true }
+      );
+    } else {
+      lockIcon.classList.remove("decrypted");
+      lockIcon.classList.remove("fa-unlock");
+      lockIcon.classList.add("fa-lock");
+      lockIcon.style.cursor = "";
+    }
   }
 
   showStatus(msg, type = "info") {
@@ -383,9 +443,18 @@ class Decryptor {
     }
   }
 
+  triggerPageLoadedEvent() {
+    document.dispatchEvent(
+      new Event('page:loaded', {
+        bubbles: true
+      })
+    );
+  }
+
   renderRefresh() {
     this.rebuildTOC();
     NexT?.boot?.refresh?.();
+    this.triggerPageLoadedEvent();
   }
 
   b64ToAB(b64) {

@@ -2965,7 +2965,7 @@ mark.search-keyword {
   }
 }
 .encrypted-post-container {
-  min-height: 300px;
+  min-height: 100px;
 }
 .encrypted-post-notice {
   text-align: center;
@@ -3040,6 +3040,16 @@ mark.search-keyword {
 .password-input:focus {
   border-color: #3b8fc7;
 }
+.password-hint {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
 .verification-status {
   margin-top: 20px;
   padding: 12px 20px;
@@ -3104,7 +3114,7 @@ mark.search-keyword {
   transition: color 0.3s ease;
 }
 .encrypted-lock-icon-index.decrypted {
-  color: #27ae60;
+  color: #3b82f6;
 }
 .encrypted-lock-icon-small {
   color: #e74c3c;
@@ -3115,7 +3125,16 @@ mark.search-keyword {
   top: -1px;
 }
 .encrypted-lock-icon-small.decrypted {
-  color: #27ae60;
+  color: #3b82f6;
+}
+.post-top-icon {
+  color: #ff4757;
+  margin-right: 3px;
+}
+.post-meta-top-text {
+  color: #ff4757;
+  font-weight: bold;
+  margin-right: 3px;
 }
 @media (prefers-color-scheme: dark) {
   .encrypted-post-notice {
@@ -3146,13 +3165,24 @@ mark.search-keyword {
     color: #ff6b6b;
   }
   .encrypted-lock-icon-index.decrypted {
-    color: #2ecc71;
+    color: #60a5fa;
   }
   .encrypted-lock-icon-small {
     color: #ff6b6b;
   }
   .encrypted-lock-icon-small.decrypted {
-    color: #2ecc71;
+    color: #60a5fa;
+  }
+  .password-hint {
+    background: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
+  }
+  .post-top-icon {
+    color: #ff6b6b;
+  }
+  .post-meta-top-text {
+    color: #ff6b6b;
   }
 }
 @-moz-keyframes fadeIn {
