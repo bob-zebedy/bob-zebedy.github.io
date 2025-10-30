@@ -1,1 +1,471 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0"><link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.ico"><link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.ico"><link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.ico"><link rel="mask-icon" href="/images/avatar.ico" color="#222"><link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/red/pace-theme-flash.css"><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script><script class="next-config" data-name="main" type="application/json">{"hostname":"blog.zebedy.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.9.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script><link rel="canonical" href="https://blog.zebedy.com/post/465f36a1.html"><script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.zebedy.com/post/465f36a1.html","path":"post/465f36a1.html","title":"OpenWrt 配置记录"}</script><script class="next-config" data-name="calendar" type="application/json">""</script><title>OpenWrt 配置记录 | Undefined</title><script async src="https://www.googletagmanager.com/gtag/js?id=G-EV574LFH56"></script><script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-EV574LFH56","only_pageview":false}</script><script src="/js/third-party/analytics/google-analytics.js"></script><noscript><link rel="stylesheet" href="/css/noscript.css"></noscript><link rel="alternate" href="/atom.xml" title="Undefined" type="application/atom+xml"></head><body itemscope itemtype="http://schema.org/WebPage" class="use-motion"><div class="headband"></div><main class="main"><header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-container"><div class="site-nav-toggle"><div class="toggle" aria-label="切换导航栏" role="button"><span class="toggle-line"></span> <span class="toggle-line"></span> <span class="toggle-line"></span></div></div><div class="site-meta"><a href="/" class="brand" rel="start"><i class="logo-line"></i><p class="site-title">Undefined</p><i class="logo-line"></i></a><p class="site-subtitle" itemprop="description">Life is but a span</p></div><div class="site-nav-right"><div class="toggle popup-trigger"><i class="fa fa-search fa-fw fa-lg"></i></div></div></div><nav class="site-nav"><ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>订阅</a></li><li class="menu-item menu-item-search"><a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索</a></li></ul></nav><div class="search-pop-overlay"><div class="popup search-popup"><div class="search-header"><span class="search-icon"><i class="fa fa-search"></i></span><div class="search-input-container"><input autocomplete="off" autocapitalize="off" maxlength="80" placeholder="搜索..." spellcheck="false" type="search" class="search-input"></div><span class="popup-btn-close" role="button"><i class="fa fa-times-circle"></i></span></div><div class="search-result-container no-result"><div class="search-result-icon"><i class="fa fa-spinner fa-pulse fa-5x"></i></div></div></div></div></div><div class="toggle sidebar-toggle" role="button"><span class="toggle-line"></span> <span class="toggle-line"></span> <span class="toggle-line"></span></div><aside class="sidebar"><div class="sidebar-inner sidebar-overview-active"><ul class="sidebar-nav"><li class="sidebar-nav-toc">文章目录</li><li class="sidebar-nav-overview">站点概览</li></ul><div class="sidebar-panel-container"><div class="post-toc-wrap sidebar-panel"></div><div class="site-overview-wrap sidebar-panel"><div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person"><img class="site-author-image" itemprop="image" alt="Zebedy" src="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin"><p class="site-author-name" itemprop="name">Zebedy</p><div class="site-description" itemprop="description"></div></div><div class="site-state-wrap site-overview-item animated"><nav class="site-state"><div class="site-state-item site-state-posts"><a href="/archives/"><span class="site-state-item-count">24</span> <span class="site-state-item-name">日志</span></a></div></nav></div></div></div><div class="twopeople"><div class="container" style="height:200px"><canvas class="illo" width="800" height="800" style="max-width:200px;max-height:200px;touch-action:none;width:640px;height:640px"></canvas></div><script src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/twopeople1.js"></script><script src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/zdog.dist.js"></script><script id="rendered-js" src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/twopeople.js"></script><style>.twopeople{margin:0;align-items:center;justify-content:center;text-align:center}canvas{display:block;margin:0 auto;cursor:move}</style></div><div class="back-to-top animated" role="button" aria-label="返回顶部"><i class="fa fa-arrow-up"></i> <span>0%</span></div></div></aside><div class="sidebar-dimmer"></div></header><div class="reading-progress-bar"></div><a role="button" class="book-mark-link book-mark-link-fixed"></a><noscript><div class="noscript-warning">Theme NexT works best with JavaScript enabled</div></noscript><div class="main-inner post posts-expand"><div class="post-block"><article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN"><link itemprop="mainEntityOfPage" href="https://blog.zebedy.com/post/465f36a1.html"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin"><meta itemprop="name" content="Zebedy"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="Undefined"></span><header class="post-header"><h1 class="post-title" itemprop="name headline"><i class="fa fa-lock encrypted-lock-icon-index" id="lock-icon-465f36a1"></i>OpenWrt 配置记录</h1><div class="post-meta-container"><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="far fa-calendar"></i> </span><span class="post-meta-item-text">发表于</span> <time title="创建时间：2022-03-02 15:43:35" itemprop="dateCreated datePublished" datetime="2022-03-02T15:43:35+08:00">2022-03-02</time> </span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="far fa-calendar-check"></i> </span><span class="post-meta-item-text">更新于</span> <time title="修改时间：2025-10-15 09:29:03" itemprop="dateModified" datetime="2025-10-15T09:29:03+08:00">2025-10-15</time> </span><span class="post-meta-item" title="阅读次数" id="vercount_container_page_pv"><span class="post-meta-item-icon"><i class="far fa-eye"></i> </span><span class="post-meta-item-text">阅读次数：</span> <span id="vercount_value_page_pv"></span> </span><span class="post-meta-break"></span> <span class="post-meta-item" title="本文字数"><span class="post-meta-item-icon"><i class="far fa-file-word"></i> </span><span class="post-meta-item-text">本文字数：</span> <span>856</span> </span><span class="post-meta-item" title="阅读时长"><span class="post-meta-item-icon"><i class="far fa-clock"></i> </span><span class="post-meta-item-text">阅读时长 &asymp;</span> <span>1 分钟</span></span></div></div></header><div class="post-body" itemprop="articleBody"><div class="encrypted-post-container" data-ciphertext="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" data-iv="XUKbNIdaPKTV3msO" data-auth-tag="URfIdgBicUWKKwSMuc36HA==" data-abbrlink="465f36a1" data-wrapped-keys="[{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;Rw4inktMQcaeuhH3gWG/6hrDNnyXNP7I1kYu9IxSWrQ=&quot;,&quot;iv&quot;:&quot;PMaFSO4AdE37N4/C&quot;,&quot;authTag&quot;:&quot;9MgQoT0xSHwYpWUOcUXyfg==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;0KbVYNEiRFlKHxSLpDijVnGKhXFROjZiwINBzjz+eqM=&quot;,&quot;iv&quot;:&quot;yhQbUDPKJWXd0m8J&quot;,&quot;authTag&quot;:&quot;ebcoZ9fZiOetCuZxelz+1A==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;q2ukKMNOgdhGEvDVEx33i2qnlQLee7aK9pD15HjoirA=&quot;,&quot;iv&quot;:&quot;g+eUMQ2AhC5L2Nmo&quot;,&quot;authTag&quot;:&quot;4yXoRjzavU9ceBNmS6iRFg==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;fDiRmx6L1gpTSnmbN04jmDUqGYc6/ulC43CignaOib0=&quot;,&quot;iv&quot;:&quot;LxImdP1HJZhdOBpv&quot;,&quot;authTag&quot;:&quot;ko2V8jhVVQb0EZoyf+D8Gw==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;UaeB5yRYj7JaE7X88sq1PuKHi5Fplejk0H2WGpx4C04=&quot;,&quot;iv&quot;:&quot;CIJeDqd0HWzDA4NC&quot;,&quot;authTag&quot;:&quot;d4wGH9gy1QhGLyqWt6GMrA==&quot;},{&quot;type&quot;:&quot;password&quot;,&quot;encryptedCEK&quot;:&quot;YcPIRKsZUWEEmHqM/Fazk1NFsgXZLUYTiPfSm/1P7l4=&quot;,&quot;iv&quot;:&quot;NIzZGN/AjbqLPrTQ&quot;,&quot;authTag&quot;:&quot;iZVhFlVHWougHbi4uw0j2g==&quot;,&quot;salt&quot;:&quot;1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b&quot;}]" data-prf-salt="1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b" data-cache="10" data-password-hint=""><div class="encrypted-post-notice"><div class="decrypt-methods"><button class="decrypt-btn" id="fido2-verify-btn"><i class="fa fa-fingerprint"></i> 通行密钥验证</button><div class="password-decrypt-group"><button class="decrypt-btn" id="show-password-btn"><i class="fa fa-lock"></i> 密码验证</button><div class="password-input-group" id="password-input-group" style="display:none"><input type="password" class="password-input" id="password-input" placeholder="输入密码"> <button class="decrypt-btn" id="password-decrypt-btn"><i class="fa fa-key"></i> 确定</button></div></div></div><div class="verification-status" id="verification-status"></div></div><div class="decrypted-content" id="decrypted-content" style="display:none"></div></div></div><footer class="post-footer"><div class="post-copyright"><ul><li class="post-copyright-author"><strong>本文作者： </strong>Zebedy</li><li class="post-copyright-link"><strong>本文链接：</strong> <a href="https://blog.zebedy.com/post/465f36a1.html" title="OpenWrt 配置记录">https://blog.zebedy.com/post/465f36a1.html</a></li><li class="post-copyright-license"><strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpoLWhhbnM="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！</li></ul></div><div class="post-nav"><div class="post-nav-item"><a href="/post/4a4b01f0.html" rel="prev" title="GitLab 自动部署 GitHub Pages 博客"><i class="fa fa-chevron-left"></i> GitLab 自动部署 GitHub Pages 博客</a></div><div class="post-nav-item"><a href="/post/c59c6467.html" rel="next" title="更改 macOS 强调色">更改 macOS 强调色 <i class="fa fa-chevron-right"></i></a></div></div></footer></article></div><div class="comments"><div id="twikoo-comments"></div></div></div></main><footer class="footer"><div class="footer-inner"><div class="copyright">&copy; 2022 – <span itemprop="copyrightYear">2025</span> <span class="with-love"><i class="fa fa-heart"></i> </span><span class="author" itemprop="copyrightHolder">Zebedy</span></div><div class="vercount"><span class="post-meta-item" id="vercount_container_site_uv"><span class="post-meta-item-icon"><i class="fa fa-user"></i> </span><span class="site-uv" title="总访客量"><span id="vercount_value_site_uv"></span> </span></span><span class="post-meta-item" id="vercount_container_site_pv"><span class="post-meta-item-icon"><i class="fa fa-eye"></i> </span><span class="site-pv" title="总访问量"><span id="vercount_value_site_pv"></span></span></span></div><span id="runtime_span"></span><script>var now=new Date;function show_runtime(){var n=new Date("Sat Feb 05 2022 08:00:00 GMT+0800 (中国标准时间)");now.setTime(now.getTime()+250),days=Math.floor((now-n)/1e3/60/60/24),hours=Math.floor((now-n)/1e3/60/60-24*days),1==String(hours).length&&(hours="0"+hours),minutes=Math.floor((now-n)/1e3/60-1440*days-60*hours),1==String(minutes).length&&(minutes="0"+minutes),seconds=Math.round((now-n)/1e3-86400*days-3600*hours-60*minutes),1==String(seconds).length&&(seconds="0"+seconds),document.getElementById("runtime_span").innerHTML=days+" 天 "+hours+" 小时 "+minutes+" 分 "+seconds+" 秒"}setInterval("show_runtime()",250)</script></div></footer><script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script><script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script><script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script><script src="/js/third-party/search/local-search.js"></script><script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"neutral","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.8/dist/mermaid.min.js","integrity":"sha256-QmSAc2kIaUjleIJ46X7qPW2zrpCbXlMz3YIGgWpQ1Jo="}}</script><script src="/js/third-party/tags/mermaid.js"></script><script src="/js/third-party/fancybox.js"></script><script src="/js/third-party/pace.js"></script><script async src="https://events.vercount.one/js"></script><script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script><script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":false,"delay":true,"timeout":1000,"priority":true,"url":"https://blog.zebedy.com/post/465f36a1.html"}</script><script src="/js/third-party/quicklink.js"></script><script type="text/javascript" src="/js/crash-cheat.js"></script><script type="text/javascript" src="/js/decrypt.js"></script><script class="next-config" data-name="twikoo" type="application/json">{"enable":true,"visitor":false,"envId":"https://twikoo.zebedy.com","el":"#twikoo-comments"}</script><script>document.addEventListener("page:loaded",()=>{NexT.utils.loadComments(CONFIG.twikoo.el).then(()=>NexT.utils.getScript(CONFIG.twikoo.jsUrl||"https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js",{condition:window.twikoo})).then(()=>{twikoo.init(CONFIG.twikoo)})})</script><style>.comments,.post-block{overflow:visible}.tk-owo-emotion{display:inline-block}</style></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.ico">
+  <link rel="mask-icon" href="/images/avatar.ico" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/red/pace-theme-flash.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.zebedy.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.9.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+
+
+<link rel="canonical" href="https://blog.zebedy.com/post/465f36a1.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.zebedy.com/post/465f36a1.html","path":"post/465f36a1.html","title":"OpenWrt 配置记录"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>OpenWrt 配置记录 | Undefined</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EV574LFH56"></script>
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-EV574LFH56","only_pageview":false}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Undefined" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Undefined</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Life is but a span</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-rss"><a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>订阅</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zebedy"
+      src="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin">
+  <p class="site-author-name" itemprop="name">Zebedy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+
+      <div class="twopeople">
+        <div class="container" style="height:200px;">
+          <canvas class="illo" width="800" height="800" style="max-width: 200px; max-height: 200px; touch-action: none; width: 640px; height: 640px;"></canvas>
+        </div>
+        <script src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/twopeople1.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/zdog.dist.js"></script>
+        <script id="rendered-js" src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN/js/twopeople.js"></script>
+        <style>
+          .twopeople{
+            margin: 0;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
+          canvas {
+            display: block;
+            margin: 0 auto;
+            cursor: move;
+         }
+        </style>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.zebedy.com/post/465f36a1.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin">
+      <meta itemprop="name" content="Zebedy">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Undefined">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+              <i class="fa fa-lock encrypted-lock-icon-index" id="lock-icon-465f36a1"></i>OpenWrt 配置记录
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-03-02 15:43:35" itemprop="dateCreated datePublished" datetime="2022-03-02T15:43:35+08:00">2022-03-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-10-15 09:29:03" itemprop="dateModified" datetime="2025-10-15T09:29:03+08:00">2025-10-15</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="vercount_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="vercount_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>856</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <div class="encrypted-post-container" 
+    data-ciphertext="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"
+    data-iv="no2bR8QaqN6SsPEj"
+    data-auth-tag="TJaeBd6VTSAeSVMPR733uw=="
+    data-abbrlink="465f36a1"
+    data-wrapped-keys='[{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;vzxPz4KJqUIR4xftPS8j3nIR/sGEMW9w7o274bEG68I=&quot;,&quot;iv&quot;:&quot;zmXo6vPSOdP8Vn+k&quot;,&quot;authTag&quot;:&quot;s1W42diy+z3AIwJ1CoLwrA==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;sjacG8V478zLfV0bgVgjGQ9KC57OfSG9x2y9+BoK6nw=&quot;,&quot;iv&quot;:&quot;ZrYxDsKLRz1aYka8&quot;,&quot;authTag&quot;:&quot;G9EqgJRP+92XXtf4TCm3mg==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;Ym+jRcKbtCzSUNM5MzNABDe8vIC1kQt+m28FTp17cHs=&quot;,&quot;iv&quot;:&quot;ere/MSDz5mvKFrwD&quot;,&quot;authTag&quot;:&quot;Dp1Wj5EfK8YZg+Io1BKMcQ==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;k7BGHs+iASNmaQvWOGzMvwMbYktmejl+xjsy9vb7m0s=&quot;,&quot;iv&quot;:&quot;lCSiWJKLvdEeDk3r&quot;,&quot;authTag&quot;:&quot;rMrPA+9XGTEnY7Pv5xI9ww==&quot;},{&quot;type&quot;:&quot;fido2&quot;,&quot;encryptedCEK&quot;:&quot;Mz5xeSnk+f7c424D9+5YHYuKbmqZqAmWJFkK476MTv0=&quot;,&quot;iv&quot;:&quot;ROYsYleOWPMOTCNt&quot;,&quot;authTag&quot;:&quot;IoDgVJPrHNNQuEKK06UGxA==&quot;},{&quot;type&quot;:&quot;password&quot;,&quot;encryptedCEK&quot;:&quot;/kQ8Bzab6+FsKBec5Cw67vMuvGTvFaURwAshriQpNOk=&quot;,&quot;iv&quot;:&quot;Vw9R8B+ea5wdkclM&quot;,&quot;authTag&quot;:&quot;YyFe5hyl+jaduSEEEXFwrA==&quot;,&quot;salt&quot;:&quot;1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b&quot;}]'
+    data-prf-salt="1be53724816528d8cc0547ca98dfcc2649f00b343011a7d07f4633d72252943b"
+    data-cache="10"
+    data-password-hint="">
+  <div class="encrypted-post-notice">
+    <div class="decrypt-methods"><button class="decrypt-btn" id="fido2-verify-btn"><i class="fa fa-fingerprint"></i> 通行密钥验证</button><div class="password-decrypt-group">
+        <button class="decrypt-btn" id="show-password-btn"><i class="fa fa-lock"></i> 密码验证</button>
+        <div class="password-input-group" id="password-input-group" style="display:none">
+          <input type="password" class="password-input" id="password-input" placeholder="输入密码" />
+          <button class="decrypt-btn" id="password-decrypt-btn"><i class="fa fa-key"></i> 确定</button>
+        </div>
+      </div></div>
+    <div class="verification-status" id="verification-status"></div>
+  </div>
+  <div class="decrypted-content" id="decrypted-content" style="display:none"></div>
+</div>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Zebedy
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://blog.zebedy.com/post/465f36a1.html" title="OpenWrt 配置记录">https://blog.zebedy.com/post/465f36a1.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpoLWhhbnM="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/4a4b01f0.html" rel="prev" title="GitLab 自动部署 GitHub Pages 博客">
+                  <i class="fa fa-chevron-left"></i> GitLab 自动部署 GitHub Pages 博客
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/c59c6467.html" rel="next" title="更改 macOS 强调色">
+                  更改 macOS 强调色 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments"><div id="twikoo-comments"></div></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2022 – 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zebedy</span>
+</div>
+<div class="vercount">
+    <span class="post-meta-item" id="vercount_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="vercount_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="vercount_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="vercount_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <span id="runtime_span"></span>
+  <script>
+    var now = new Date();
+    function show_runtime() {
+      var born = new Date("Sat Feb 05 2022 08:00:00 GMT+0800 (中国标准时间)");
+      now.setTime(now.getTime() + 250);
+      days = Math.floor((now - born) / 1000 / 60 / 60 / 24);
+      hours = Math.floor((now - born) / 1000 / 60 / 60 - (24 * days));
+      if (String(hours).length == 1) { hours = "0" + hours; }
+      minutes = Math.floor((now - born) / 1000 / 60 - (24 * 60 * days) - (60 * hours));
+      if (String(minutes).length == 1) { minutes = "0" + minutes; }
+      seconds = Math.round((now - born) / 1000 - (24 * 60 * 60 * days) - (60 * 60 * hours) - (60 * minutes));
+      if (String(seconds).length == 1) { seconds = "0" + seconds; }
+      document.getElementById("runtime_span").innerHTML = days + " 天 " + hours + " 小时 " + minutes + " 分 " + seconds + " 秒";
+    }
+    setInterval("show_runtime()", 250);
+  </script>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"neutral","dark":"dark"},"js":{"url":"https://cdn.jsdelivr.net/npm/mermaid@8.13.8/dist/mermaid.min.js","integrity":"sha256-QmSAc2kIaUjleIJ46X7qPW2zrpCbXlMz3YIGgWpQ1Jo="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+  <script async src="https://events.vercount.one/js"></script>
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/quicklink@2.2.0/dist/quicklink.umd.js" integrity="sha256-4kQf9z5ntdQrzsBC3YSHnEz02Z9C1UeW/E9OgnvlzSY=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":true,"archive":false,"delay":true,"timeout":1000,"priority":true,"url":"https://blog.zebedy.com/post/465f36a1.html"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+
+    <script type="text/javascript" src="/js/crash-cheat.js"></script>
+  
+
+  
+    <script type="text/javascript" src="/js/decrypt.js"></script><script class="next-config" data-name="twikoo" type="application/json">{"enable":true,"visitor":false,"envId":"https://twikoo.zebedy.com","el":"#twikoo-comments"}</script>
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.twikoo.el)
+    .then(() => NexT.utils.getScript(
+      CONFIG.twikoo.jsUrl || 'https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js',
+      { condition: window.twikoo }
+    ))
+    .then(() => {
+      twikoo.init(CONFIG.twikoo);
+    });
+});
+</script>
+<style>
+.post-block, .comments {
+  overflow: visible;
+}
+.tk-owo-emotion {
+  display: inline-block;
+}
+</style>
+
+</body>
+</html>

@@ -1,1 +1,38 @@
-document.addEventListener("page:loaded",()=>{document.querySelectorAll(".post-body :not(a) > img, .post-body > img").forEach(a=>{var a=$(a),t=a.attr("data-src")||a.attr("src"),t=a.wrap(`<a class="fancybox fancybox.image" href="${t}" itemscope itemtype="http://schema.org/ImageObject" itemprop="url"></a>`).parent("a"),a=(a.is(".post-gallery img")?t.attr("data-fancybox","gallery").attr("rel","gallery"):a.is(".group-picture img")?t.attr("data-fancybox","group").attr("rel","group"):t.attr("data-fancybox","default").attr("rel","default"),a.attr("title")||a.attr("alt"));a&&(t.next("figcaption").length||t.append(`<p class="image-caption">${a}</p>`),t.attr("title",a).attr("data-caption",a))}),$.fancybox.defaults.hash=!1,$(".fancybox").fancybox({loop:!0,helpers:{overlay:{locked:!1}}})});
+document.addEventListener('page:loaded', () => {
+
+  /**
+   * Wrap images with fancybox.
+   */
+  document.querySelectorAll('.post-body :not(a) > img, .post-body > img').forEach(element => {
+    const $image = $(element);
+    const imageLink = $image.attr('data-src') || $image.attr('src');
+    const $imageWrapLink = $image.wrap(`<a class="fancybox fancybox.image" href="${imageLink}" itemscope itemtype="http://schema.org/ImageObject" itemprop="url"></a>`).parent('a');
+    if ($image.is('.post-gallery img')) {
+      $imageWrapLink.attr('data-fancybox', 'gallery').attr('rel', 'gallery');
+    } else if ($image.is('.group-picture img')) {
+      $imageWrapLink.attr('data-fancybox', 'group').attr('rel', 'group');
+    } else {
+      $imageWrapLink.attr('data-fancybox', 'default').attr('rel', 'default');
+    }
+
+    const imageTitle = $image.attr('title') || $image.attr('alt');
+    if (imageTitle) {
+      // Do not append image-caption if pandoc has already created a figcaption
+      if (!$imageWrapLink.next('figcaption').length) {
+        $imageWrapLink.append(`<p class="image-caption">${imageTitle}</p>`);
+      }
+      // Make sure img title tag will show correctly in fancybox
+      $imageWrapLink.attr('title', imageTitle).attr('data-caption', imageTitle);
+    }
+  });
+
+  $.fancybox.defaults.hash = false;
+  $('.fancybox').fancybox({
+    loop   : true,
+    helpers: {
+      overlay: {
+        locked: false
+      }
+    }
+  });
+});

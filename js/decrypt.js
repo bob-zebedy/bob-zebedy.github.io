@@ -1,1 +1,471 @@
-let PBKDF2_ITERATIONS=5e5;function getRPID(){var t=location.hostname;return"127.0.0.1"===t?"localhost":t}class Decryptor{constructor(){this.container=null,this.data=null,this.rpId=getRPID()}init(){var t;this.container=document.querySelector(".encrypted-post-container"),this.container&&(this.data={ciphertext:this.container.dataset.ciphertext,iv:this.container.dataset.iv,authTag:this.container.dataset.authTag,abbrlink:this.container.dataset.abbrlink,wrappedKeys:JSON.parse(this.container.dataset.wrappedKeys||"[]"),prfSalt:this.container.dataset.prfSalt,cache:parseInt(this.container.dataset.cache)||0,passwordHint:this.container.dataset.passwordHint||""},!this.checkCache())&&((t=document.getElementById("fido2-verify-btn"))&&(window.PublicKeyCredential?t.onclick=()=>this.authenticate():this.showStatus("浏览器不支持 FIDO2/WebAuthn","error")),(t=document.getElementById("show-password-btn"))&&(t.onclick=()=>this.showPasswordInput()),(t=document.getElementById("password-decrypt-btn"))&&(t.onclick=()=>this.decryptWithPassword()),t=document.getElementById("password-input"))&&t.addEventListener("keydown",t=>{"Enter"===t.key&&this.decryptWithPassword()})}getCacheKey(){return this.data.abbrlink}showPasswordInput(){var t=document.getElementById("show-password-btn"),e=document.getElementById("password-input-group"),a=document.getElementById("password-input");t&&(t.style.display="none"),e&&(e.style.display="flex"),this.data.passwordHint&&this.showPasswordHint(),a&&(a.focus(),a.addEventListener("input",()=>this.updatePasswordButtonState())),this.updatePasswordButtonState()}showPasswordHint(){var e=document.getElementById("password-input-group");if(e){let t=e.querySelector(".password-hint");t||((t=document.createElement("div")).className="password-hint",e.appendChild(t)),t.textContent=this.data.passwordHint}}updatePasswordButtonState(){var t=document.getElementById("password-input"),e=document.getElementById("password-decrypt-btn");t&&e&&(t=0<t.value.trim().length,e.disabled=!t,e.style.opacity=t?"1":"0.5",e.style.cursor=t?"pointer":"not-allowed")}checkCache(){if(!this.data.cache)return!1;try{var t=localStorage.getItem(this.getCacheKey());if(t){var{html:e,expired:a}=JSON.parse(t);if(Date.now()<a)return this.render(e),setTimeout(()=>this.hideStatus(),2e3),!0;localStorage.removeItem(this.getCacheKey())}return!1}catch(t){return!1}}saveCache(t){if(this.data.cache)try{var e=Date.now()+60*this.data.cache*1e3;localStorage.setItem(this.getCacheKey(),JSON.stringify({html:t,expired:e}))}catch(t){}}async authenticate(){this.showStatus("正在验证身份...","info");try{var e=crypto.getRandomValues(new Uint8Array(32)),a=await crypto.subtle.digest("SHA-256",(new TextEncoder).encode(this.data.prfSalt)),r=(await navigator.credentials.get({publicKey:{challenge:e,rpId:this.rpId,userVerification:"preferred",timeout:6e4,extensions:{prf:{eval:{first:a}}}}})).getClientExtensionResults().prf;if(!r?.results?.first)throw new Error("PRF 扩展不可用");let t=r.results.first;this.showStatus("验证成功，正在解密...","success"),setTimeout(()=>this.unwrapAndDecrypt(t),300)}catch(t){"NotAllowedError"===t.name?this.showStatus("验证被拒绝","error"):"InvalidStateError"===t.name||"NotFoundError"===t.name?this.showStatus("未注册的通行密钥","error"):this.showStatus("验证失败: "+t.message,"error")}}async derivePBKDF2Key(t,e,a=PBKDF2_ITERATIONS){t=(new TextEncoder).encode(t),e=(new TextEncoder).encode(e),t=await crypto.subtle.importKey("raw",t,"PBKDF2",!1,["deriveBits"]);return await crypto.subtle.deriveBits({name:"PBKDF2",salt:e,iterations:a,hash:"SHA-256"},t,256)}async decryptWithPassword(){var t=document.getElementById("password-input")?.value.trim();if(t){this.showStatus("正在解密...","info");try{var e=this.data.wrappedKeys.find(t=>"password"===t.type);if(!e)throw new Error("不支持密码认证");var a=await this.derivePBKDF2Key(t,e.salt);await this.unwrapAndDecrypt(a,"password")}catch(t){this.showStatus("解密失败: "+t.message,"error")}}else this.showStatus("未输入密码","error")}combineWithAuthTag(t,e){var a=new Uint8Array(t.byteLength+e.byteLength);return a.set(new Uint8Array(t),0),a.set(new Uint8Array(e),t.byteLength),a}async unwrapAndDecrypt(e,a="fido2"){try{var r,s=await crypto.subtle.importKey("raw",e,{name:"AES-GCM"},!1,["decrypt"]),i=this.data.wrappedKeys.filter(t=>t.type===a);let t=null;for(r of i)try{var n=this.b64ToAB(r.encryptedCEK),o=this.b64ToAB(r.iv),c=this.b64ToAB(r.authTag),d=this.combineWithAuthTag(n,c);t=await crypto.subtle.decrypt({name:"AES-GCM",iv:o,tagLength:128},s,d);break}catch(t){}if(!t)throw new Error("password"===a?"密码错误":"通行密钥无权限");await this.decryptContent(t)}catch(t){this.showStatus("解密失败: "+t.message,"error")}}async decryptContent(t){try{this.showStatus("正在解密...","info");var e=this.b64ToAB(this.data.ciphertext),a=this.b64ToAB(this.data.iv),r=this.b64ToAB(this.data.authTag),s=this.combineWithAuthTag(e,r),i=await crypto.subtle.importKey("raw",t,{name:"AES-GCM"},!1,["decrypt"]),n=await crypto.subtle.decrypt({name:"AES-GCM",iv:a,tagLength:128},i,s),o=(new TextDecoder).decode(n);this.saveCache(o),this.render(o),setTimeout(()=>this.hideStatus(),2e3)}catch(t){this.showStatus("解密失败: "+t.message,"error")}}executeScripts(t){t.querySelectorAll("script").forEach(t=>{let e=document.createElement("script");Array.from(t.attributes).forEach(t=>{e.setAttribute(t.name,t.value)}),e.textContent=t.textContent,t.parentNode.replaceChild(e,t)})}render(t){var e=document.getElementById("decrypted-content"),a=document.querySelector(".encrypted-post-notice");e&&a&&(a.style.display="none",e.innerHTML=t,this.executeScripts(e),e.style.display="block",this.updateLockIconState(!0),this.renderRefresh())}updateLockIconState(t){let e=this.getCacheKey?.()||this.data?.abbrlink;var a;e&&(a=document.getElementById("lock-icon-"+e))&&(t?(a.classList.add("decrypted"),a.classList.remove("fa-lock"),a.classList.add("fa-unlock"),a.style.cursor="pointer",a.addEventListener("click",()=>{try{localStorage.removeItem(e)}catch(t){}location.reload()},{once:!0})):(a.classList.remove("decrypted"),a.classList.remove("fa-unlock"),a.classList.add("fa-lock"),a.style.cursor=""))}showStatus(t,e="info"){var a=document.getElementById("verification-status");a&&(a.style.display="block",a.className="verification-status "+e,a.innerHTML=`<i class="fa ${{info:"fa-info-circle",success:"fa-check-circle",error:"fa-times-circle"}[e]}"></i> `+t)}hideStatus(){var t=document.getElementById("verification-status");t&&(t.style.display="none")}rebuildTOC(){try{var e=document.getElementById("decrypted-content");let t=document.querySelector(".post-toc-wrap");var a=document.querySelector(".sidebar-inner"),r=window.NexT?.utils;if(e&&t){var s,i=e.querySelectorAll("h1,h2,h3,h4,h5,h6");if(i.length){var n=Array.from(i).reduce((t,e,a)=>{e.id||(e.id="heading-"+a);for(var r=parseInt(e.tagName[1],10),a={level:r,id:e.id,text:e.textContent.trim(),children:[]};t.stack.length&&t.stack.at(-1).level>=r;)t.stack.pop();return(t.stack.length?t.stack.at(-1).children:t.roots).push(a),t.stack.push(a),t},{roots:[],stack:[]}).roots;let r=(t,a=1)=>t.map(t=>{var e=`<a class="nav-link" href="#${t.id}"><span class="nav-text">${t.text}</span></a>`,t=t.children.length?`<ol class="nav-child">${r(t.children,a+1)}</ol>`:"";return`<li class="nav-item nav-level-${a}">${e}${t}</li>`}).join("");(t.querySelector(".post-toc")||((o=document.createElement("div")).className="post-toc animated",t.appendChild(o),o)).innerHTML=`<ol class="nav">${r(n)}</ol>`,a?.classList.add("sidebar-nav-active","sidebar-toc-active"),a?.classList.remove("sidebar-overview-active")}else(s=t.querySelector(".post-toc"))&&(s.innerHTML=""),a?.classList.remove("sidebar-nav-active","sidebar-toc-active"),a?.classList.add("sidebar-overview-active");r?.registerSidebarTOC?.()}}catch(t){console.error("TOC 重建失败: "+t.message)}var o}triggerPageLoadedEvent(){document.dispatchEvent(new Event("page:loaded",{bubbles:!0}))}renderRefresh(){this.rebuildTOC(),NexT?.boot?.refresh?.(),this.triggerPageLoadedEvent()}b64ToAB(t){var e=atob(t),a=new Uint8Array(e.length);for(let t=0;t<e.length;t++)a[t]=e.charCodeAt(t);return a.buffer}}let decryptor=new Decryptor;document.addEventListener("DOMContentLoaded",()=>{document.querySelector(".encrypted-post-container")&&decryptor.init()});
+const PBKDF2_ITERATIONS = 500000;
+
+function getRPID() {
+  const hostname = location.hostname;
+  return hostname === "127.0.0.1" ? "localhost" : hostname;
+}
+
+class Decryptor {
+  constructor() {
+    this.container = null;
+    this.data = null;
+    this.rpId = getRPID();
+  }
+
+  init() {
+    this.container = document.querySelector(".encrypted-post-container");
+    if (!this.container) return;
+
+    this.data = {
+      ciphertext: this.container.dataset.ciphertext,
+      iv: this.container.dataset.iv,
+      authTag: this.container.dataset.authTag,
+      abbrlink: this.container.dataset.abbrlink,
+      wrappedKeys: JSON.parse(this.container.dataset.wrappedKeys || "[]"),
+      prfSalt: this.container.dataset.prfSalt,
+      cache: parseInt(this.container.dataset.cache) || 0,
+      passwordHint: this.container.dataset.passwordHint || "",
+    };
+
+    if (this.checkCache()) return;
+
+    const fido2Btn = document.getElementById("fido2-verify-btn");
+    if (fido2Btn) {
+      if (!window.PublicKeyCredential) {
+        this.showStatus("浏览器不支持 FIDO2/WebAuthn", "error");
+      } else {
+        fido2Btn.onclick = () => this.authenticate();
+      }
+    }
+
+    const showPasswordBtn = document.getElementById("show-password-btn");
+    if (showPasswordBtn) {
+      showPasswordBtn.onclick = () => this.showPasswordInput();
+    }
+
+    const passwordBtn = document.getElementById("password-decrypt-btn");
+    if (passwordBtn) {
+      passwordBtn.onclick = () => this.decryptWithPassword();
+    }
+
+    const passwordInput = document.getElementById("password-input");
+    if (passwordInput) {
+      passwordInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") this.decryptWithPassword();
+      });
+    }
+  }
+
+  getCacheKey() {
+    return this.data.abbrlink;
+  }
+
+  showPasswordInput() {
+    const showBtn = document.getElementById("show-password-btn");
+    const inputGroup = document.getElementById("password-input-group");
+    const passwordInput = document.getElementById("password-input");
+
+    if (showBtn) showBtn.style.display = "none";
+    if (inputGroup) inputGroup.style.display = "flex";
+    if (this.data.passwordHint) this.showPasswordHint();
+
+    if (passwordInput) {
+      passwordInput.focus();
+      passwordInput.addEventListener("input", () =>
+        this.updatePasswordButtonState()
+      );
+    }
+    this.updatePasswordButtonState();
+  }
+
+  showPasswordHint() {
+    const inputGroup = document.getElementById("password-input-group");
+    if (!inputGroup) return;
+
+    let hintElement = inputGroup.querySelector(".password-hint");
+    if (!hintElement) {
+      hintElement = document.createElement("div");
+      hintElement.className = "password-hint";
+      inputGroup.appendChild(hintElement);
+    }
+    hintElement.textContent = this.data.passwordHint;
+  }
+
+  updatePasswordButtonState() {
+    const passwordInput = document.getElementById("password-input");
+    const passwordBtn = document.getElementById("password-decrypt-btn");
+
+    if (!passwordInput || !passwordBtn) return;
+
+    const hasPassword = passwordInput.value.trim().length > 0;
+    passwordBtn.disabled = !hasPassword;
+    passwordBtn.style.opacity = hasPassword ? "1" : "0.5";
+    passwordBtn.style.cursor = hasPassword ? "pointer" : "not-allowed";
+  }
+
+  checkCache() {
+    if (!this.data.cache) return false;
+
+    try {
+      const cached = localStorage.getItem(this.getCacheKey());
+      if (!cached) return false;
+
+      const { html, expired } = JSON.parse(cached);
+      if (Date.now() < expired) {
+        this.render(html);
+        setTimeout(() => this.hideStatus(), 2000);
+        return true;
+      }
+      localStorage.removeItem(this.getCacheKey());
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  saveCache(html) {
+    if (!this.data.cache) return;
+
+    try {
+      const expired = Date.now() + this.data.cache * 60 * 1000;
+      localStorage.setItem(
+        this.getCacheKey(),
+        JSON.stringify({ html, expired })
+      );
+    } catch (_) {}
+  }
+
+  async authenticate() {
+    this.showStatus("正在验证身份...", "info");
+
+    try {
+      const challenge = crypto.getRandomValues(new Uint8Array(32));
+
+      const prfSalt = await crypto.subtle.digest(
+        "SHA-256",
+        new TextEncoder().encode(this.data.prfSalt)
+      );
+
+      const assertion = await navigator.credentials.get({
+        publicKey: {
+          challenge,
+          rpId: this.rpId,
+          userVerification: "preferred",
+          timeout: 60000,
+          extensions: { prf: { eval: { first: prfSalt } } },
+        },
+      });
+
+      const prfResults = assertion.getClientExtensionResults().prf;
+      if (!prfResults?.results?.first) throw new Error("PRF 扩展不可用");
+
+      const wrappingKey = prfResults.results.first;
+
+      this.showStatus("验证成功，正在解密...", "success");
+      setTimeout(() => this.unwrapAndDecrypt(wrappingKey), 300);
+    } catch (e) {
+      if (e.name === "NotAllowedError") {
+        this.showStatus("验证被拒绝", "error");
+      } else if (e.name === "InvalidStateError" || e.name === "NotFoundError") {
+        this.showStatus("未注册的通行密钥", "error");
+      } else {
+        this.showStatus(`验证失败: ${e.message}`, "error");
+      }
+    }
+  }
+
+  async derivePBKDF2Key(password, salt, iterations = PBKDF2_ITERATIONS) {
+    const passwordBuffer = new TextEncoder().encode(password);
+    const saltBuffer = new TextEncoder().encode(salt);
+
+    const baseKey = await crypto.subtle.importKey(
+      "raw",
+      passwordBuffer,
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+
+    const derivedBits = await crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt: saltBuffer,
+        iterations: iterations,
+        hash: "SHA-256",
+      },
+      baseKey,
+      256
+    );
+
+    return derivedBits;
+  }
+
+  async decryptWithPassword() {
+    const passwordInput = document.getElementById("password-input");
+    const password = passwordInput?.value.trim();
+
+    if (!password) {
+      this.showStatus("未输入密码", "error");
+      return;
+    }
+
+    this.showStatus("正在解密...", "info");
+
+    try {
+      const passwordWrapped = this.data.wrappedKeys.find(
+        (k) => k.type === "password"
+      );
+      if (!passwordWrapped) throw new Error("不支持密码认证");
+
+      const wrappingKey = await this.derivePBKDF2Key(
+        password,
+        passwordWrapped.salt
+      );
+      await this.unwrapAndDecrypt(wrappingKey, "password");
+    } catch (e) {
+      this.showStatus(`解密失败: ${e.message}`, "error");
+    }
+  }
+
+  combineWithAuthTag(data, authTag) {
+    const combined = new Uint8Array(data.byteLength + authTag.byteLength);
+    combined.set(new Uint8Array(data), 0);
+    combined.set(new Uint8Array(authTag), data.byteLength);
+    return combined;
+  }
+
+  async unwrapAndDecrypt(wrappingKey, type = "fido2") {
+    try {
+      const wrapKeyBuffer = await crypto.subtle.importKey(
+        "raw",
+        wrappingKey,
+        { name: "AES-GCM" },
+        false,
+        ["decrypt"]
+      );
+      const targetKeys = this.data.wrappedKeys.filter((k) => k.type === type);
+
+      let cek = null;
+      for (const wrapped of targetKeys) {
+        try {
+          const encCEK = this.b64ToAB(wrapped.encryptedCEK);
+          const wrapIV = this.b64ToAB(wrapped.iv);
+          const wrapAuthTag = this.b64ToAB(wrapped.authTag);
+          const wrappedCEK = this.combineWithAuthTag(encCEK, wrapAuthTag);
+
+          cek = await crypto.subtle.decrypt(
+            { name: "AES-GCM", iv: wrapIV, tagLength: 128 },
+            wrapKeyBuffer,
+            wrappedCEK
+          );
+          break;
+        } catch (_) {}
+      }
+
+      if (!cek)
+        throw new Error(type === "password" ? "密码错误" : "通行密钥无权限");
+      await this.decryptContent(cek);
+    } catch (e) {
+      this.showStatus(`解密失败: ${e.message}`, "error");
+    }
+  }
+
+  async decryptContent(decryptionKey) {
+    try {
+      this.showStatus("正在解密...", "info");
+
+      const ciphertext = this.b64ToAB(this.data.ciphertext);
+      const iv = this.b64ToAB(this.data.iv);
+      const authTag = this.b64ToAB(this.data.authTag);
+      const encData = this.combineWithAuthTag(ciphertext, authTag);
+
+      const key = await crypto.subtle.importKey(
+        "raw",
+        decryptionKey,
+        { name: "AES-GCM" },
+        false,
+        ["decrypt"]
+      );
+      const decrypted = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv, tagLength: 128 },
+        key,
+        encData
+      );
+
+      const html = new TextDecoder().decode(decrypted);
+      this.saveCache(html);
+      this.render(html);
+      setTimeout(() => this.hideStatus(), 2000);
+    } catch (e) {
+      this.showStatus(`解密失败: ${e.message}`, "error");
+    }
+  }
+
+  executeScripts(container) {
+    const scripts = container.querySelectorAll("script");
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement("script");
+      Array.from(oldScript.attributes).forEach((attr) => {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      newScript.textContent = oldScript.textContent;
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+  }
+
+  render(html) {
+    const content = document.getElementById("decrypted-content");
+    const notice = document.querySelector(".encrypted-post-notice");
+    if (!content || !notice) return;
+
+    notice.style.display = "none";
+    content.innerHTML = html;
+    this.executeScripts(content);
+    content.style.display = "block";
+
+    this.updateLockIconState(true);
+    this.renderRefresh();
+  }
+
+  updateLockIconState(isDecrypted) {
+    const abbr = this.getCacheKey?.() || this.data?.abbrlink;
+    if (!abbr) return;
+
+    const lockIcon = document.getElementById(`lock-icon-${abbr}`);
+    if (!lockIcon) return;
+
+    if (isDecrypted) {
+      lockIcon.classList.add("decrypted");
+      lockIcon.classList.remove("fa-lock");
+      lockIcon.classList.add("fa-unlock");
+      lockIcon.style.cursor = "pointer";
+      lockIcon.addEventListener(
+        "click",
+        () => {
+          try {
+            localStorage.removeItem(abbr);
+          } catch (_) {}
+          location.reload();
+        },
+        { once: true }
+      );
+    } else {
+      lockIcon.classList.remove("decrypted");
+      lockIcon.classList.remove("fa-unlock");
+      lockIcon.classList.add("fa-lock");
+      lockIcon.style.cursor = "";
+    }
+  }
+
+  showStatus(msg, type = "info") {
+    const el = document.getElementById("verification-status");
+    if (!el) return;
+    const icons = {
+      info: "fa-info-circle",
+      success: "fa-check-circle",
+      error: "fa-times-circle",
+    };
+    el.style.display = "block";
+    el.className = `verification-status ${type}`;
+    el.innerHTML = `<i class="fa ${icons[type]}"></i> ${msg}`;
+  }
+
+  hideStatus() {
+    const el = document.getElementById("verification-status");
+    if (el) el.style.display = "none";
+  }
+
+  rebuildTOC() {
+    try {
+      const content = document.getElementById("decrypted-content");
+      const tocWrap = document.querySelector(".post-toc-wrap");
+      const sidebar = document.querySelector(".sidebar-inner");
+      const utils = window.NexT?.utils;
+      if (!content || !tocWrap) return;
+
+      const headings = content.querySelectorAll("h1,h2,h3,h4,h5,h6");
+      const ensureToc = () =>
+        tocWrap.querySelector(".post-toc") ||
+        (() => {
+          const el = document.createElement("div");
+          el.className = "post-toc animated";
+          tocWrap.appendChild(el);
+          return el;
+        })();
+
+      if (!headings.length) {
+        const exist = tocWrap.querySelector(".post-toc");
+        if (exist) exist.innerHTML = "";
+        sidebar?.classList.remove("sidebar-nav-active", "sidebar-toc-active");
+        sidebar?.classList.add("sidebar-overview-active");
+        utils?.registerSidebarTOC?.();
+        return;
+      }
+
+      const { roots } = Array.from(headings).reduce(
+        (acc, h, i) => {
+          if (!h.id) h.id = `heading-${i}`;
+          const level = parseInt(h.tagName[1], 10);
+          const node = {
+            level,
+            id: h.id,
+            text: h.textContent.trim(),
+            children: [],
+          };
+          while (acc.stack.length && acc.stack.at(-1).level >= level)
+            acc.stack.pop();
+          (acc.stack.length ? acc.stack.at(-1).children : acc.roots).push(node);
+          acc.stack.push(node);
+          return acc;
+        },
+        { roots: [], stack: [] }
+      );
+
+      const render = (nodes, depth = 1) =>
+        nodes
+          .map((n) => {
+            const link = `<a class="nav-link" href="#${n.id}"><span class="nav-text">${n.text}</span></a>`;
+            const kids = n.children.length
+              ? `<ol class="nav-child">${render(n.children, depth + 1)}</ol>`
+              : "";
+            return `<li class="nav-item nav-level-${depth}">${link}${kids}</li>`;
+          })
+          .join("");
+
+      const toc = ensureToc();
+      toc.innerHTML = `<ol class="nav">${render(roots)}</ol>`;
+
+      sidebar?.classList.add("sidebar-nav-active", "sidebar-toc-active");
+      sidebar?.classList.remove("sidebar-overview-active");
+      utils?.registerSidebarTOC?.();
+    } catch (e) {
+      console.error(`TOC 重建失败: ${e.message}`);
+    }
+  }
+
+  triggerPageLoadedEvent() {
+    document.dispatchEvent(
+      new Event('page:loaded', {
+        bubbles: true
+      })
+    );
+  }
+
+  renderRefresh() {
+    this.rebuildTOC();
+    NexT?.boot?.refresh?.();
+    this.triggerPageLoadedEvent();
+  }
+
+  b64ToAB(b64) {
+    const str = atob(b64);
+    const bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
+    return bytes.buffer;
+  }
+}
+
+const decryptor = new Decryptor();
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.querySelector(".encrypted-post-container")) decryptor.init();
+});
