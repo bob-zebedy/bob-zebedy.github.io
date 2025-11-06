@@ -2,6 +2,8 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   
+  
+  
   <url>
     <loc>https://blog.zebedy.com/post/16e3b020.html</loc>
     
@@ -10,8 +12,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  
-  
   
   
   
@@ -230,7 +230,7 @@
 
   <url>
     <loc>https://blog.zebedy.com/</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
