@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.1">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.ico">
@@ -299,7 +299,7 @@
         <p>我们知道，如果想给一个自定义类型增加对应的方法，可以直接修改这个类就可以了，但是如果我们这个时候想给内置的类型增加一些自定义方法呢？</p>
 <span id="more"></span>
 
-<p>比如对于可变类型对象，我们想增加一个 <code>deepcopy</code> 的方法实现深拷贝，类似<code>dd = &#123;&#39;a&#39;: [1, 2, 3]&#125;.deepcopy()</code> 达到 <code>dd = copy.deepcopy(&#123;&#39;a&#39;: [1, 2, 3]&#125;)</code> 的效果，显而易见的是直接在一个 dict 对象上 <code>.deepcopy()</code> 是更优雅的。但是事与愿违，我们没有办法通过常规手段给 dict 增加 <code>deepcopy()</code> 方法。</p>
+<p>比如对于可变类型对象，我们想增加一个 <code>deepcopy</code> 的方法实现深拷贝，类似<code>dd = {&#39;a&#39;: [1, 2, 3]}.deepcopy()</code> 达到 <code>dd = copy.deepcopy({&#39;a&#39;: [1, 2, 3]})</code> 的效果，显而易见的是直接在一个 dict 对象上 <code>.deepcopy()</code> 是更优雅的。但是事与愿违，我们没有办法通过常规手段给 dict 增加 <code>deepcopy()</code> 方法。</p>
 <p>难道就真的没有办法吗？下面这段代码可以优雅的实现。</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> ctypes</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PyType</span>(ctypes.Structure):</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PyObject</span>(ctypes.Structure):</span><br><span class="line">    Py_ssize_t = (</span><br><span class="line">        ctypes.c_int64 <span class="keyword">if</span> ctypes.sizeof(ctypes.c_void_p) == <span class="number">8</span> <span class="keyword">else</span> ctypes.c_int32</span><br><span class="line">    )</span><br><span class="line">    _fields_ = [</span><br><span class="line">        (<span class="string">&quot;ob_refcnt&quot;</span>, Py_ssize_t),</span><br><span class="line">        (<span class="string">&quot;ob_type&quot;</span>, ctypes.POINTER(PyType)),</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PyTypeObject</span>(<span class="title class_ inherited__">PyObject</span>):</span><br><span class="line">    _fields_ = [</span><br><span class="line">        (<span class="string">&quot;dict&quot;</span>, ctypes.POINTER(PyObject))</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">inject</span>(<span class="params">class_, method, force=<span class="literal">False</span></span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_</span>(<span class="params">function</span>):</span><br><span class="line">        name_, dict_ = class_.__name__, class_.__dict__</span><br><span class="line">        proxy_dict = PyTypeObject.from_address(<span class="built_in">id</span>(dict_))</span><br><span class="line">        namespace = &#123;&#125;</span><br><span class="line">        ctypes.pythonapi.PyDict_SetItem(</span><br><span class="line">            ctypes.py_object(namespace),</span><br><span class="line">            ctypes.py_object(name_),</span><br><span class="line">            proxy_dict.<span class="built_in">dict</span></span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> force <span class="keyword">and</span> namespace.get(name_, &#123;&#125;).get(method, <span class="literal">None</span>):</span><br><span class="line">            <span class="keyword">raise</span> RuntimeError(<span class="string">f&quot;已存在方法 <span class="subst">&#123;class_.__name__&#125;</span>.<span class="subst">&#123;method&#125;</span>()&quot;</span>)</span><br><span class="line">        namespace[name_][method] = function</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> _</span><br></pre></td></tr></table></figure>
 
@@ -404,7 +404,7 @@
   <script>
     var now = new Date();
     function show_runtime() {
-      var born = new Date("Sat Feb 05 2022 08:00:00 GMT+0800 (中国标准时间)");
+      var born = new Date("Sat Feb 05 2022 08:00:00 GMT+0800 (China Standard Time)");
       now.setTime(now.getTime() + 250);
       days = Math.floor((now - born) / 1000 / 60 / 60 / 24);
       hours = Math.floor((now - born) / 1000 / 60 / 60 - (24 * days));

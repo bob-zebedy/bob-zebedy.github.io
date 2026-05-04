@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.1.1">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.ico">
@@ -401,7 +401,7 @@
 <div class="tabs" id="head-unique.njk"><ul class="nav-tabs"><li class="tab active"><a href="#head-unique.njk-1"><i class="fa fa-code"></i>./themes/next/layout/_partials/head/head-unique.njk</a></li></ul><div class="tab-content"><div class="tab-pane active" id="head-unique.njk-1"><figure class="highlight jinja"><table><tr><td class="code"><pre><span class="line"><span class="comment">&#123;# 判断文章是否是是加密的，如果不是则生成对应的 meta 标签 #&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;%- <span class="name"><span class="name">if</span></span> not page.encrypted %&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  </span><span class="template-variable">&#123;&#123; open_graph() &#125;&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;%- <span class="name"><span class="name">endif</span></span> %&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="comment">&#123;# https://github.com/theme-next/hexo-theme-next/issues/866 #&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;%- <span class="name">set</span> canonical = url | replace(r/index\.html$/, &#x27;&#x27;) %&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;%- <span class="name"><span class="name">if</span></span> not config.permalink.endsWith(&#x27;.html&#x27;) %&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">  </span><span class="template-tag">&#123;%- <span class="name">set</span> canonical = canonical | replace(r/\.html$/, &#x27;&#x27;) %&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-tag">&#123;%- <span class="name"><span class="name">endif</span></span> %&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;canonical&quot;</span> <span class="attr">href</span>=<span class="string">&quot;</span></span></span><span class="template-variable">&#123;&#123; canonical &#125;&#125;</span><span class="language-xml"><span class="tag"><span class="string">&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="comment">&#123;# Exports some front-matter variables to Front-End #&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="comment">&#123;# https://hexo.io/docs/variables.html #&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-variable">&#123;&#123; next_data(&#x27;page&#x27;, next_config_unique()) &#125;&#125;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml"></span><span class="template-variable">&#123;&#123; next_data(&#x27;calendar&#x27;,</span></span><br><span class="line"><span class="template-variable">  theme.calendar if page.type === &#x27;schedule&#x27; else &#x27;&#x27;)</span></span><br><span class="line"><span class="template-variable">&#125;&#125;</span></span><br></pre></td></tr></table></figure></div></div></div>
 
 
-<h3 id="修补-post-njk"><a href="#修补-post-njk" class="headerlink" title="修补 post.njk"></a>修补 post.njk</h3><p>加密后的文章在首页预览的时候会显示 <code>文章已加密</code> 的提示字样。同时如果文章已经解密，则正常展示预览部分 (即 <code>&lt;!-- more --&gt;</code> 之前的内容) </p>
+<h3 id="修补-post-njk"><a href="#修补-post-njk" class="headerlink" title="修补 post.njk"></a>修补 post.njk</h3><p>加密后的文章在首页预览的时候会显示 <code>文章已加密</code> 的提示字样。同时如果文章已经解密，则正常展示预览部分 (即 <code><!-- more --></code> 之前的内容) </p>
 <p>同时在首页文章标题前面增加一把锁图标，未解密时是红色锁定图标，已解密变为绿色开锁图标</p>
 <p>并且，在文章内标题前方也增加所得图标。同时点击解密后的绿色开锁图标文章会立刻变为加密状态。</p>
 <ul>
@@ -500,7 +500,7 @@
   <script>
     var now = new Date();
     function show_runtime() {
-      var born = new Date("Sat Feb 05 2022 08:00:00 GMT+0800 (中国标准时间)");
+      var born = new Date("Sat Feb 05 2022 08:00:00 GMT+0800 (China Standard Time)");
       now.setTime(now.getTime() + 250);
       days = Math.floor((now - born) / 1000 / 60 / 60 / 24);
       hours = Math.floor((now - born) / 1000 / 60 / 60 - (24 * days));
