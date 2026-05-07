@@ -279,14 +279,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>6.2k</span>
+      <span>6k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>6 分钟</span>
+      <span>5 分钟</span>
     </span>
 </div>
 
@@ -461,9 +461,7 @@
 <li>组装 qname: <code>RouteID.SID.u.seq-total.QueryNonce.payload_labels...</code></li>
 <li>发送 DNS TXT 查询；失败则<strong>生成新 QueryNonce 重试</strong> (最多 3 次)</li>
 </ol>
-<h2 id="服务端重组"><a href="#服务端重组" class="headerlink" title="服务端重组"></a>服务端重组</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line">addChunk(sid, seq, total, payload)</span><br></pre></td></tr></table></figure>
-
-<ul>
+<h2 id="服务端重组"><a href="#服务端重组" class="headerlink" title="服务端重组"></a>服务端重组</h2><ul>
 <li>按 <code>(sid, total)</code> 缓冲分块</li>
 <li><code>seq == 0</code> 时重置缓冲区 (处理前一条未完成的消息) </li>
 <li>全部块到齐后按序拼接，广播完整 E2E 密文到组内其他会话</li>
@@ -473,47 +471,39 @@
 <tr>
 <th>参数</th>
 <th>值</th>
-<th>来源</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>最大消息载荷</td>
 <td>4096 字节</td>
-<td><code>client/main.go: maxPayloadSize</code></td>
 </tr>
 <tr>
 <td>分块大小</td>
 <td>80 字节</td>
-<td><code>client/main.go: chunkSize</code></td>
 </tr>
 <tr>
 <td>分块重试次数</td>
 <td>3 次</td>
-<td><code>client/main.go: chunkRetries</code></td>
 </tr>
 <tr>
 <td>DNS 标签段长</td>
 <td>30 字符</td>
-<td><code>shared.LabelSegLen</code></td>
 </tr>
 <tr>
 <td>DNS 标签上限</td>
 <td>63 字符</td>
-<td>RFC 1035</td>
 </tr>
 <tr>
 <td>DNS qname 上限</td>
 <td>253 字符</td>
-<td>RFC 1035</td>
 </tr>
 <tr>
 <td>TXT 单条字符串上限</td>
 <td>200 字符 (base32)</td>
-<td><code>server/main.go: maxTXTLength</code></td>
 </tr>
 </tbody></table>
 <h1 id="Poll-响应帧格式"><a href="#Poll-响应帧格式" class="headerlink" title="Poll 响应帧格式"></a>Poll 响应帧格式</h1><p>服务端返回多条消息时使用长度前缀帧格式: </p>
-<figure class="highlight excel"><table><tr><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────┐</span><br><span class="line">│ <span class="number">2</span>B <span class="built_in">len</span> │ E2E blob <span class="number">1</span> │ <span class="number">2</span>B <span class="built_in">len</span> │ E2E blob <span class="number">2</span> │ ...         │</span><br><span class="line">└─────────────────────────────────────────────────────────┘</span><br><span class="line">         │                      │</span><br><span class="line">         ▼                      ▼</span><br><span class="line">  nonce(<span class="number">12</span>) || ct(<span class="built_in">N</span>+<span class="number">16</span>)   nonce(<span class="number">12</span>) || ct(<span class="built_in">N</span>+<span class="number">16</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────┐</span><br><span class="line">│ <span class="number">2</span>B len │ E2E blob <span class="number">1</span> │ <span class="number">2</span>B len │ E2E blob <span class="number">2</span> │ ...         │</span><br><span class="line">└─────────────────────────────────────────────────────────┘</span><br><span class="line">                │                     │</span><br><span class="line">                ▼                     ▼</span><br><span class="line">          nonce (<span class="number">12</span> 字节)       nonce (<span class="number">12</span> 字节)</span><br><span class="line">          ct + <span class="keyword">tag</span> <span class="title">(N</span>+<span class="number">16</span>)      ct + <span class="keyword">tag</span> <span class="title">(N</span>+<span class="number">16</span>)</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li><strong>长度前缀</strong>: 2 字节大端序 uint16 表示后续 E2E blob 长度</li>
@@ -530,11 +520,11 @@
 </thead>
 <tbody><tr>
 <td>每次 poll 最大消息数</td>
-<td>10 (<code>maxPollCount</code>)</td>
+<td>10</td>
 </tr>
 <tr>
 <td>每次 poll 最大字节数</td>
-<td>4096 (<code>maxPollBytes</code>)</td>
+<td>4096</td>
 </tr>
 <tr>
 <td>TXT 记录最大长度</td>
