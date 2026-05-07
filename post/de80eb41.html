@@ -23,15 +23,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"blog.zebedy.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.9.0","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="在 阮一峰周刊 369 期 中这样一篇文章 破解加拿大航空的飞机上网 当时看了之后觉得很有意思，但没有额外作什么思考。过了两周的某一天早上在上班路上突然想到了这个文章，因为是上班路上有点无聊，所以就思考了一下这个问题：如果在某一网络中，只有 DNS 协议的请求能成功，那么在这个网络中的人们能否自由彼此通信？">
+  <meta name="description" content="在 阮一峰周刊 369 期 中这样一篇文章 破解加拿大航空的飞机上网 当时看了之后觉得很有意思，但没有额外作什么思考。过了两周的某一天早上在上班路上突然想到了这个文章，因为是上班路上有点无聊，所以就思考了一下这个问题: 如果在某一网络中，只有 DNS 协议的请求能成功，那么在这个网络中的人们能否自由彼此通信？">
 <meta property="og:type" content="article">
 <meta property="og:title" content="把 DNS 服务变为一个聊天室">
 <meta property="og:url" content="https://blog.zebedy.com/post/de80eb41.html">
 <meta property="og:site_name" content="Undefined">
-<meta property="og:description" content="在 阮一峰周刊 369 期 中这样一篇文章 破解加拿大航空的飞机上网 当时看了之后觉得很有意思，但没有额外作什么思考。过了两周的某一天早上在上班路上突然想到了这个文章，因为是上班路上有点无聊，所以就思考了一下这个问题：如果在某一网络中，只有 DNS 协议的请求能成功，那么在这个网络中的人们能否自由彼此通信？">
+<meta property="og:description" content="在 阮一峰周刊 369 期 中这样一篇文章 破解加拿大航空的飞机上网 当时看了之后觉得很有意思，但没有额外作什么思考。过了两周的某一天早上在上班路上突然想到了这个文章，因为是上班路上有点无聊，所以就思考了一下这个问题: 如果在某一网络中，只有 DNS 协议的请求能成功，那么在这个网络中的人们能否自由彼此通信？">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-10-27T09:47:54.000Z">
-<meta property="article:modified_time" content="2025-10-27T09:47:54.000Z">
+<meta property="article:modified_time" content="2026-05-07T12:33:54.000Z">
 <meta property="article:author" content="Zebedy">
 <meta name="twitter:card" content="summary">
 
@@ -140,7 +140,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -153,6 +153,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88"><span class="nav-text">架构概览</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%86%E9%92%A5%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%88%86%E7%A6%BB"><span class="nav-text">密钥与路由分离</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DNS-%E6%9F%A5%E8%AF%A2%E5%90%8D%E6%A0%BC%E5%BC%8F-QName"><span class="nav-text">DNS 查询名格式 (QName)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E5%90%91-Dir-%E8%AF%B4%E6%98%8E"><span class="nav-text">方向 (Dir) 说明</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#E2E-%E5%8A%A0%E5%AF%86%E6%B5%81%E7%A8%8B"><span class="nav-text">E2E 加密流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E5%AF%86-%E5%8F%91%E9%80%81%E6%96%B9"><span class="nav-text">加密 (发送方)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%AF%86-%E6%8E%A5%E6%94%B6%E6%96%B9"><span class="nav-text">解密 (接收方)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E5%AF%86%E5%8F%82%E6%95%B0"><span class="nav-text">加密参数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%9D%97%E4%BC%A0%E8%BE%93%E6%9C%BA%E5%88%B6"><span class="nav-text">分块传输机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E6%96%B9%E5%88%86%E5%9D%97"><span class="nav-text">发送方分块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%87%8D%E7%BB%84"><span class="nav-text">服务端重组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%A7%E5%B0%8F%E9%99%90%E5%88%B6"><span class="nav-text">大小限制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Poll-%E5%93%8D%E5%BA%94%E5%B8%A7%E6%A0%BC%E5%BC%8F"><span class="nav-text">Poll 响应帧格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%8D%E5%BA%94%E5%A4%A7%E5%B0%8F%E9%99%90%E5%88%B6"><span class="nav-text">响应大小限制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS-%E4%BC%A0%E8%BE%93"><span class="nav-text">DNS 传输</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E9%80%82%E5%BA%94%E8%BD%AE%E8%AF%A2"><span class="nav-text">自适应轮询</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%98%B5%E7%A7%B0%E7%AE%A1%E7%90%86"><span class="nav-text">昵称管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E5%86%8C%E6%B5%81%E7%A8%8B"><span class="nav-text">注册流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A6%BB%E5%BC%80%E6%B5%81%E7%A8%8B"><span class="nav-text">离开流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%9A%E8%AF%9D%E8%BF%87%E6%9C%9F%E8%87%AA%E5%8A%A8%E6%81%A2%E5%A4%8D"><span class="nav-text">会话过期自动恢复</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E6%B6%88%E6%81%AF%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-text">完整消息生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF%E4%BC%9A%E8%AF%9D%E7%8A%B6%E6%80%81"><span class="nav-text">服务端会话状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%A8%E6%B5%81%E7%A8%8B"><span class="nav-text">全流程</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -256,6 +257,13 @@
 
       <time title="创建时间：2025-10-27 17:47:54" itemprop="dateCreated datePublished" datetime="2025-10-27T17:47:54+08:00">2025-10-27</time>
     </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-05-07 20:33:54" itemprop="dateModified" datetime="2026-05-07T20:33:54+08:00">2026-05-07</time>
+    </span>
 
   
     <span class="post-meta-item" title="阅读次数" id="vercount_container_page_pv">
@@ -271,14 +279,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>1.8k</span>
+      <span>6.2k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
+      <span>6 分钟</span>
     </span>
 </div>
 
@@ -289,21 +297,299 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>在 <span class="exturl" data-url="aHR0cHM6Ly93d3cucnVhbnlpZmVuZy5jb20vYmxvZy8yMDI1LzEwL3dlZWtseS1pc3N1ZS0zNjkuaHRtbA==">阮一峰周刊 369 期<i class="fa fa-external-link-alt"></i></span> 中这样一篇文章 <span class="exturl" data-url="aHR0cHM6Ly9yYW1zYXlsZXVuZy5naXRodWIuaW8vemgvcG9zdC8yMDI1LyVFNSU4NSVCMyVFNCVCQSU4RSVFNyVBMCVCNCVFOCVBNyVBMyVFNSU4QSVBMCVFNiU4QiVCRiVFNSVBNCVBNyVFOCU4OCVBQSVFNyVBOSVCQSVFOSVBMyU5RSVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5QyVFOSU5OSU5MCVFNSU4OCVCNiVFNyU5QSU4NCVFNCVCOCU4MCVFNCVCQiVCNiVFNSVCMCU4RiVFNCVCQSU4Qi8=">破解加拿大航空的飞机上网<i class="fa fa-external-link-alt"></i></span> 当时看了之后觉得很有意思，但没有额外作什么思考。过了两周的某一天早上在上班路上突然想到了这个文章，因为是上班路上有点无聊，所以就思考了一下这个问题：如果在某一网络中，只有 DNS 协议的请求能成功，那么在这个网络中的人们能否自由彼此通信？</p>
+        <p>在 <span class="exturl" data-url="aHR0cHM6Ly93d3cucnVhbnlpZmVuZy5jb20vYmxvZy8yMDI1LzEwL3dlZWtseS1pc3N1ZS0zNjkuaHRtbA==">阮一峰周刊 369 期<i class="fa fa-external-link-alt"></i></span> 中这样一篇文章 <span class="exturl" data-url="aHR0cHM6Ly9yYW1zYXlsZXVuZy5naXRodWIuaW8vemgvcG9zdC8yMDI1LyVFNSU4NSVCMyVFNCVCQSU4RSVFNyVBMCVCNCVFOCVBNyVBMyVFNSU4QSVBMCVFNiU4QiVCRiVFNSVBNCVBNyVFOCU4OCVBQSVFNyVBOSVCQSVFOSVBMyU5RSVFNiU5QyVCQSVFNyVCRCU5MSVFNyVCQiU5QyVFOSU5OSU5MCVFNSU4OCVCNiVFNyU5QSU4NCVFNCVCOCU4MCVFNCVCQiVCNiVFNSVCMCU4RiVFNCVCQSU4Qi8=">破解加拿大航空的飞机上网<i class="fa fa-external-link-alt"></i></span> 当时看了之后觉得很有意思，但没有额外作什么思考。过了两周的某一天早上在上班路上突然想到了这个文章，因为是上班路上有点无聊，所以就思考了一下这个问题: 如果在某一网络中，只有 DNS 协议的请求能成功，那么在这个网络中的人们能否自由彼此通信？</p>
 <span id="more"></span>
 
 <p>先说结论，肯定是可以的，只需要单建一个特殊的 DNS 服务器就可以了。</p>
-<div class="note success"><p>核心思想：把文本消息伪装成 DNS 查询，放到 QNAME 中发给服务器，服务器收到特殊的 DNS 查询，将结果按照 TXT 查询格式返回内容。</p>
-</div>
+<h1 id="架构概览"><a href="#架构概览" class="headerlink" title="架构概览"></a>架构概览</h1><figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">┌──────────┐   <span class="built_in"> DNS </span>TXT Query     ┌──────────┐   <span class="built_in"> DNS </span>TXT Query     ┌──────────┐</span><br><span class="line">│<span class="built_in"> Client </span>A ├─────────────────────&gt;│ <span class="built_in"> Server </span> │&lt;─────────────────────┤<span class="built_in"> Client </span>B │</span><br><span class="line">│          │&lt;─────────────────────┤ (盲转发)  ├─────────────────────&gt;│          │</span><br><span class="line">└──────────┘   <span class="built_in"> DNS </span>TXT Reply     └──────────┘   <span class="built_in"> DNS </span>TXT Reply     └──────────┘</span><br><span class="line">     │                                                                    │</span><br><span class="line">     │            E2E Key = HMAC-SHA256(<span class="string">&quot;dnsay-key-v1&quot;</span>, group)            │</span><br><span class="line">     └─────────────────────<span class="built_in"> group </span>名 (共享密钥) ────────────────────────────┘</span><br></pre></td></tr></table></figure>
 
-<p>上行数据包 (消息)</p>
-<figure class="highlight gherkin"><table><tr><td class="code"><pre><span class="line"><span class="variable">&lt;group&gt;</span>.<span class="variable">&lt;sid&gt;</span>.u.<span class="variable">&lt;seq&gt;</span>.<span class="variable">&lt;nonce&gt;</span>.<span class="variable">&lt;payload1&gt;</span>.<span class="variable">&lt;payload2&gt;</span>....[.<span class="variable">&lt;TLD&gt;</span>].</span><br><span class="line">^------^-----^-^-----^-------^--------------------------^------^</span><br><span class="line">    |<span class="string">     </span>|<span class="string">   </span>|<span class="string">   </span>|<span class="string">      </span>|<span class="string">                </span>|<span class="string">                </span>|<span class="string">   </span></span><br><span class="line"><span class="string">    </span>|<span class="string">     </span>|<span class="string">   </span>|<span class="string">   </span>|<span class="string">      </span>|<span class="string">                </span>|<span class="string">                </span>|</span><br><span class="line">    |<span class="string">     </span>|<span class="string">   </span>|<span class="string">   </span>|<span class="string">      </span>|<span class="string">                </span>|<span class="string">                └── 可选域 (权威模式)</span></span><br><span class="line"><span class="string">    </span>|<span class="string">     </span>|<span class="string">   </span>|<span class="string">   </span>|<span class="string">      </span>|<span class="string">                </span>|</span><br><span class="line">    |<span class="string">     </span>|<span class="string">   </span>|<span class="string">   </span>|<span class="string">      </span>|<span class="string">                └── 密文分片(Base64，≤30/段)    </span></span><br><span class="line"><span class="string">    </span>|<span class="string">     </span>|<span class="string">   </span>|<span class="string">   </span>|<span class="string">      </span>|</span><br><span class="line">    |<span class="string">     </span>|<span class="string">   </span>|<span class="string">   </span>|<span class="string">      └── 随机数 (Base32)</span></span><br><span class="line"><span class="string">    </span>|<span class="string">     </span>|<span class="string">   </span>|<span class="string">   </span>|</span><br><span class="line">    |<span class="string">     </span>|<span class="string">   </span>|<span class="string">   └── 分片号 (从0递增)</span></span><br><span class="line"><span class="string">    </span>|<span class="string">     </span>|<span class="string">   </span>|<span class="string"> </span></span><br><span class="line"><span class="string">    </span>|<span class="string">     </span>|<span class="string">   └── 数据包类型 (u = 消息)</span></span><br><span class="line"><span class="string">    </span>|<span class="string">     </span>|</span><br><span class="line">    |<span class="string">     └── 会话 ID (Base32)</span></span><br><span class="line"><span class="string">    </span>|</span><br><span class="line">    └── 组 ID (Base32)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>Client</strong>: 负责 E2E 加密&#x2F;解密、DNS 编码、TUI 交互、昵称注册</li>
+<li><strong>Server</strong>: DNS 服务器，负责会话管理、消息中继、昵称去重，<strong>不接触加密密钥</strong></li>
+</ul>
+<h1 id="密钥与路由分离"><a href="#密钥与路由分离" class="headerlink" title="密钥与路由分离"></a>密钥与路由分离</h1><p>group 名同时用于路由和加密，但通过不同的 HMAC 路径派生，实现域分离</p>
+<table>
+<thead>
+<tr>
+<th>用途</th>
+<th>派生方式</th>
+<th>长度</th>
+<th>可见性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>路由 ID</td>
+<td><code>HMAC-SHA256(&quot;dnsay-route&quot;, group)[:8]</code></td>
+<td>8 字节</td>
+<td>DNS 流量中可见 (base32 编码)</td>
+</tr>
+<tr>
+<td>加密密钥</td>
+<td><code>HMAC-SHA256(&quot;dnsay-key-v1&quot;, group)</code></td>
+<td>32 字节</td>
+<td>仅客户端持有，不传输</td>
+</tr>
+</tbody></table>
+<p><strong>安全性</strong>: DNS 观察者只能看到路由 ID (8 字节哈希) ，无法反推 group 名，也无法推导加密密钥。</p>
+<h1 id="DNS-查询名格式-QName"><a href="#DNS-查询名格式-QName" class="headerlink" title="DNS 查询名格式 (QName)"></a>DNS 查询名格式 (QName)</h1><p>所有通信通过 DNS TXT 查询实现。查询名 (qname) 的标签格式</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">RouteID</span>&gt;</span>.<span class="tag">&lt;<span class="name">SID</span>&gt;</span>.<span class="tag">&lt;<span class="name">Dir</span>&gt;</span>.<span class="tag">&lt;<span class="name">Seq-Total</span>&gt;</span>.<span class="tag">&lt;<span class="name">QueryNonce</span>&gt;</span>[.<span class="tag">&lt;<span class="name">Payload</span>&gt;</span>...].</span><br></pre></td></tr></table></figure>
 
-<p>上行数据包 (轮询)</p>
-<figure class="highlight gherkin"><table><tr><td class="code"><pre><span class="line"><span class="variable">&lt;group&gt;</span>.<span class="variable">&lt;sid&gt;</span>.p.0.<span class="variable">&lt;nonce&gt;</span>[.<span class="variable">&lt;TLD&gt;</span>].</span><br><span class="line">^------^-----^-^-^--------^------^</span><br><span class="line">   |<span class="string">      </span>|<span class="string">   </span>|<span class="string"> </span>|<span class="string">    </span>|<span class="string">       </span>|</span><br><span class="line">   |<span class="string">      </span>|<span class="string">   </span>|<span class="string"> </span>|<span class="string">    </span>|<span class="string">       └── 可选域 (权威模式)</span></span><br><span class="line"><span class="string">   </span>|<span class="string">      </span>|<span class="string">   </span>|<span class="string"> </span>|<span class="string">    </span>|</span><br><span class="line">   |<span class="string">      </span>|<span class="string">   </span>|<span class="string"> </span>|<span class="string">    └── 随机数 (Base32)</span></span><br><span class="line"><span class="string">   </span>|<span class="string">      </span>|<span class="string">   </span>|<span class="string"> </span>|</span><br><span class="line">   |<span class="string">      </span>|<span class="string">   </span>|<span class="string"> └── 固定 0 (简单轮询)</span></span><br><span class="line"><span class="string">   </span>|<span class="string">      </span>|<span class="string">   </span>|</span><br><span class="line">   |<span class="string">      </span>|<span class="string">   └── 数据包类型 (p = 轮询)</span></span><br><span class="line"><span class="string">   </span>|<span class="string">      </span>|</span><br><span class="line">   |<span class="string">      └── 会话 ID (Base32)</span></span><br><span class="line"><span class="string">   </span>|</span><br><span class="line">   └── 组 ID (Base32)</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>标签位置</th>
+<th>内容</th>
+<th>编码</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>路由 ID</td>
+<td>base32, 无 padding, 小写</td>
+<td>8 字节 HMAC 哈希，用于会话匹配</td>
+</tr>
+<tr>
+<td>1</td>
+<td>会话 ID</td>
+<td>base32, 无 padding, 小写</td>
+<td>8 字节随机值，客户端启动时生成</td>
+</tr>
+<tr>
+<td>2</td>
+<td>方向</td>
+<td>明文</td>
+<td><code>u</code>&#x2F;<code>p</code>&#x2F;<code>j</code>&#x2F;<code>n</code>&#x2F;<code>l</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>序号-总数</td>
+<td>明文</td>
+<td>上传 <code>seq-total</code> (如 <code>0-3</code>) ，其他方向为 <code>0</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>查询 Nonce</td>
+<td>base32, 无 padding, 小写</td>
+<td>12 字节随机值，防 DNS 缓存命中</td>
+</tr>
+<tr>
+<td>5+</td>
+<td>载荷</td>
+<td>base32, 无 padding, 每 30 字符一个标签</td>
+<td>仅 <code>u</code> 和 <code>j</code> 方向需要</td>
+</tr>
+</tbody></table>
+<p><strong>重要</strong>: 载荷使用 base32 而非 base64。原因是 base64 的字母表包含 <code>-</code> 而 DNS 标签 <strong>不允许以 <code>-</code> 开头</strong> <span class="exturl" data-url="aHR0cHM6Ly93d3cucmZjLWVkaXRvci5vcmcvcmZjL3JmYzEwMzUjc2VjdGlvbi0yLjMuMQ==">RFC 1035<i class="fa fa-external-link-alt"></i></span></p>
+<h2 id="方向-Dir-说明"><a href="#方向-Dir-说明" class="headerlink" title="方向 (Dir) 说明"></a>方向 (Dir) 说明</h2><table>
+<thead>
+<tr>
+<th>方向</th>
+<th>含义</th>
+<th>载荷</th>
+<th>服务端响应</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>u</code></td>
+<td>上传消息</td>
+<td>E2E 密文分块</td>
+<td><code>ok</code> (已注册) &#x2F; <code>unreg</code> (未注册)</td>
+</tr>
+<tr>
+<td><code>p</code></td>
+<td>轮询消息</td>
+<td>无</td>
+<td>base32 编码的多消息帧</td>
+</tr>
+<tr>
+<td><code>j</code></td>
+<td>注册昵称</td>
+<td>base32(昵称字节)</td>
+<td><code>ok</code> (成功)  &#x2F; <code>dup</code> (重名)  &#x2F; <code>bad</code> (空昵称)</td>
+</tr>
+<tr>
+<td><code>l</code></td>
+<td>离开</td>
+<td>无</td>
+<td><code>ok</code></td>
+</tr>
+</tbody></table>
+<h1 id="E2E-加密流程"><a href="#E2E-加密流程" class="headerlink" title="E2E 加密流程"></a>E2E 加密流程</h1><h2 id="加密-发送方"><a href="#加密-发送方" class="headerlink" title="加密 (发送方)"></a>加密 (发送方)</h2><figure class="highlight lasso"><table><tr><td class="code"><pre><span class="line">plaintext = nickname + <span class="string">&#x27;\x00&#x27;</span> + message_text</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">msgNonce = random(<span class="number">12</span> <span class="built_in">bytes</span>)</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">e2e_ct = AES<span class="number">-256</span><span class="params">-GCM.Encrypt</span>(</span><br><span class="line">    key   = HMAC<span class="params">-SHA256</span>(<span class="string">&quot;dnsay-key-v1&quot;</span>, <span class="keyword">group</span>),         <span class="comment">// 32 字节</span></span><br><span class="line">    nonce = msgNonce,                                   <span class="comment">// 12 字节</span></span><br><span class="line">    <span class="built_in">data</span>  = plaintext,</span><br><span class="line">    aad   = <span class="keyword">group</span>                                       <span class="comment">// 原始 group 名作为附加认证数据</span></span><br><span class="line">)</span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">wire_data = msgNonce(<span class="number">12</span>) || e2e_ct(len + <span class="number">16</span>)</span><br></pre></td></tr></table></figure>
 
-<p>服务端决策</p>
-<figure class="highlight elm"><table><tr><td class="code"><pre><span class="line">服务端收到<span class="type">DNS</span>查询</span><br><span class="line">    │</span><br><span class="line">    ├─ 查询类型<span class="type">TXT</span>? ──否──&gt; <span class="type">TXT</span> <span class="string">&quot;ok&quot;</span></span><br><span class="line">    │             │</span><br><span class="line">    │             |是</span><br><span class="line">    │             │</span><br><span class="line">    ├─ 域名格式正确? ──否──&gt; <span class="type">TXT</span> <span class="string">&quot;ok&quot;</span></span><br><span class="line">    │             │</span><br><span class="line">    │             |是</span><br><span class="line">    │             │</span><br><span class="line">    ├─ 解析域名标签</span><br><span class="line">    │   ├─ 提取: group, sid, <span class="keyword">type</span>, seq, nonce, payload</span><br><span class="line">    │   │</span><br><span class="line">    │   └─ <span class="type">Base32</span>解码成功? ──否──&gt; <span class="type">TXT</span> <span class="string">&quot;ok&quot;</span></span><br><span class="line">    │                    │</span><br><span class="line">    │                    |是</span><br><span class="line">    │                    │</span><br><span class="line">    ├─ 更新会话(touch)</span><br><span class="line">    │   └─ 记录: sid, group, 最后活跃时间</span><br><span class="line">    │</span><br><span class="line">    ├─ 判断类型 (<span class="keyword">type</span>)</span><br><span class="line">    │   │</span><br><span class="line">    │   ├─ <span class="keyword">type</span> = &quot;u&quot; (消息请求)</span><br><span class="line">    │   │   │</span><br><span class="line">    │   │   ├─ 解密payload</span><br><span class="line">    │   │   │   │</span><br><span class="line">    │   │   │   ├─ 成功? ──否──&gt; <span class="type">TXT</span> <span class="string">&quot;bad&quot;</span></span><br><span class="line">    │   │   │   │      │</span><br><span class="line">    │   │   │   │      |是</span><br><span class="line">    │   │   │   │      │</span><br><span class="line">    │   │   │   ├─ 广播到同组其他会话</span><br><span class="line">    │   │   │   │    └─ 放入各会话的下行队列</span><br><span class="line">    │   │   │   │</span><br><span class="line">    │   │   │   └─ 构造<span class="type">ACK</span>响应</span><br><span class="line">    │   │   │       ├─ 明文: <span class="string">&quot;ok&quot;</span> + <span class="number">4</span> 字节序列号</span><br><span class="line">    │   │   │       ├─ 加密: <span class="type">AES</span>-<span class="type">GCM</span></span><br><span class="line">    │   │   │       └─ 返回: <span class="type">TXT</span> <span class="string">&quot;&lt;encrypted_ack&gt;&quot;</span></span><br><span class="line">    │   │   │</span><br><span class="line">    │   │   └──&gt; [上行确认包]</span><br><span class="line">    │   │</span><br><span class="line">    │   ├─ <span class="keyword">type</span> = &quot;p&quot; (轮询请求)</span><br><span class="line">    │   │   │</span><br><span class="line">    │   │   ├─ 获取会话(sid)</span><br><span class="line">    │   │   │</span><br><span class="line">    │   │   ├─ 检查下行队列</span><br><span class="line">    │   │   │   │</span><br><span class="line">    │   │   │   ├─ 队列非空?</span><br><span class="line">    │   │   │   │   │</span><br><span class="line">    │   │   │   │   ├─ 是: 取出第一条消息</span><br><span class="line">    │   │   │   │   │   ├─ 加密消息</span><br><span class="line">    │   │   │   │   │   ├─ <span class="type">Base64URL</span> 编码</span><br><span class="line">    │   │   │   │   │   ├─ 按 maxLength 分片</span><br><span class="line">    │   │   │   │   │   └─ 返回: <span class="type">TXT</span> <span class="string">&quot;&lt;片段1&gt;&quot;</span> <span class="string">&quot;&lt;片段2&gt;&quot;</span> ...</span><br><span class="line">    │   │   │   │   │       └──&gt; [下行消息包]</span><br><span class="line">    │   │   │   │   │</span><br><span class="line">    │   │   │   │   └─ 否: 返回空内容</span><br><span class="line">    │   │   │   │       ├─ 加密空字节数组</span><br><span class="line">    │   │   │   │       └─ 返回: <span class="type">TXT</span> <span class="string">&quot;&lt;encrypted_empty&gt;&quot;</span></span><br><span class="line">    │   │   │   │           └──&gt; [空响应包]</span><br><span class="line">    │   │   │   │</span><br><span class="line">    │   │   │   └─ 加密失败? ──&gt; <span class="type">TXT</span> <span class="string">&quot;bad&quot;</span></span><br><span class="line">    │   │   │</span><br><span class="line">    │   │   └──&gt; 根据队列状态返回</span><br><span class="line">    │   │</span><br><span class="line">    │   └─ <span class="keyword">type</span> = 其他</span><br><span class="line">    │       └──&gt; <span class="type">TXT</span> <span class="string">&quot;noop&quot;</span></span><br><span class="line">    │</span><br><span class="line">    └─ 发送<span class="type">DNS</span>响应</span><br></pre></td></tr></table></figure>
+<h2 id="解密-接收方"><a href="#解密-接收方" class="headerlink" title="解密 (接收方)"></a>解密 (接收方)</h2><figure class="highlight stylus"><table><tr><td class="code"><pre><span class="line">wire_data</span><br><span class="line">    │</span><br><span class="line">    ├─ msgNonce = wire_data<span class="selector-attr">[:12]</span></span><br><span class="line">    ├─ e2e_ct   = wire_data<span class="selector-attr">[12:]</span></span><br><span class="line">    │</span><br><span class="line">    ▼</span><br><span class="line">plaintext = AES-<span class="number">256</span>-GCM<span class="selector-class">.Decrypt</span>(</span><br><span class="line">    key   = <span class="built_in">HMAC-SHA256</span>(<span class="string">&quot;dnsay-key-v1&quot;</span>, group),</span><br><span class="line">    nonce = msgNonce,</span><br><span class="line">    data  = e2e_ct,</span><br><span class="line">    aad   = group</span><br><span class="line">)</span><br><span class="line">    │</span><br><span class="line">    ├─ nickname = plaintext<span class="selector-attr">[:null_byte_index]</span></span><br><span class="line">    └─ message  = plaintext<span class="selector-attr">[null_byte_index+1:]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="加密参数"><a href="#加密参数" class="headerlink" title="加密参数"></a>加密参数</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>算法</td>
+<td>AES-256-GCM</td>
+</tr>
+<tr>
+<td>密钥长度</td>
+<td>32 字节</td>
+</tr>
+<tr>
+<td>Nonce 长度</td>
+<td>12 字节 (随机)</td>
+</tr>
+<tr>
+<td>Tag 长度</td>
+<td>16 字节</td>
+</tr>
+<tr>
+<td>AAD</td>
+<td>group 名原始字节</td>
+</tr>
+<tr>
+<td>每消息开销</td>
+<td>28 字节 (12 nonce + 16 tag)</td>
+</tr>
+</tbody></table>
+<h1 id="分块传输机制"><a href="#分块传输机制" class="headerlink" title="分块传输机制"></a>分块传输机制</h1><h2 id="发送方分块"><a href="#发送方分块" class="headerlink" title="发送方分块"></a>发送方分块</h2><p>E2E 密文按 <strong>80 字节</strong> 分块，每块作为独立 DNS 查询发送。每块<strong>重试最多 3 次</strong>: </p>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">wire_data (nonce || ciphertext || tag)</span><br><span class="line">    │</span><br><span class="line">    ▼ 按 80 字节切割</span><br><span class="line">┌──────────┐ ┌──────────┐ ┌──────────┐</span><br><span class="line">│ chunk 0  │ │ chunk 1  │ │ chunk 2  │  <span class="built_in">..</span>.</span><br><span class="line">│ (80B)    │ │ (80B)    │ │ (&lt;=80B)  │</span><br><span class="line">└────┬─────┘ └────┬─────┘ └────┬─────┘</span><br><span class="line">     │            │            │</span><br><span class="line">     ▼            ▼            ▼</span><br><span class="line"> <span class="built_in"> DNS </span>Query   <span class="built_in"> DNS </span>Query   <span class="built_in"> DNS </span>Query</span><br><span class="line">  <span class="attribute">seq</span>=0-3      <span class="attribute">seq</span>=1-3      <span class="attribute">seq</span>=2-3</span><br><span class="line">  (重试3次)     (重试3次)     (重试3次)</span><br></pre></td></tr></table></figure>
+
+<p>每个分块的 DNS 查询: </p>
+<ol>
+<li>生成 12 字节随机 QueryNonce (仅防 DNS 缓存) </li>
+<li>分块 base32 编码，每 30 字符一个 DNS 标签</li>
+<li>组装 qname: <code>RouteID.SID.u.seq-total.QueryNonce.payload_labels...</code></li>
+<li>发送 DNS TXT 查询；失败则<strong>生成新 QueryNonce 重试</strong> (最多 3 次)</li>
+</ol>
+<h2 id="服务端重组"><a href="#服务端重组" class="headerlink" title="服务端重组"></a>服务端重组</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line">addChunk(sid, seq, total, payload)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>按 <code>(sid, total)</code> 缓冲分块</li>
+<li><code>seq == 0</code> 时重置缓冲区 (处理前一条未完成的消息) </li>
+<li>全部块到齐后按序拼接，广播完整 E2E 密文到组内其他会话</li>
+</ul>
+<h2 id="大小限制"><a href="#大小限制" class="headerlink" title="大小限制"></a>大小限制</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>值</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最大消息载荷</td>
+<td>4096 字节</td>
+<td><code>client/main.go: maxPayloadSize</code></td>
+</tr>
+<tr>
+<td>分块大小</td>
+<td>80 字节</td>
+<td><code>client/main.go: chunkSize</code></td>
+</tr>
+<tr>
+<td>分块重试次数</td>
+<td>3 次</td>
+<td><code>client/main.go: chunkRetries</code></td>
+</tr>
+<tr>
+<td>DNS 标签段长</td>
+<td>30 字符</td>
+<td><code>shared.LabelSegLen</code></td>
+</tr>
+<tr>
+<td>DNS 标签上限</td>
+<td>63 字符</td>
+<td>RFC 1035</td>
+</tr>
+<tr>
+<td>DNS qname 上限</td>
+<td>253 字符</td>
+<td>RFC 1035</td>
+</tr>
+<tr>
+<td>TXT 单条字符串上限</td>
+<td>200 字符 (base32)</td>
+<td><code>server/main.go: maxTXTLength</code></td>
+</tr>
+</tbody></table>
+<h1 id="Poll-响应帧格式"><a href="#Poll-响应帧格式" class="headerlink" title="Poll 响应帧格式"></a>Poll 响应帧格式</h1><p>服务端返回多条消息时使用长度前缀帧格式: </p>
+<figure class="highlight excel"><table><tr><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────┐</span><br><span class="line">│ <span class="number">2</span>B <span class="built_in">len</span> │ E2E blob <span class="number">1</span> │ <span class="number">2</span>B <span class="built_in">len</span> │ E2E blob <span class="number">2</span> │ ...         │</span><br><span class="line">└─────────────────────────────────────────────────────────┘</span><br><span class="line">         │                      │</span><br><span class="line">         ▼                      ▼</span><br><span class="line">  nonce(<span class="number">12</span>) || ct(<span class="built_in">N</span>+<span class="number">16</span>)   nonce(<span class="number">12</span>) || ct(<span class="built_in">N</span>+<span class="number">16</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>长度前缀</strong>: 2 字节大端序 uint16 表示后续 E2E blob 长度</li>
+<li><strong>E2E blob</strong>: <code>msgNonce(12) || AES-GCM-Ciphertext || Tag(16)</code></li>
+<li>多条消息顺序拼接</li>
+<li>空响应时返回空字符串 TXT 记录</li>
+</ul>
+<h2 id="响应大小限制"><a href="#响应大小限制" class="headerlink" title="响应大小限制"></a>响应大小限制</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>每次 poll 最大消息数</td>
+<td>10 (<code>maxPollCount</code>)</td>
+</tr>
+<tr>
+<td>每次 poll 最大字节数</td>
+<td>4096 (<code>maxPollBytes</code>)</td>
+</tr>
+<tr>
+<td>TXT 记录最大长度</td>
+<td>200 字符 base32</td>
+</tr>
+</tbody></table>
+<h2 id="DNS-传输"><a href="#DNS-传输" class="headerlink" title="DNS 传输"></a>DNS 传输</h2><p>帧数据 → base32 编码 → 按 200 字符切分 → 每段作为一条 TXT 记录回复。</p>
+<p>客户端: 拼接 TXT 记录 → base32 解码 → 解析帧 → 逐条 E2E 解密。</p>
+<h1 id="自适应轮询"><a href="#自适应轮询" class="headerlink" title="自适应轮询"></a>自适应轮询</h1><figure class="highlight abnf"><table><tr><td class="code"><pre><span class="line">         收到消息</span><br><span class="line">           │</span><br><span class="line">┌──────────▼──────────┐</span><br><span class="line">│ interval <span class="operator">=</span> <span class="number">250</span>ms    │◀─── 立即回到快速轮询</span><br><span class="line">│ (baseInterval)      │</span><br><span class="line">└──────────┬──────────┘</span><br><span class="line">           │ 无消息</span><br><span class="line">           ▼</span><br><span class="line">┌─────────────────────┐</span><br><span class="line">│ interval *<span class="operator">=</span> <span class="number">2</span>       │</span><br><span class="line">│ cap at <span class="number">2</span>s           │</span><br><span class="line">│ (maxInterval)       │</span><br><span class="line">└──────────┬──────────┘</span><br><span class="line">           │ 无消息</span><br><span class="line">           ▼</span><br><span class="line">      继续倍增直到 <span class="number">2</span>s</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>活跃聊天: 每 250ms 轮询一次</li>
+<li>空闲时: 250ms → 500ms → 1s → 2s (封顶) </li>
+<li>任意消息到达: 立即回到 250ms</li>
+</ul>
+<h1 id="昵称管理"><a href="#昵称管理" class="headerlink" title="昵称管理"></a>昵称管理</h1><h2 id="注册流程"><a href="#注册流程" class="headerlink" title="注册流程"></a>注册流程</h2><ol>
+<li>客户端启动时调用 <code>RegisterName</code></li>
+<li>客户端发送 <code>j</code> 方向请求带上昵称</li>
+<li>服务端检查同组 (routeID) 下是否已存在该昵称: <ul>
+<li>不存在 → 在该 SID 上注册昵称，回复 <code>ok</code></li>
+<li>已存在 → 回复 <code>dup</code></li>
+</ul>
+</li>
+<li>客户端收到 <code>dup</code>: <ul>
+<li>命令行<strong>未指定</strong> <code>--name</code> (auto 模式): 自动重新生成，最多重试 10 次</li>
+<li>命令行<strong>显式指定</strong> <code>--name</code>: 直接退出，提示昵称冲突</li>
+</ul>
+</li>
+</ol>
+<h2 id="离开流程"><a href="#离开流程" class="headerlink" title="离开流程"></a>离开流程</h2><ul>
+<li><strong>主动关闭</strong> (ESC &#x2F; Ctrl+C) : 客户端发送 <code>l</code> 方向请求，服务端立即删除会话和昵称</li>
+<li><strong>被动断开</strong> (崩溃 &#x2F; 断网)会话最后活跃时间停止更新，超过 <code>--timeout</code> (默认 300 秒) 后被 <code>cleanup</code> 删除，昵称随之释放</li>
+</ul>
+<h2 id="会话过期自动恢复"><a href="#会话过期自动恢复" class="headerlink" title="会话过期自动恢复"></a>会话过期自动恢复</h2><p>如果会话被服务端清理 (如长时间网络中断后恢复) ，客户端再次发送消息时: </p>
+<ol>
+<li>服务端 <code>touch</code> 创建新 session (无昵称) </li>
+<li>服务端回复 <code>unreg</code> 而不是 <code>ok</code></li>
+<li>客户端检测到 <code>unreg</code>，自动重新注册昵称</li>
+</ol>
+<h1 id="完整消息生命周期"><a href="#完整消息生命周期" class="headerlink" title="完整消息生命周期"></a>完整消息生命周期</h1><figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line"> Client A (发送方)                   Server                    Client B (接收方)</span><br><span class="line">──────────────────                 ────────                  ──────────────────</span><br><span class="line"><span class="bullet">1.</span> 用户输入 &quot;你好&quot;</span><br><span class="line"><span class="bullet">2.</span> 构建 payload:</span><br><span class="line">   &quot;飞翔的开拓者\x00你好&quot;</span><br><span class="line"><span class="bullet">3.</span> E2E 加密:</span><br><span class="line">   nonce(12) || AES-GCM(...)</span><br><span class="line"><span class="bullet">4.</span> 分块 (80B each)</span><br><span class="line"><span class="bullet">5.</span> 每块 → DNS TXT Query</span><br><span class="line">   qname: RouteID.SID.u.0-1...</span><br><span class="line">   (失败自动重试最多 3 次)</span><br><span class="line"><span class="bullet">                                   6.</span> 解析 qname (base32 解码)</span><br><span class="line"><span class="bullet">                                   7.</span> addChunk 重组</span><br><span class="line"><span class="bullet">                                   8.</span> broadcast → B.downq</span><br><span class="line"><span class="bullet">                                   9.</span> 回复 &quot;ok&quot;/&quot;unreg&quot;</span><br><span class="line"><span class="bullet">                                                             10.</span> Poll Query</span><br><span class="line"><span class="code">                                                                 qname: RouteID.SID.p.0...</span></span><br><span class="line"><span class="code">                                   11. popMessages</span></span><br><span class="line"><span class="code">                                   12. 帧编码 + base32</span></span><br><span class="line"><span class="code">                                   13. TXT 记录回复</span></span><br><span class="line"><span class="code">                                                             14. base32 解码</span></span><br><span class="line"><span class="code">                                                             15. 解析帧</span></span><br><span class="line"><span class="code">                                                             16. E2E 解密</span></span><br><span class="line"><span class="code">                                                             17. 解析 name\x00message</span></span><br><span class="line"><span class="code">                                                             18. TUI 显示:</span></span><br><span class="line"><span class="code">                                                                 &quot;飞翔的开拓者: 你好&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="服务端会话状态"><a href="#服务端会话状态" class="headerlink" title="服务端会话状态"></a>服务端会话状态</h1><p>每个 SID 对应一个 <code>session</code></p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> session <span class="keyword">struct</span> &#123;</span><br><span class="line">    grp    []<span class="type">byte</span>       <span class="comment">// 路由 ID (同组归属) </span></span><br><span class="line">    name   <span class="type">string</span>       <span class="comment">// 注册的昵称 (可能为空) </span></span><br><span class="line">    downq  [][]<span class="type">byte</span>     <span class="comment">// 待投递消息队列</span></span><br><span class="line">    last   <span class="type">int64</span>        <span class="comment">// 最后活跃时间戳</span></span><br><span class="line">    msgBuf *msgBuffer   <span class="comment">// 多块上传重组缓冲</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>服务端职责</p>
+<ul>
+<li>解析 DNS qname 提取路由 ID 和会话 ID</li>
+<li>按路由 ID 匹配同组会话</li>
+<li>重组分块消息</li>
+<li>广播 E2E 密文到组内其他会话</li>
+<li>注册和检查昵称唯一性</li>
+<li>管理会话生命周期 (10 秒一次 cleanup，超时清理) </li>
+<li><strong>不持有任何加密密钥，不解密消息内容</strong></li>
+</ul>
+<h1 id="全流程"><a href="#全流程" class="headerlink" title="全流程"></a>全流程</h1><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">服务端收到 DNS 查询</span><br><span class="line">      │</span><br><span class="line">      ├─ 有 Question? ──否──&gt; 静默丢弃</span><br><span class="line">      │             │</span><br><span class="line">      │             |是</span><br><span class="line">      │             │</span><br><span class="line">      ├─ 查询类型 TXT? ──否──&gt; TXT <span class="string">&quot;ok&quot;</span></span><br><span class="line">      │             │</span><br><span class="line">      │             |是</span><br><span class="line">      │             │</span><br><span class="line">      ├─ 解析域名标签 (parseQName)</span><br><span class="line">      │   ├─ 标签数 ≥ 5? ──否──&gt; TXT <span class="string">&quot;ok&quot;</span></span><br><span class="line">      │   ├─ labels[0] = group routeID  (Base32)</span><br><span class="line">      │   ├─ labels[1] = sid            (Base32)</span><br><span class="line">      │   ├─ labels[2] = <span class="built_in">dir</span> (u/p/j/l)</span><br><span class="line">      │   ├─ labels[3] = <span class="string">&quot;seq[-total]&quot;</span></span><br><span class="line">      │   ├─ labels[4] = query nonce    (DNS 去重，不使用)</span><br><span class="line">      │   ├─ labels[5..] = payload      (Base32，可空)</span><br><span class="line">      │   └─ 任一解码/解析失败? ──&gt; TXT <span class="string">&quot;ok&quot;</span></span><br><span class="line">      │</span><br><span class="line">      ├─ 更新会话 <span class="built_in">touch</span>(sid, grp)</span><br><span class="line">      │   └─ 若不存在则创建会话；记录 grp 与 last 时间戳</span><br><span class="line">      │       (注: 服务端不持有密钥，不解密任何 payload)</span><br><span class="line">      │</span><br><span class="line">      ├─ 按 <span class="built_in">dir</span> 分发</span><br><span class="line">      │   │</span><br><span class="line">      │   ├─ <span class="built_in">dir</span> = <span class="string">&quot;u&quot;</span>  上行消息 (E2E 密文) </span><br><span class="line">      │   │   │</span><br><span class="line">      │   │   ├─ total ≤ 1 (单包)</span><br><span class="line">      │   │   │   └─ broadcast(grp, sid, payload)</span><br><span class="line">      │   │   │       └─ 把密文塞进同组其他会话的 downq</span><br><span class="line">      │   │   │</span><br><span class="line">      │   │   ├─ total &gt; 1 (分片)</span><br><span class="line">      │   │   │   ├─ addChunk(sid, <span class="built_in">seq</span>, total, payload)</span><br><span class="line">      │   │   │   ├─ addChunk(sid, <span class="built_in">seq</span>, total, payload)</span><br><span class="line">      │   │   │   │   ├─ total 变化或 <span class="built_in">seq</span>=0 ──&gt; 重置缓冲</span><br><span class="line">      │   │   │   │   └─ 收齐全部分片 ──&gt; 拼接整包</span><br><span class="line">      │   │   │   └─ 拼齐后 broadcast(grp, sid, full)</span><br><span class="line">      │   │   │</span><br><span class="line">      │   │   └─ 已注册昵称? ── 是 ──&gt; TXT <span class="string">&quot;ok&quot;</span></span><br><span class="line">      │   │                  └─ 否 ──&gt; TXT <span class="string">&quot;unreg&quot;</span></span><br><span class="line">      │   │</span><br><span class="line">      │   ├─ <span class="built_in">dir</span> = <span class="string">&quot;p&quot;</span>  轮询拉取</span><br><span class="line">      │   │   │</span><br><span class="line">      │   │   ├─ popMessages(sid, maxPollCount=10, maxPollBytes=4096)</span><br><span class="line">      │   │   │   └─ 取出 downq 内若干条，受条数与字节上限约束</span><br><span class="line">      │   │   │</span><br><span class="line">      │   │   ├─ 拼装帧:  [len_hi, len_lo, msg] × N      (无消息则空 buf)</span><br><span class="line">      │   │   │</span><br><span class="line">      │   │   └─ replyData</span><br><span class="line">      │   │       ├─ buf 为空 ──&gt; TXT <span class="string">&quot;&quot;</span></span><br><span class="line">      │   │       └─ 否则 Base64URL → 按 maxTXTLength=200 切片</span><br><span class="line">      │   │           └─ 多条 TXT <span class="string">&quot;&lt;片1&gt;&quot;</span> <span class="string">&quot;&lt;片2&gt;&quot;</span> ...</span><br><span class="line">      │   │</span><br><span class="line">      │   ├─ <span class="built_in">dir</span> = <span class="string">&quot;j&quot;</span>  加入群组 / 注册昵称</span><br><span class="line">      │   │   │</span><br><span class="line">      │   │   ├─ payload = 昵称</span><br><span class="line">      │   │   ├─ 昵称为空? ──&gt; TXT <span class="string">&quot;bad&quot;</span></span><br><span class="line">      │   │   └─ register(sid, grp, name)</span><br><span class="line">      │   │        ├─ 同组内已存在同名(他人)? ──&gt; TXT <span class="string">&quot;dup&quot;</span></span><br><span class="line">      │   │        └─ 否则写入 grp+name ──&gt; TXT <span class="string">&quot;ok&quot;</span></span><br><span class="line">      │   │</span><br><span class="line">      │   ├─ <span class="built_in">dir</span> = <span class="string">&quot;l&quot;</span>  离开群组</span><br><span class="line">      │   │   ├─ remove(sid)  删除会话</span><br><span class="line">      │   │   └─ TXT <span class="string">&quot;ok&quot;</span></span><br><span class="line">      │   │</span><br><span class="line">      │   └─ <span class="built_in">dir</span> = 其他 ──&gt; TXT <span class="string">&quot;noop&quot;</span></span><br><span class="line">      │</span><br><span class="line">      └─ 发送 DNS 响应</span><br><span class="line">         (replyText: 单条字符串；replyData: 长数据 Base64URL + 多 TXT 分片)</span><br><span class="line"></span><br><span class="line">  并行: 周期性清理 (每 10s)</span><br><span class="line">      └─ 移除 last 早于 <span class="built_in">timeout</span> 的会话</span><br></pre></td></tr></table></figure>
 
 <p>最后就是实现</p>
 <figure class="link-card">
