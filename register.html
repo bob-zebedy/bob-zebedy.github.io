@@ -1,344 +1,657 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>注册通行密钥</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "sans-serif";
-        background: white;
-        min-height: 100vh;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 60px 20px 20px;
-      }
-
-      .container {
-        border-radius: 16px;
-        max-width: 650px;
-        width: 100%;
-        padding: 40px;
-      }
-
-      h1 {
-        color: #333;
-        margin-bottom: 10px;
-        font-size: 28px;
-        text-align: center;
-      }
-
-      .subtitle {
-        color: #666;
-        text-align: center;
-        margin-bottom: 30px;
-        font-size: 14px;
-      }
-
-      .register-btn {
-        width: 100%;
-        padding: 15px;
-        background: #059669;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-      }
-
-      .register-btn:hover:not(:disabled) {
-        background: #047857;
-      }
-
-      .register-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        background: #9ca3af;
-      }
-
-      .register-btn i {
-        margin-right: 10px;
-      }
-
-      #status {
-        margin-top: 20px;
-        display: none;
-      }
-
-      .note {
-        padding: 15px;
-        border-radius: 8px;
-        margin-top: 15px;
-      }
-
-      .note.success {
-        background: #d4edda;
-        border: 1px solid #c3e6cb;
-        color: #155724;
-      }
-
-      .note.danger {
-        background: #f8d7da;
-        border: 1px solid #f5c6cb;
-        color: #721c24;
-      }
-
-      .note.info {
-        background: #d1ecf1;
-        border: 1px solid #bee5eb;
-        color: #0c5460;
-      }
-
-      .note code {
-        display: block;
-        background: #f5f5f5;
-        padding: 15px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-family: "Monaco", "Courier New", monospace;
-        user-select: all;
-        word-break: break-all;
-        margin: 10px auto;
-        text-align: center;
-      }
-
-      .copy-btn {
-        display: block;
-        padding: 8px 16px;
-        background: #0284c7;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        margin: 10px auto 0;
-      }
-
-      .copy-btn:hover {
-        background: #0369a1;
-      }
-
-      .copy-btn i {
-        margin-right: 5px;
-      }
-
-      .salt-container {
-        margin-bottom: 20px;
-      }
-
-      .salt-container label {
-        display: block;
-        margin-bottom: 8px;
-        color: #666;
-        font-size: 14px;
-      }
-
-      .salt-container input {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 13px;
-        font-family: monospace;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>注册通行密钥</h1>
-      <p class="subtitle">
-        使用 YubiKey、Touch ID 或其他 FIDO2 设备保护加密内容
-      </p>
-
-      <div class="salt-container">
-        <label for="prf-salt-input"
-          >PRF Salt <span style="color: #ef4444">*</span></label
-        >
-        <input type="text" id="prf-salt-input" placeholder="" required />
-      </div>
-
-      <button class="register-btn" id="register-btn" disabled>
-        <i class="fa fa-key"></i> 开始注册
-      </button>
-
-      <div id="status"></div>
-    </div>
-
-    <script>
-      function getRPID() {
-        const hostname = location.hostname;
-        return hostname === "127.0.0.1" ? "localhost" : hostname;
-      }
-
-      class FIDO2Registrar {
-        constructor() {
-          this.btn = document.getElementById("register-btn");
-          this.saltInput = document.getElementById("prf-salt-input");
-
-          this.btn.onclick = () => this.register();
-          this.saltInput.addEventListener("input", () => this.validateInput());
-          this.validateInput();
-        }
-
-        validateInput() {
-          const isValid = this.saltInput.value.trim().length > 0;
-          this.btn.disabled = !isValid;
-        }
-
-        async register() {
-          this.btn.disabled = true;
-
-          if (!window.PublicKeyCredential) {
-            this.show(
-              '<div class="note danger"><p>浏览器不支持 FIDO2/WebAuthn</p></div>'
-            );
-            this.btn.disabled = false;
-            return;
-          }
-
-          this.show('<div class="note info"><p>正在注册通行密钥...</p></div>');
-
-          try {
-            const userId = crypto.getRandomValues(new Uint8Array(32));
-            const challenge = crypto.getRandomValues(new Uint8Array(32));
-
-            const cred = await navigator.credentials.create({
-              publicKey: {
-                challenge,
-                rp: {
-                  name: "Undefined Blog",
-                  id: getRPID(),
-                },
-                user: {
-                  id: userId,
-                  name: "Zabrian",
-                  displayName: "Zabrian",
-                },
-                pubKeyCredParams: [
-                  { alg: -7, type: "public-key" },
-                  { alg: -257, type: "public-key" },
-                ],
-                authenticatorSelection: {
-                  residentKey: "required",
-                  userVerification: "preferred",
-                  requireResidentKey: true,
-                },
-                timeout: 60000,
-                extensions: {
-                  prf: {},
-                },
-              },
-            });
-
-            if (!cred) throw new Error("生成凭证失败");
-
-            const prfEnabled = cred.getClientExtensionResults().prf?.enabled;
-            if (!prfEnabled) {
-              this.show('<div class="note danger"><p>PRF 扩展不可用</p></div>');
-              this.btn.disabled = false;
-              return;
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>注册通行密钥</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" media="print" onload="this.media = 'all'" />
+        <meta name="color-scheme" content="light dark" />
+        <style>
+            :root {
+                --page: #f6f7f6;
+                --surface: #fff;
+                --text: #202923;
+                --muted: #69736c;
+                --border: #e2e7e3;
+                --accent: #18794e;
+                --soft: #edf5ef;
+                --error: #a63737;
+                --error-bg: #fff3f2;
             }
 
-            await this.generateEncryptionKey();
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                min-height: 100vh;
+                min-height: 100svh;
+                display: grid;
+                place-items: center;
+                padding: 48px 20px;
+                background: var(--page);
+                color: var(--text);
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                font-size: 14px;
+                line-height: 1.65;
+                -webkit-font-smoothing: antialiased;
+            }
+            button,
+            input {
+                font: inherit;
+            }
+            button {
+                cursor: pointer;
+            }
+            button,
+            input {
+                -webkit-tap-highlight-color: transparent;
+            }
+            button:focus-visible,
+            input:focus-visible {
+                outline: 3px solid var(--accent);
+                outline-offset: 4px;
+            }
+            [hidden] {
+                display: none !important;
+            }
+            .container {
+                width: 100%;
+                max-width: 460px;
+            }
+            .card {
+                padding: 36px;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 24px;
+                box-shadow:
+                    0 8px 32px #182b1f05,
+                    0 1px 3px #182b1f03;
+            }
+            .intro {
+                margin-bottom: 30px;
+            }
+            .key-icon {
+                display: grid;
+                place-items: center;
+                width: 52px;
+                height: 52px;
+                margin-bottom: 24px;
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                color: var(--accent);
+                background: var(--soft);
+                font-size: 23px;
+            }
+            h1 {
+                margin: 0 0 10px;
+                font-size: 28px;
+                font-weight: 650;
+                line-height: 1.3;
+                letter-spacing: -0.8px;
+            }
+            label {
+                display: block;
+                margin-bottom: 9px;
+                font-size: 13px;
+                font-weight: 600;
+            }
+            input {
+                display: block;
+                width: 100%;
+                min-width: 0;
+                height: 48px;
+                padding: 12px 14px;
+                background: var(--surface);
+                color: var(--text);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+                font-size: 14px;
+                transition: border-color 0.2s;
+            }
+            input::placeholder {
+                color: var(--muted);
+                font-family: -apple-system, 'PingFang SC', sans-serif;
+            }
+            input:hover:not(:disabled) {
+                border-color: var(--muted);
+            }
+            input:focus {
+                border-color: var(--accent);
+            }
+            .field-hint {
+                margin: 9px 0 22px;
+                font-size: 12px;
+                color: var(--muted);
+            }
+            .field-hint code {
+                font-size: 12px;
+            }
+            .register-btn {
+                --thumb-size: 48px;
+                --thumb-inset: 5px;
+                --slide-x: 0px;
+                --label-opacity: 1;
+                position: relative;
+                isolation: isolate;
+                overflow: hidden;
+                display: block;
+                width: 100%;
+                height: calc(var(--thumb-size) + var(--thumb-inset) * 2 + 2px);
+                padding: 0 16px;
+                text-align: center;
+                border: 1px solid var(--border);
+                border-radius: 999px;
+                background: var(--soft);
+                color: var(--accent);
+                font-weight: 500;
+                user-select: none;
+                -webkit-user-select: none;
+                touch-action: pan-y;
+                cursor: default;
+                transition:
+                    border-color 0.25s,
+                    box-shadow 0.25s;
+            }
+            .register-btn::before {
+                content: '';
+                position: absolute;
+                inset: 0 auto 0 0;
+                width: calc(var(--slide-x) + var(--thumb-size) + var(--thumb-inset) * 2);
+                border-radius: inherit;
+                background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 24%, transparent));
+                opacity: calc(1 - var(--label-opacity));
+                pointer-events: none;
+                transition:
+                    width 0.5s cubic-bezier(0.22, 1.35, 0.36, 1),
+                    opacity 0.3s;
+            }
+            .register-btn::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                z-index: -1;
+                background: linear-gradient(110deg, transparent 25%, color-mix(in srgb, var(--accent) 16%, transparent) 50%, transparent 75%);
+                transform: translateX(-100%);
+                pointer-events: none;
+            }
+            .slider-label {
+                position: relative;
+                display: block;
+                opacity: var(--label-opacity);
+                transition: opacity 0.25s;
+            }
+            .register-btn:not(:disabled):not(.is-dragging) .slider-label {
+                background: linear-gradient(110deg, var(--accent) 35%, color-mix(in srgb, var(--accent) 25%, var(--surface)) 50%, var(--accent) 65%);
+                background-size: 250% 100%;
+                background-clip: text;
+                -webkit-background-clip: text;
+                color: transparent;
+                animation: slide-shimmer 3.6s ease-in-out infinite;
+            }
+            .slider-thumb {
+                position: absolute;
+                top: var(--thumb-inset);
+                left: var(--thumb-inset);
+                display: grid;
+                place-items: center;
+                width: var(--thumb-size);
+                height: var(--thumb-size);
+                border-radius: 50%;
+                background: var(--surface);
+                color: var(--accent);
+                box-shadow: 0 2px 6px #182b1f14;
+                font-size: 18px;
+                cursor: grab;
+                transform: translateX(var(--slide-x)) scale(1);
+                transition:
+                    transform 0.5s cubic-bezier(0.22, 1.35, 0.36, 1),
+                    box-shadow 0.25s,
+                    background 0.25s,
+                    color 0.25s;
+            }
+            .register-btn:not(:disabled):hover,
+            .register-btn.is-dragging {
+                border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+                box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 8%, transparent);
+            }
+            .register-btn.is-dragging .slider-thumb {
+                cursor: grabbing;
+                background: var(--accent);
+                color: var(--surface);
+                box-shadow: 0 3px 14px color-mix(in srgb, var(--accent) 35%, transparent);
+                transform: translateX(var(--slide-x)) scale(1.06);
+                transition:
+                    box-shadow 0.2s,
+                    background 0.2s,
+                    color 0.2s;
+            }
+            .register-btn.is-dragging::before {
+                transition: none;
+            }
+            .register-btn.is-dragging .slider-label {
+                transition: none;
+            }
+            .register-btn:not(:disabled):not(.is-dragging) .slider-thumb i {
+                animation: slide-nudge 3.6s ease-in-out infinite;
+            }
+            .register-btn:disabled {
+                color: var(--muted);
+                cursor: not-allowed;
+            }
+            .register-btn:disabled .slider-thumb {
+                color: var(--muted);
+                box-shadow: none;
+                cursor: inherit;
+            }
+            .register-btn[aria-busy='true'],
+            .register-btn[aria-busy='true'] .slider-thumb {
+                color: var(--accent);
+                cursor: wait;
+            }
+            .register-btn[aria-busy='true']::after {
+                animation: slide-processing 1.8s ease-in-out infinite;
+            }
+            @keyframes slide-shimmer {
+                0%,
+                15% {
+                    background-position: 150% 0;
+                }
+                65%,
+                100% {
+                    background-position: -150% 0;
+                }
+            }
+            @keyframes slide-nudge {
+                0%,
+                20%,
+                55%,
+                100% {
+                    transform: translateX(0);
+                }
+                35% {
+                    transform: translateX(4px);
+                }
+                45% {
+                    transform: translateX(1px);
+                }
+            }
+            @keyframes slide-processing {
+                to {
+                    transform: translateX(100%);
+                }
+            }
+            .device-note {
+                margin: 25px 0 0;
+                padding-top: 21px;
+                border-top: 1px solid var(--border);
+                color: var(--muted);
+                font-size: 12px;
+                text-align: center;
+            }
+            #status > .note {
+                margin-top: 20px;
+            }
+            .note {
+                padding: 16px;
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                font-size: 13px;
+                overflow-wrap: anywhere;
+            }
+            .note p {
+                margin: 0;
+            }
+            .note.info {
+                background: var(--page);
+                color: var(--muted);
+            }
+            .note.danger {
+                background: var(--error-bg);
+                color: var(--error);
+                border-color: color-mix(in srgb, var(--error) 20%, transparent);
+            }
+            .note.success {
+                background: var(--soft);
+            }
+            .note-title {
+                display: block;
+                margin-bottom: 5px;
+                color: var(--accent);
+                font-size: 14px;
+            }
+            .note code {
+                display: block;
+                margin: 14px 0;
+                padding: 12px;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                background: var(--surface);
+                color: var(--text);
+                font:
+                    12px/1.8 ui-monospace,
+                    SFMono-Regular,
+                    Consolas,
+                    monospace;
+                overflow-wrap: anywhere;
+                user-select: all;
+            }
+            .copy-btn {
+                width: 100%;
+                min-height: 42px;
+                padding: 8px 12px;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                color: var(--text);
+                background: var(--surface);
+                font-size: 13px;
+            }
+            .copy-btn:hover {
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+            .copy-btn i {
+                margin-right: 6px;
+            }
+            .copy-feedback {
+                margin-top: 8px !important;
+                font-size: 12px;
+                color: var(--muted);
+            }
+            @media (max-width: 480px) {
+                body {
+                    padding: 28px 16px;
+                }
+                .card {
+                    padding: 28px 24px;
+                    border-radius: 20px;
+                }
+                h1 {
+                    font-size: 26px;
+                }
+                input {
+                    font-size: 16px;
+                }
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --page: #151917;
+                    --surface: #1d2320;
+                    --text: #e6ece7;
+                    --muted: #a0ada4;
+                    --border: #343e37;
+                    --accent: #82d9a7;
+                    --soft: #27392e;
+                    --error: #f5b1ab;
+                    --error-bg: #3a2625;
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                *,
+                *::before,
+                *::after {
+                    animation: none !important;
+                    transition: none !important;
+                }
+                .register-btn .slider-label {
+                    background: none !important;
+                    color: inherit !important;
+                }
+                .register-btn.is-dragging .slider-thumb {
+                    transform: translateX(var(--slide-x));
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main class="container">
+            <section class="card" aria-labelledby="page-title">
+                <header class="intro">
+                    <div class="key-icon" aria-hidden="true"><i class="fa-solid fa-fingerprint"></i></div>
+                    <h1 id="page-title">注册通行密钥</h1>
+                </header>
+                <form id="register-form">
+                    <label for="prf-salt-input">PRF Salt</label>
+                    <input type="text" id="prf-salt-input" placeholder="粘贴站点的 Salt" aria-describedby="salt-hint" autocomplete="off" spellcheck="false" autocapitalize="none" required />
+                    <p class="field-hint" id="salt-hint">需要与站点 <code>_config.yml</code> 中的 <code>salt</code> 保持一致</p>
+                    <button class="register-btn" id="register-btn" type="button" aria-label="创建通行密钥：向右滑动，或按回车键、空格键确认" disabled>
+                        <span class="slider-label" id="button-label" aria-hidden="true">滑动创建通行密钥</span>
+                        <span class="slider-thumb" id="button-thumb" aria-hidden="true"><i class="fa-solid fa-arrow-right" id="button-icon"></i></span>
+                    </button>
+                </form>
+                <div id="status" role="status" aria-live="polite" aria-atomic="true">
+                    <div id="status-message" class="note" hidden></div>
+                    <div id="registration-result" class="note success" hidden>
+                        <strong class="note-title">通行密钥已就绪</strong>
+                        <p>复制加密密钥，保存到站点配置中。</p>
+                        <code id="encryption-key"></code>
+                        <button class="copy-btn" id="copy-btn" type="button"><i class="fa fa-copy" aria-hidden="true"></i> <span>复制密钥</span></button>
+                        <p class="copy-feedback" id="copy-feedback">请妥善保存，不要分享给他人。</p>
+                    </div>
+                </div>
+                <p class="device-note">支持具备 PRF 功能的 Touch ID、YubiKey 等验证器</p>
+            </section>
+        </main>
 
-            this.btn.style.display = "none";
-          } catch (e) {
-            let msg = "注册失败: ";
-            if (e.name === "NotAllowedError") msg += "操作取消";
-            else if (e.name === "InvalidStateError") msg += "重复注册";
-            else msg += e.message;
+        <script>
+            function getRPID() {
+                const hostname = location.hostname;
+                return hostname === '127.0.0.1' ? 'localhost' : hostname;
+            }
 
-            this.show(`<div class="note danger"><p>${msg}</p></div>`);
-          } finally {
-            this.btn.disabled = false;
-          }
-        }
+            class FIDO2Registrar {
+                constructor() {
+                    this.btn = document.getElementById('register-btn');
+                    this.saltInput = document.getElementById('prf-salt-input');
 
-        async generateEncryptionKey() {
-          try {
-            const prfSaltString = this.saltInput.value.trim();
+                    this.busy = false;
+                    this.complete = false;
+                    this.buttonLabel = document.getElementById('button-label');
+                    this.buttonIcon = document.getElementById('button-icon');
+                    this.thumb = document.getElementById('button-thumb');
+                    this.drag = null;
+                    this.message = document.getElementById('status-message');
+                    this.result = document.getElementById('registration-result');
+                    document.getElementById('register-form').addEventListener('submit', (event) => {
+                        event.preventDefault();
+                        this.register();
+                    });
+                    this.saltInput.addEventListener('input', () => this.validateInput());
+                    this.btn.addEventListener('click', (event) => {
+                        // Native keyboard and assistive-technology activation have no pointer clicks.
+                        if (event.detail === 0) this.register();
+                    });
+                    this.btn.addEventListener('pointerdown', (event) => this.startSlide(event));
+                    this.btn.addEventListener('pointermove', (event) => this.moveSlide(event));
+                    this.btn.addEventListener('pointerup', (event) => this.endSlide(event));
+                    this.btn.addEventListener('pointercancel', () => this.resetSlide());
+                    this.btn.addEventListener('lostpointercapture', () => this.resetSlide());
+                    document.getElementById('copy-btn').addEventListener('click', (event) => this.copyEncryptionKey(event));
+                    this.validateInput();
+                }
 
-            this.show(
-              '<div class="note info"><p>正在生成加密密钥...</p></div>'
-            );
+                validateInput() {
+                    const isValid = this.saltInput.value.trim().length > 0;
+                    this.btn.disabled = !isValid || this.busy || this.complete;
+                }
 
-            const challenge = crypto.getRandomValues(new Uint8Array(32));
-            const prfSalt = await crypto.subtle.digest(
-              "SHA-256",
-              new TextEncoder().encode(prfSaltString)
-            );
+                startSlide(event) {
+                    if (this.btn.disabled || this.drag || !event.isPrimary || event.button !== 0 || !this.thumb.contains(event.target)) return;
+                    const distance = this.btn.clientWidth - this.thumb.offsetWidth - this.thumb.offsetLeft * 2;
+                    if (distance <= 0) return;
+                    this.drag = { id: event.pointerId, startX: event.clientX, distance, progress: 0 };
+                    this.btn.setPointerCapture(event.pointerId);
+                    this.btn.classList.add('is-dragging');
+                }
 
-            const assertion = await navigator.credentials.get({
-              publicKey: {
-                challenge,
-                rpId: getRPID(),
-                userVerification: "preferred",
-                timeout: 60000,
-                extensions: {
-                  prf: {
-                    eval: { first: prfSalt },
-                  },
-                },
-              },
-            });
+                moveSlide(event) {
+                    if (!this.drag || event.pointerId !== this.drag.id) return;
+                    const offset = Math.min(this.drag.distance, Math.max(0, event.clientX - this.drag.startX));
+                    this.drag.progress = offset / this.drag.distance;
+                    this.btn.style.setProperty('--slide-x', `${offset}px`);
+                    this.btn.style.setProperty('--label-opacity', 1 - this.drag.progress);
+                }
 
-            const prfKey =
-              assertion.getClientExtensionResults().prf?.results?.first;
-            if (!prfKey) throw new Error("无法获取 PRF 密钥");
+                endSlide(event) {
+                    if (!this.drag || event.pointerId !== this.drag.id) return;
+                    this.moveSlide(event);
+                    const confirmed = this.drag.progress >= 0.95;
+                    this.resetSlide();
+                    if (confirmed) this.register();
+                }
 
-            const encryptionKey = new Uint8Array(prfKey);
-            const encryptionKeyHex = Array.from(encryptionKey)
-              .map((b) => b.toString(16).padStart(2, "0"))
-              .join("");
+                resetSlide() {
+                    const pointerId = this.drag?.id;
+                    this.drag = null;
+                    this.btn.classList.remove('is-dragging');
+                    this.btn.style.removeProperty('--slide-x');
+                    this.btn.style.removeProperty('--label-opacity');
+                    if (pointerId !== undefined && this.btn.hasPointerCapture(pointerId)) this.btn.releasePointerCapture(pointerId);
+                }
 
-            this.show(`
-              <div class="note success">
-                <p>
-                  <code id="encryption-key">${encryptionKeyHex}</code>
-                  <button class="copy-btn" onclick="copyEncryptionKey(event)">
-                    <i class="fa fa-copy"></i> 复制密钥
-                  </button>
-                </p>
-              </div>`);
-          } catch (e) {
-            this.show(
-              `<div class="note danger"><p>生成密钥失败: ${e.message}</p></div>`
-            );
-          }
-        }
+                async register() {
+                    if (this.busy || this.complete || !this.saltInput.value.trim()) return;
+                    this.resetSlide();
 
-        show(html) {
-          document.getElementById("status").innerHTML = html;
-          document.getElementById("status").style.display = "block";
-        }
-      }
+                    if (!window.PublicKeyCredential) {
+                        this.showMessage('danger', '浏览器不支持 FIDO2/WebAuthn');
+                        return;
+                    }
 
-      function copyEncryptionKey(event) {
-        const key = document.getElementById("encryption-key").textContent;
-        navigator.clipboard.writeText(key).then(() => {
-          const btn = event.target.closest("button");
-          const originalText = btn.innerHTML;
-          btn.innerHTML = '<i class="fa fa-check"></i> 已复制';
-          setTimeout(() => {
-            btn.innerHTML = originalText;
-          }, 2000);
-        });
-      }
+                    this.busy = true;
+                    this.saltInput.disabled = true;
+                    this.btn.setAttribute('aria-busy', 'true');
+                    this.buttonLabel.textContent = '等待设备确认';
+                    this.buttonIcon.className = 'fa-solid fa-circle-notch fa-spin';
+                    this.validateInput();
+                    this.showMessage('info', '请按照浏览器提示，完成通行密钥创建。');
 
-      document.addEventListener("DOMContentLoaded", () => new FIDO2Registrar());
-    </script>
-  </body>
+                    try {
+                        const userId = crypto.getRandomValues(new Uint8Array(32));
+                        const challenge = crypto.getRandomValues(new Uint8Array(32));
+
+                        const cred = await navigator.credentials.create({
+                            publicKey: {
+                                challenge,
+                                rp: {
+                                    name: 'Undefined Blog',
+                                    id: getRPID(),
+                                },
+                                user: {
+                                    id: userId,
+                                    name: 'Zabrian',
+                                    displayName: 'Zabrian',
+                                },
+                                pubKeyCredParams: [
+                                    { alg: -7, type: 'public-key' },
+                                    { alg: -257, type: 'public-key' },
+                                ],
+                                authenticatorSelection: {
+                                    residentKey: 'required',
+                                    userVerification: 'preferred',
+                                    requireResidentKey: true,
+                                },
+                                timeout: 60000,
+                                extensions: {
+                                    prf: {},
+                                },
+                            },
+                        });
+
+                        if (!cred) throw new Error('生成凭证失败');
+
+                        const prfEnabled = cred.getClientExtensionResults().prf?.enabled;
+                        if (!prfEnabled) {
+                            this.showMessage('danger', 'PRF 扩展不可用');
+                            return;
+                        }
+
+                        await this.generateEncryptionKey();
+                        this.complete = true;
+                        this.btn.hidden = true;
+                    } catch (e) {
+                        let msg = '注册失败: ';
+                        if (e.name === 'NotAllowedError') msg += '操作取消';
+                        else if (e.name === 'InvalidStateError') msg += '重复注册';
+                        else msg += e.message;
+
+                        this.showMessage('danger', msg);
+                    } finally {
+                        this.busy = false;
+                        this.saltInput.disabled = this.complete;
+                        this.btn.setAttribute('aria-busy', 'false');
+                        this.buttonLabel.textContent = '滑动创建通行密钥';
+                        this.buttonIcon.className = 'fa-solid fa-arrow-right';
+                        this.validateInput();
+                    }
+                }
+
+                async generateEncryptionKey() {
+                    const prfSaltString = this.saltInput.value.trim();
+
+                    this.showMessage('info', '通行密钥已创建，请再次验证身份以生成加密密钥。');
+
+                    const challenge = crypto.getRandomValues(new Uint8Array(32));
+                    const prfSalt = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(prfSaltString));
+
+                    const assertion = await navigator.credentials.get({
+                        publicKey: {
+                            challenge,
+                            rpId: getRPID(),
+                            userVerification: 'preferred',
+                            timeout: 60000,
+                            extensions: {
+                                prf: {
+                                    eval: { first: prfSalt },
+                                },
+                            },
+                        },
+                    });
+
+                    const prfKey = assertion.getClientExtensionResults().prf?.results?.first;
+                    if (!prfKey) throw new Error('无法获取 PRF 密钥');
+
+                    const encryptionKey = new Uint8Array(prfKey);
+                    const encryptionKeyHex = Array.from(encryptionKey)
+                        .map((b) => b.toString(16).padStart(2, '0'))
+                        .join('');
+
+                    document.getElementById('encryption-key').textContent = encryptionKeyHex;
+                    this.message.hidden = true;
+                    this.result.hidden = false;
+                }
+
+                showMessage(type, text) {
+                    this.result.hidden = true;
+                    this.message.className = `note ${type}`;
+                    this.message.textContent = text;
+                    this.message.hidden = false;
+                }
+
+                async copyEncryptionKey(event) {
+                    const btn = event.currentTarget;
+                    const label = btn.querySelector('span');
+                    const icon = btn.querySelector('i');
+                    const key = document.getElementById('encryption-key').textContent;
+                    const feedback = document.getElementById('copy-feedback');
+                    try {
+                        await navigator.clipboard.writeText(key);
+                        label.textContent = '已复制';
+                        icon.className = 'fa fa-check';
+                        feedback.textContent = '已复制到剪贴板，请妥善保存。';
+                        clearTimeout(btn.copyTimer);
+                        btn.copyTimer = setTimeout(() => {
+                            label.textContent = '复制密钥';
+                            icon.className = 'fa fa-copy';
+                        }, 2000);
+                    } catch {
+                        feedback.textContent = '无法访问剪贴板，请手动复制以上密钥。';
+                    }
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => new FIDO2Registrar());
+        </script>
+    </body>
 </html>
