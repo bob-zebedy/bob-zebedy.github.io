@@ -26,7 +26,7 @@
   <meta name="description" content="Hexo 中主流使用 hexo-blog-encrypt 插件可以对文章进行加密。这种方法通过密码实现。相比更为简单的前端 JavaScript 密码比较验证，该方法的加密流程如下  Markdown 文章头部密码 → PBKDF2 派生密钥 → AES-256-CBC 加密原始内容 → 生成 HMAC 完整性校验 → 输出加密的 HTML  从而实现使用加密厚的内容替换原始内容，防止通过简单 J">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hexo 使用通行密钥对文章加密">
-<meta property="og:url" content="https://blog.zabrian.com/post/4de6100b.html">
+<meta property="og:url" content="https://blog.zabrian.com/post/4de6100b">
 <meta property="og:site_name" content="Undefined">
 <meta property="og:description" content="Hexo 中主流使用 hexo-blog-encrypt 插件可以对文章进行加密。这种方法通过密码实现。相比更为简单的前端 JavaScript 密码比较验证，该方法的加密流程如下  Markdown 文章头部密码 → PBKDF2 派生密钥 → AES-256-CBC 加密原始内容 → 生成 HMAC 完整性校验 → 输出加密的 HTML  从而实现使用加密厚的内容替换原始内容，防止通过简单 J">
 <meta property="og:locale" content="zh_CN">
@@ -39,11 +39,11 @@
 <meta name="twitter:image" content="https://images.zabrian.com/85d3037a-fadf-4e98-8ee2-d84196e8ce01/origin">
 
 
-<link rel="canonical" href="https://blog.zabrian.com/post/4de6100b.html">
+<link rel="canonical" href="https://blog.zabrian.com/post/4de6100b">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.zabrian.com/post/4de6100b.html","path":"post/4de6100b.html","title":"Hexo 使用通行密钥对文章加密"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.zabrian.com/post/4de6100b","path":"post/4de6100b.html","title":"Hexo 使用通行密钥对文章加密"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Hexo 使用通行密钥对文章加密 | Undefined</title>
@@ -234,7 +234,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.zabrian.com/post/4de6100b.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.zabrian.com/post/4de6100b">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin">
@@ -326,7 +326,7 @@
 <p><strong>Q</strong>: 下载了我的博客 HTML，能破解吗？<br><strong>A</strong>: <strong>不能</strong>，原因如下</p>
 <figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line">从 HTML 可以获得:</span><br><span class="line"><span class="bullet"> 1.</span> 加密的文章内容 (ciphertext)</span><br><span class="line"><span class="bullet"> 2.</span> 初始化向量 (iv, authTag)</span><br><span class="line"><span class="bullet"> 3.</span> 包装后的 CEK (wrappedKeys)</span><br><span class="line"><span class="bullet"> 4.</span> PRF Salt</span><br><span class="line"></span><br><span class="line">不能获得：</span><br><span class="line">  包装密钥 (wrappingKey)</span><br><span class="line"><span class="code">     └─ 使用 AES-256-GCM 加密，安全性目前尚可</span></span><br></pre></td></tr></table></figure></div>
 
-<h1 id="测试页面"><a href="#测试页面" class="headerlink" title="测试页面"></a>测试页面</h1><a href="/post/19c1a188.html" title="测试加密文章">测试加密文章</a>
+<h1 id="测试页面"><a href="#测试页面" class="headerlink" title="测试页面"></a>测试页面</h1><a href="/post/19c1a188" title="测试加密文章">测试加密文章</a>
 
 <p>密码: <code>123456</code></p>
 <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start;">
@@ -430,7 +430,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://blog.zabrian.com/post/4de6100b.html" title="Hexo 使用通行密钥对文章加密">https://blog.zabrian.com/post/4de6100b.html</a>
+      <a href="https://blog.zabrian.com/post/4de6100b" title="Hexo 使用通行密钥对文章加密">https://blog.zabrian.com/post/4de6100b</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpoLWhhbnM="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
@@ -443,12 +443,12 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/post/19c1a188.html" rel="prev" title="测试加密文章">
+                <a href="/post/19c1a188" rel="prev" title="测试加密文章">
                   <i class="fa fa-chevron-left"></i> 测试加密文章
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/post/de80eb41.html" rel="next" title="把 DNS 服务变为一个聊天室">
+                <a href="/post/de80eb41" rel="next" title="把 DNS 服务变为一个聊天室">
                   把 DNS 服务变为一个聊天室 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>

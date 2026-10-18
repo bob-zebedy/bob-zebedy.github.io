@@ -26,7 +26,7 @@
   <meta name="description" content="在 Cloudflare 使用 Workers 建立 Images 代理 一文中。使用 Workers 搭建了一个 Images 代理，通过设置 Referer 和 URL 签名有效期实现简易的防盗链以及防刷流量。但是这些措施只能做到防君子不防小人，其实很轻易的就可以通过代码自动实现刷图片流量。为了避免这种情况，想着能不能使用 Cloudflare Turnstile 阻挡非人类请求的流量。但是研">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hexo 静态博客使用 Cloudflare Turnstile">
-<meta property="og:url" content="https://blog.zabrian.com/post/50a431e6.html">
+<meta property="og:url" content="https://blog.zabrian.com/post/50a431e6">
 <meta property="og:site_name" content="Undefined">
 <meta property="og:description" content="在 Cloudflare 使用 Workers 建立 Images 代理 一文中。使用 Workers 搭建了一个 Images 代理，通过设置 Referer 和 URL 签名有效期实现简易的防盗链以及防刷流量。但是这些措施只能做到防君子不防小人，其实很轻易的就可以通过代码自动实现刷图片流量。为了避免这种情况，想着能不能使用 Cloudflare Turnstile 阻挡非人类请求的流量。但是研">
 <meta property="og:locale" content="zh_CN">
@@ -41,11 +41,11 @@
 <meta name="twitter:image" content="https://images.zabrian.com/d0a19b46-f067-4866-2f22-f3d224d3a301/origin">
 
 
-<link rel="canonical" href="https://blog.zabrian.com/post/50a431e6.html">
+<link rel="canonical" href="https://blog.zabrian.com/post/50a431e6">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.zabrian.com/post/50a431e6.html","path":"post/50a431e6.html","title":"Hexo 静态博客使用 Cloudflare Turnstile"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.zabrian.com/post/50a431e6","path":"post/50a431e6.html","title":"Hexo 静态博客使用 Cloudflare Turnstile"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Hexo 静态博客使用 Cloudflare Turnstile | Undefined</title>
@@ -235,7 +235,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.zabrian.com/post/50a431e6.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.zabrian.com/post/50a431e6">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://images.zabrian.com/3df4d5a1-6f7e-44b0-33b8-b49273c8ef01/origin">
@@ -301,7 +301,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>在 <a href="/post/ec93b507.html" title="Cloudflare 使用 Workers 建立 Images 代理">Cloudflare 使用 Workers 建立 Images 代理</a> 一文中。使用 Workers 搭建了一个 Images 代理，通过设置 <code>Referer</code> 和 URL 签名有效期实现简易的防盗链以及防刷流量。但是这些措施只能做到防君子不防小人，其实很轻易的就可以通过代码自动实现刷图片流量。为了避免这种情况，想着能不能使用 <code>Cloudflare Turnstile</code> 阻挡非人类请求的流量。但是研究了一下发现 <code>Cloudflare Turnstile</code> 需要 <strong><span class="exturl" data-url="aHR0cHM6Ly9kZXZlbG9wZXJzLmNsb3VkZmxhcmUuY29tL3R1cm5zdGlsZS9nZXQtc3RhcnRlZC9zZXJ2ZXItc2lkZS12YWxpZGF0aW9uLw==">服务端代码验证<i class="fa fa-external-link-alt"></i></span></strong> 但是很显然，<code>Hexo</code> 这种纯静态博客没有后端服务，所以思索了一下决定还是使用 Workers 实现一个支持静态网页的 <code>Cloudflare Turnstile</code> 方案。</p>
+        <p>在 <a href="/post/ec93b507" title="Cloudflare 使用 Workers 建立 Images 代理">Cloudflare 使用 Workers 建立 Images 代理</a> 一文中。使用 Workers 搭建了一个 Images 代理，通过设置 <code>Referer</code> 和 URL 签名有效期实现简易的防盗链以及防刷流量。但是这些措施只能做到防君子不防小人，其实很轻易的就可以通过代码自动实现刷图片流量。为了避免这种情况，想着能不能使用 <code>Cloudflare Turnstile</code> 阻挡非人类请求的流量。但是研究了一下发现 <code>Cloudflare Turnstile</code> 需要 <strong><span class="exturl" data-url="aHR0cHM6Ly9kZXZlbG9wZXJzLmNsb3VkZmxhcmUuY29tL3R1cm5zdGlsZS9nZXQtc3RhcnRlZC9zZXJ2ZXItc2lkZS12YWxpZGF0aW9uLw==">服务端代码验证<i class="fa fa-external-link-alt"></i></span></strong> 但是很显然，<code>Hexo</code> 这种纯静态博客没有后端服务，所以思索了一下决定还是使用 Workers 实现一个支持静态网页的 <code>Cloudflare Turnstile</code> 方案。</p>
 <span id="more"></span>
 
 <p>思路就是将原始博客通过 <code>Cloudflare Pages</code> 托管并绑定一个自定义域名比如 <code>source.example.com</code> 作为静态页面的源站，然后再创建一个 blog 的 Workers (绑定自定义域名 <code>blog.example.com</code>) 作为代理站，在这个 blog 的 Workers 中实现 <code>Cloudflare Turnstile</code> 的服务端验证逻辑，验证通过则注入一个 <code>JWT Token</code> 实现在有效期内就无需再次验证。</p>
@@ -332,7 +332,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://blog.zabrian.com/post/50a431e6.html" title="Hexo 静态博客使用 Cloudflare Turnstile">https://blog.zabrian.com/post/50a431e6.html</a>
+      <a href="https://blog.zabrian.com/post/50a431e6" title="Hexo 静态博客使用 Cloudflare Turnstile">https://blog.zabrian.com/post/50a431e6</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpoLWhhbnM="><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
@@ -345,12 +345,12 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/post/ec93b507.html" rel="prev" title="Cloudflare 使用 Workers 建立 Images 代理">
+                <a href="/post/ec93b507" rel="prev" title="Cloudflare 使用 Workers 建立 Images 代理">
                   <i class="fa fa-chevron-left"></i> Cloudflare 使用 Workers 建立 Images 代理
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/post/fbb67a4e.html" rel="next" title="Windy 自定义色层">
+                <a href="/post/fbb67a4e" rel="next" title="Windy 自定义色层">
                   Windy 自定义色层 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
